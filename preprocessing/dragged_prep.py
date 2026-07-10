@@ -10,10 +10,20 @@
     · 문항당 문서가 10개 고정이 아니다 — 5~20개, 중앙 9개. 따라서 문서 수는
       RQ3 회귀에서 살아있는 공변량이다(상수가 아니다).
 
+유형별 역할 분담 (연구보고 PPT 10·12·22p 확정 — 쓰는 유형과 안 쓰는 유형):
+
+    | 유형              | 건수 | 채점(행동) 트랙        | 자기일관성 트랙       |
+    |-------------------|-----|------------------------|-----------------------|
+    | temporal (시간)   |  62 | ⓐ 충돌 조건 (전수 검증) | 충돌측 (182의 일부)   |
+    | misinfo (오정보)  |   5 | ⓐ 충돌 조건 (전수 검증) | 충돌측 (182의 일부)   |
+    | opinion (의견)    | 115 | **미사용** (정답 없음)  | 충돌측 (182의 일부)   |
+    | complementary     | 115 | **미사용** (정답 108건 부재) | 비상충측 (276의 일부) + ⓒ 기준선 |
+    | none (비충돌)     | 161 | ⓒ 행동 대조군 (RQ3)     | 비상충측 (276의 일부) |
+
 정답 가용성(실측): 사실 충돌 67건과 비충돌 161건은 전건 정답이 있으나,
 상보 115건 중 108건·의견 115건 중 113건은 `correct_answer`가 비어 있다.
-따라서 **행동(정확도·AIR) 트랙의 비충돌 대조군은 사실상 비충돌 161건**이며,
-정답 없는 상보·의견 문항은 자기일관성 트랙 전용이다(§3.2 이중 트랙).
+따라서 **행동 트랙의 대조군은 비충돌 161건**이고(사전등록 §7.2), 상보·의견은
+정답 채점 없이 자기일관성 비교(충돌 182 vs 비상충 276)에 쓴다(§3.2 이중 트랙).
 
 3단계 파이프라인 (CLI 서브커맨드):
     draft   — 문자열·앵커 토큰 매칭으로 정답 문서 자동 매핑 초안. 복수 매칭은 제외가
@@ -198,7 +208,9 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter]:
             # 사실 충돌의 behavior_track은 인간 검증 후 final에서 확정한다.
             # 비충돌 대조군(RQ3 행동 트랙 분모)은 매핑이 자명해 초안에서 바로 확정한다.
             behavior_track=(ctype == "none" and scorable),
-            self_consistency_track=ctype in ("temporal", "misinfo", "opinion"),
+            # 자기일관성 비교는 충돌측(temporal·misinfo·opinion = 182) vs
+            # 비상충측(complementary·none = 276) — 다섯 유형 전부가 대상이다 (§3.2 이중 트랙)
+            self_consistency_track=True,
             exclusion_flag=flag,
             meta={"source_row": i, "source": row.get("source"),
                   "raw_conflict_type": row["conflict_type"],
@@ -279,11 +291,14 @@ def report(items: list[Item]) -> None:
           f"/ 해소 불가(날짜): {flags['date_tie'] + flags['date_absent']}건")
     print(f"  → 인간 검증 후 채점 가능 상한 {n_auto + pending}건 (계획서 사전 점검 예상 56~61)")
     ctrl = [it for it in items if it.conflict_type == "none"]
-    print(f"비충돌 대조군: {len(ctrl)}건, 그중 behavior_track "
+    print(f"비충돌 대조군(ⓒ 행동): {len(ctrl)}건, 그중 behavior_track "
           f"{sum(1 for it in ctrl if it.behavior_track)}건")
-    no_gold = [it for it in items
-               if it.conflict_type in ("opinion", "complementary") and not it.correct_answers]
-    print(f"정답 부재(자기일관성 트랙 전용): {len(no_gold)}건")
+    sc_conflict = sum(1 for it in items
+                      if it.conflict_type in ("temporal", "misinfo", "opinion"))
+    sc_control = sum(1 for it in items
+                     if it.conflict_type in ("complementary", "none"))
+    print(f"자기일관성 트랙: 충돌측 {sc_conflict}건(목표 182) vs 비상충측 {sc_control}건(목표 276)")
+    print("채점 미사용 유형: opinion(정답 없음) · complementary(정답 108/115 부재) — PPT 10·22p")
 
 
 def main() -> None:

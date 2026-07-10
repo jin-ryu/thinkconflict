@@ -6,8 +6,22 @@
 | 파일 | 생성 | 용도 |
 |---|---|---|
 | `dragged_review.csv` | `python -m preprocessing.dragged_prep sheet` | DRAGged 사실 충돌(temporal+misinfo) 67문항 전수 인간 검토 — 골드 매핑 교정 + 정답 정오표 |
-| `qacc_screen.csv` | `python -m preprocessing.qacc_prep screen` | QACC 스크리닝 게이트 ①·③ 템플릿(N=333). 판정자 2종 결과와 인간 스팟체크를 채운 뒤 `verdict` 열이 `sharp`인 문항만 채점 트랙 투입 |
+| `dragged_llm_labels.csv` | `python -m preprocessing.llm_assist dragged` | LLM 초벌 라벨 제안(PPT 12p ①). 검토자가 위 시트를 채울 때 참조 — 확정은 항상 사람 |
+| `qacc_screen.csv` | `python -m preprocessing.qacc_prep screen` | QACC 스크리닝 게이트 ①·③ 템플릿(N=333). LLM 판정자 2종이 judge1/judge2(+type) 열을 채우고, 사람이 `verdict`·`final_type`을 확정 — `sharp`만 채점 트랙 투입 |
 | `label_kappa.csv` | Phase 3-2 | 인간 2인 라벨(AIR·Discordant Hit 양성 전수 + 층화 표본 ~200건)과 Cohen's κ. L2 κ < 0.7이면 라벨 정의 수정 후 재라벨링 |
+
+## LLM 초벌 워크플로 (Phase 1의 LLM 소요 전부 — `preprocessing/llm_assist.py`)
+
+```bash
+# 어떤 OpenAI 호환 엔드포인트든 사용 가능 — 자체 서빙 오픈 모델이면 비용 0
+python -m preprocessing.llm_assist dragged --base-url http://HOST:PORT/v1 --model MODEL
+python -m preprocessing.llm_assist qacc --judge 1 --base-url ... --model MODEL_A
+python -m preprocessing.llm_assist qacc --judge 2 --base-url ... --model MODEL_B  # 다른 계열
+```
+
+- RAMDocs는 LLM이 필요 없다(라벨 원본 승계).
+- 판정자 2종은 서로 다른 계열이어야 한다(부록 A(a) 자기선호 편향 통제).
+- 중단 후 재실행하면 이미 판정된 행은 건너뛴다(재개 가능).
 
 ## 검토 규칙
 

@@ -24,7 +24,7 @@ from diagnosis.trace_parser import parse_record
 from preprocessing.schema import read_jsonl
 
 # 판정자 자기선호 편향 통제: 트레이스 생성 모델과 같은 계열은 그 모델의 판정에서 제외
-SAME_FAMILY = {"qwen": {"qwen"}, "olmo": {"olmo"}, "gptoss": {"gptoss", "gpt"}}
+SAME_FAMILY = {"qwen": {"qwen"}, "gemma": {"gemma"}, "gptoss": {"gptoss", "gpt"}}
 
 
 def make_judge(judge_model: str | None, judge_url: str | None, target_model: str):

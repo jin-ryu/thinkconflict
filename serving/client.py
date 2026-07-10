@@ -25,11 +25,12 @@ from preprocessing.schema import read_jsonl, render_documents
 DECODING = {"temperature": 0.6, "top_p": 0.95}
 SEEDS = (13, 42, 71, 108, 2026)
 
-MODELS = {  # 논리명 → (기본 포트, 기본 model id) — launch_*.sh와 일치
-    "qwen": (8001, "Qwen/Qwen3.6-27B"),
-    "olmo": (8002, "allenai/Olmo-3.1-32B-Think"),
-    "gptoss": (8003, "openai/gpt-oss-20b"),
+MODELS = {  # 논리명 → (기본 포트, 기본 model id) — launch_*.sh와 일치 (PPT 19p)
+    "qwen": (8001, "Qwen/Qwen3.6-27B"),          # 주력 추론 모델, thinking 하드 토글
+    "gemma": (8002, "google/gemma-3-27b-it"),    # 비추론 교차 계열 대조 (트레이스 없음)
+    "gptoss": (8003, "openai/gpt-oss-20b"),      # MoE 추론 모델, Harmony 채널
 }
+NON_THINKING_MODELS = {"gemma"}  # 추론 채널 자체가 없는 모델 — thinking 라벨 강제 False
 
 
 @dataclass
@@ -40,6 +41,11 @@ class GenConfig:
     effort: str | None = None    # gpt-oss reasoning effort (보조 신호 전용)
     max_tokens: int = 8192
     base_url: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.model_key in NON_THINKING_MODELS:
+            # 트레이스 부재를 파싱 실패로 오독하지 않도록 라벨을 강제한다
+            self.thinking = False
 
 
 def make_client(cfg: GenConfig) -> tuple[OpenAI, str]:

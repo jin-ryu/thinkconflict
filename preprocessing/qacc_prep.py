@@ -98,6 +98,10 @@ def load_raw(raw_dir: Path) -> list[dict]:
 
 
 def conflict_type_of(row: dict) -> str:
+    """초벌 prior: reasons 코드 A(최신성 48건, 실측 검증)만 temporal로 확정.
+
+    확정 유형은 PPT 13p 설계대로 LLM 초벌(llm_assist qacc의 judge_type 열) +
+    인간 검수를 거쳐 final 단계에서 덮어쓴다 — 여기 값은 그 전까지의 기본값이다."""
     return "temporal" if RECENCY_CODE in as_list(row.get("reasons")) else "misinfo"
 
 
@@ -218,14 +222,15 @@ def write_screen_template(items: list[Item], out_csv: Path) -> None:
         w = csv.writer(f)
         w.writerow(["question_id", "question", "correct_answer", "conflicting_answers",
                     "conflict_type", "exclusion_flag",
-                    "judge1(sharp/soft)", "judge2(sharp/soft)",
+                    "judge1(sharp/soft)", "judge1_type",
+                    "judge2(sharp/soft)", "judge2_type",
                     "human_spotcheck(sharp/soft)", "gold_reverified(y/n/corrected)",
-                    "verdict(sharp/soft)"])
+                    "verdict(sharp/soft)", "final_type"])
         for it in items:
             w.writerow([it.question_id, it.question,
                         it.correct_answers[0] if it.correct_answers else "",
                         " | ".join(it.wrong_answers), it.conflict_type,
-                        it.exclusion_flag or "", "", "", "", "", ""])
+                        it.exclusion_flag or "", "", "", "", "", "", "", "", ""])
     print(f"판정 시트 템플릿: {out_csv} (N={len(items)})")
 
 
@@ -258,22 +263,36 @@ def main() -> None:
     else:  # final
         if not JUDGE_SHEET.exists():
             raise SystemExit(f"게이트 ① 판정 시트 없음: {JUDGE_SHEET} — screen 단계 선행")
+        verdicts: dict[str, dict] = {}
         with open(JUDGE_SHEET, encoding="utf-8") as f:
-            sharp = {r["question_id"] for r in csv.DictReader(f)
-                     if r.get("verdict(sharp/soft)", "").strip() == "sharp"}
-        if not sharp:
-            raise SystemExit("verdict 열이 비어 있다 — 판정 결과를 먼저 채울 것")
+            for r in csv.DictReader(f):
+                verdicts[r["question_id"]] = r
+        if not any(r.get("verdict(sharp/soft)", "").strip() for r in verdicts.values()):
+            raise SystemExit("verdict 열이 비어 있다 — llm_assist qacc(판정자 2종) 후 인간 확정 필요")
         items = []
         for it in read_jsonl(draft_path):
-            if it.question_id not in sharp:
-                continue
-            it.behavior_track = (it.exclusion_flag is None and bool(it.correct_answers))
+            row = verdicts.get(it.question_id, {})
+            if row.get("verdict(sharp/soft)", "").strip() != "sharp":
+                continue  # soft(사이비 충돌)·미판정은 채점 트랙에서 드롭 (게이트 ①)
+            # 유형 확정: 인간 확정 열 > 판정자 일치 > reasons prior (PPT 13p)
+            j1, j2 = row.get("judge1_type", "").strip(), row.get("judge2_type", "").strip()
+            human_type = row.get("final_type", "").strip()
+            if human_type in ("temporal", "misinfo", "opinion"):
+                it.conflict_type = human_type
+            elif j1 and j1 == j2 and j1 in ("temporal", "misinfo", "opinion"):
+                it.conflict_type = j1
+            it.meta["type_provenance"] = ("human" if human_type else
+                                          "judges_agree" if j1 and j1 == j2 else "reasons_prior")
+            # opinion으로 확정되면 단일 정답이 없으므로 채점 트랙에서 제외 (§3.2 이중 트랙)
+            it.behavior_track = (it.exclusion_flag is None and bool(it.correct_answers)
+                                 and it.conflict_type != "opinion")
             it.meta["screen"] = "sharp"
             items.append(it)
         write_jsonl(items, args.out_dir / "qacc.jsonl")
         n_behav = sum(1 for it in items if it.behavior_track)
         print(f"확정: qacc.jsonl (게이트 통과 N={len(items)}, behavior_track {n_behav}건 "
-              f"— 보수 가정 ~167)")
+              f"— 보수 가정 ~134)")
+        print("유형 출처:", dict(Counter(it.meta["type_provenance"] for it in items)))
 
 
 if __name__ == "__main__":
