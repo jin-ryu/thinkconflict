@@ -55,6 +55,9 @@ def attach_item_features(labels: list[dict], data_path: Path) -> pd.DataFrame:
         rows.append({
             "question_id": r["question_id"],
             "seed": r.get("seed"),
+            # within-item 쌍은 전처리가 부여한 pair_id로 짝짓는다 (문자열 파싱 금지)
+            "pair_id": it.meta.get("pair_id"),
+            "variant": it.meta.get("variant"),
             "conflict": int(it.conflict_type in CONFLICT_TYPES),
             "n_docs": len(it.chunks),
             "doc_len": sum(len(c.text.split()) for c in it.chunks) / len(it.chunks),
@@ -89,7 +92,7 @@ def _finite(x: float) -> float | None:
 
 def _live_covariates(d: pd.DataFrame) -> tuple[list[str], dict[str, str]]:
     """식별 불가능한 공변량을 떨어뜨린다:
-    - 분산 0: 절편과 공선 (DRAGged는 전 문항 top-10이라 n_docs가 상수인 것이 정상)
+    - 분산 0: 절편과 공선 (RAMDocs 매칭 쌍은 설계상 문서 수가 고정이라 n_docs가 상수다)
     - conflict와 완전 상관: 충돌 효과와 분리 불가 — 보정 대상이 아니라 교락 그 자체
     """
     live, dropped = [], {}
@@ -168,17 +171,18 @@ def between_item_regression(df: pd.DataFrame, outcome: str = "correct") -> dict:
 
 
 def within_item_contrast(df: pd.DataFrame) -> dict:
-    """RAMDocs 매칭 대조: 같은 문항의 misinfo 포함(conflict=1) vs 노이즈만(conflict=0).
+    """RAMDocs 매칭 대조: 같은 문항·같은 문서 수에서 misinfo↔noise만 교체한 쌍.
 
-    ramdocs_a는 gold 단위 분해 시 question_id를 'ramdocs-NNNN-aK'로 부여하므로,
-    원본 문항(source_row) 기준으로 짝을 찾는다."""
-    df = df.copy()
-    df["source"] = df.question_id.str.rsplit("-a", n=1).str[0]
-    paired = df.groupby("source").filter(lambda g: g.conflict.nunique() == 2)
+    `ramdocs_pairs.jsonl`이 conflict/control 변형을 pair_id로 묶어 두므로, 두 변형이
+    모두 존재하는 pair_id에 대해서만 문항 내(within-item) 차이를 집계한다."""
+    paired = df[df.pair_id.notna()]
     if paired.empty:
-        return {"error": "매칭 쌍 없음 — ramdocs_a 전처리(A/B 분리) 확인"}
+        return {"error": "pair_id 없음 — data는 ramdocs_pairs.jsonl이어야 한다"}
+    paired = paired.groupby("pair_id").filter(lambda g: g.conflict.nunique() == 2)
+    if paired.empty:
+        return {"error": "conflict/control 두 변형이 다 있는 쌍 없음 — 생성 로그 확인"}
     agg = paired.groupby("conflict")[["correct", "air", "abstain"]].mean()
-    n_pairs = paired.source.nunique()
+    n_pairs = paired.pair_id.nunique()
     return {
         "n_pairs": n_pairs,
         "comparable": n_pairs >= MIN_COMPARABLE_N,

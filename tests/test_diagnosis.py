@@ -19,7 +19,10 @@ from experiments.exp1_mitigation.transition import flow_matrix, gain_decompositi
 from experiments.exp3_causal.interventions import (analyze, make_filler,
                                                    resample_prefixes,
                                                    truncate_thinking)
-from preprocessing.ramdocs_prep import build_a, build_b
+from preprocessing.dragged_prep import (anchor_tokens, doc_text, map_conflict_type,
+                                        match_answer, resolve_by_recency)
+from preprocessing.qacc_prep import as_list, letters_to_indices
+from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, passes_valid_conflict_gate,
                                   render_documents, validate_item)
 
@@ -197,19 +200,56 @@ def test_ramdocs_a_decomposes_to_single_conflict_factor():
             {"text": "noise", "type": "noise", "answer": None}],
         "gold_answers": ["3,559 people", "3,600 people"],
         "wrong_answers": ["10,000 people"]}]
-    a, b = build_a(rows), build_b(rows)
+    a, _ = build_a(rows)
+    b = build_b(rows)
     assert len(b) == 1 and len(a) == 2               # gold 단위 분해
     assert a[0].correct_answers == ["3,559 people"]  # 하위 문항은 단일 gold
     assert [c.label for c in a[0].chunks] == ["correct", "conflicting", "noise"]
     assert all(validate_item(x) == [] for x in a + b)
 
 
-def test_ramdocs_noise_only_item_is_noncontrol_condition():
+def test_ramdocs_gold_without_supporting_doc_is_dropped():
+    rows = [{"question": "q", "documents": [{"text": "g", "type": "correct", "answer": "A"}],
+             "gold_answers": ["A", "B"], "wrong_answers": []}]
+    a, stats = build_a(rows)
+    assert len(a) == 1 and stats["dropped_gold_without_support"] == 1
+
+
+def test_ramdocs_within_item_pair_holds_document_count_fixed():
+    """RQ3 매칭 대조의 전제: misinfo↔noise만 바뀌고 문서 수는 같아야 한다 (§3.3.3(a))."""
+    rows = [{"question": "q", "documents": [
+        {"text": "g", "type": "correct", "answer": "A"},
+        {"text": "m1", "type": "misinfo", "answer": "X"},
+        {"text": "n1", "type": "noise", "answer": None},
+        {"text": "n2", "type": "noise", "answer": None}],
+        "gold_answers": ["A"], "wrong_answers": ["X"]}]
+    pairs, stats = build_pairs(rows)
+    assert stats["pairs"] == 1 and len(pairs) == 2
+    conflict, control = pairs
+    assert len(conflict.chunks) == len(control.chunks)      # 문서 수 고정
+    assert conflict.conflict_type == "misinfo" and control.conflict_type == "none"
+    assert any(c.label == "conflicting" for c in conflict.chunks)
+    assert not any(c.label == "conflicting" for c in control.chunks)
+    assert conflict.meta["pair_id"] == control.meta["pair_id"]
+
+
+def test_ramdocs_pair_skipped_when_no_noise_to_swap():
+    """노이즈 문서는 질문 고유라 외부에서 빌려올 수 없다 — 쌍을 만들지 않고 보고한다."""
+    rows = [{"question": "q", "documents": [
+        {"text": "g", "type": "correct", "answer": "A"},
+        {"text": "m", "type": "misinfo", "answer": "X"}],
+        "gold_answers": ["A"], "wrong_answers": ["X"]}]
+    pairs, stats = build_pairs(rows)
+    assert pairs == [] and stats["no_noise_to_swap"] == 1
+
+
+def test_ramdocs_noise_only_item_is_control_condition():
     rows = [{"question": "q", "documents": [
         {"text": "gold", "type": "correct", "answer": "A"},
         {"text": "n", "type": "noise", "answer": None}],
         "gold_answers": ["A"], "wrong_answers": []}]
-    assert build_a(rows)[0].conflict_type == "none"  # within-item 대조의 비충돌 조건
+    a, _ = build_a(rows)
+    assert a[0].conflict_type == "none"  # between-item 대조의 비충돌 조건
 
 
 # ── 흐름 행렬 · 이득 분해 (§3.2.2(3)) ────────────────────────────────────────
@@ -235,6 +275,69 @@ def test_gain_decomposition_separates_improvement_from_hidden_regression():
     assert gd["hidden_regression"]["value"] == pytest.approx(0.2)
     assert gd["hidden_regression"]["to_abstain"] == 1   # 퇴행-기권 하위 항목
     assert gd["flip_rate"]["value"] == pytest.approx(6 / 20)
+
+
+# ── DRAGged 전처리: 원본 실측 구조에 대한 계약 ───────────────────────────────
+
+def test_dragged_conflict_type_map_covers_all_five_raw_labels():
+    raw = ["No conflict", "Complementary information",
+           "Conflicting opinions and research outcomes",
+           "Conflict due to outdated information", "Conflict due to misinformation"]
+    assert [map_conflict_type(r) for r in raw] == [
+        "none", "complementary", "opinion", "temporal", "misinfo"]
+
+
+def test_dragged_unknown_conflict_type_raises_rather_than_silently_passing():
+    with pytest.raises(ValueError):
+        map_conflict_type("Some new category")
+
+
+def test_dragged_doc_text_falls_back_short_text_then_snippet():
+    """원본 문서에는 `text` 키가 없다 — 폴백 체인이 본문을 찾아야 한다."""
+    assert doc_text({"short_text": "body", "snippet": "s"}) == "body"
+    assert doc_text({"short_text": "", "snippet": "s"}) == "s"
+    assert doc_text({"short_text": "", "snippet": "", "response_str": "r"}) == "r"
+    assert doc_text({}) == ""
+
+
+def test_dragged_anchor_matching_finds_outdated_doc_mentioning_same_entity():
+    """시간 충돌에서 구버전 문서도 정답 개체를 언급한다 → 복수 매칭이 정상."""
+    gold = "begins at sundown on Saturday, April 12."
+    assert match_answer(gold, "Pesach begins before sundown on Saturday April 12, 2025.")
+    assert not match_answer(gold, "Passover is a Jewish holiday celebrated worldwide.")
+    assert "april" in anchor_tokens(gold) and "the" not in anchor_tokens(gold)
+
+
+def test_recency_resolves_multi_match_when_an_older_doc_exists():
+    matched = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2024-01-01")]
+    winners, flag = resolve_by_recency(matched)
+    assert winners == [0] and flag is None
+
+
+def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
+    """최신 날짜를 공유해도 더 오래된 매칭 문서가 있으면 구버전을 가릴 수 있다."""
+    split = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2025-01-01"),
+             Chunk(2, "t", date="2020-01-01")]
+    winners, flag = resolve_by_recency(split)
+    assert winners == [0, 1] and flag is None
+
+    all_same = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2025-01-01")]
+    assert resolve_by_recency(all_same) == ([], "date_tie")
+    assert resolve_by_recency([Chunk(0, "t"), Chunk(1, "t")]) == ([], "date_absent")
+
+
+# ── QACC 전처리: MTurk 플랫 포맷 파싱 계약 ───────────────────────────────────
+
+def test_qacc_letter_codes_index_into_contexts():
+    assert letters_to_indices(["A", "C", "J"], 10) == [0, 2, 9]
+    assert letters_to_indices(["K"], 10) == []      # 범위 밖은 버린다
+    assert letters_to_indices(["", "AB"], 10) == []
+
+
+def test_qacc_as_list_parses_string_literal_safely():
+    assert as_list("['I', 'G']") == ["I", "G"]
+    assert as_list(float("nan")) == [] and as_list(None) == [] and as_list("") == []
+    assert as_list("not a list") == []              # eval 대신 literal_eval → 예외 없이 빈 리스트
 
 
 def test_recency_authority_not_applicable_to_ramdocs():

@@ -20,6 +20,12 @@ data/raw/ramdocs/
 !data/raw/checksums.lock
 !data/raw/LICENSES/
 
+# 전처리 산출물도 원본 문서 본문을 담으므로 커밋하지 않는다 (QACC는 CC BY-SA 3.0
+# ShareAlike 대상). download.sh + preprocessing/ 코드 + checksums.lock으로 완전 재현된다.
+# 반면 preprocessing/review/의 인간 검증 시트는 본문을 담지 않으며 검증 이력 자체가
+# 산출물이므로 커밋한다 (계획서 §3).
+data/processed/*.jsonl
+
 # 실행 산출물: raw 생성물은 git 미포함, 집계만 포함 (계획서 §3)
 results/raw/
 results/**/generations/

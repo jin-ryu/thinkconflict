@@ -143,6 +143,9 @@ def render_documents(item: Item, *, shuffle_seed: int) -> tuple[str, list[int]]:
 
 # ── CLI: 산출물 검증 + 게이트 통과율 보고 (Phase 1-4) ─────────────────────────
 
+CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 대상
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="공통 스키마 JSONL 검증 + 유효 충돌 게이트 통과율")
     ap.add_argument("paths", nargs="+", help="data/processed/*.jsonl")
@@ -151,10 +154,14 @@ def main() -> None:
         items = list(read_jsonl(path))
         n_err = sum(1 for it in items if validate_item(it))
         behav = [it for it in items if it.behavior_track]
-        gate = sum(1 for it in behav if passes_valid_conflict_gate(it))
-        msg = f"{path}: N={len(items)}  스키마 위반={n_err}  behavior_track N={len(behav)}"
-        if behav:
-            msg += f"  유효충돌게이트 통과={gate} ({gate / len(behav):.1%})"
+        # 게이트는 충돌 문항에만 적용된다 — 비충돌 대조군은 정의상 충돌 문서가 없다
+        conflict = [it for it in behav if it.conflict_type in CONFLICT_CONDITIONS]
+        control = [it for it in behav if it.conflict_type not in CONFLICT_CONDITIONS]
+        gate = sum(1 for it in conflict if passes_valid_conflict_gate(it))
+        msg = (f"{path}: N={len(items)}  스키마 위반={n_err}  "
+               f"behavior_track={len(behav)} (충돌 {len(conflict)} / 대조군 {len(control)})")
+        if conflict:
+            msg += f"  유효충돌게이트 {gate}/{len(conflict)} ({gate / len(conflict):.1%})"
         print(msg)
         for it in items:
             for e in validate_item(it):

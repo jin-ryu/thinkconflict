@@ -1,16 +1,27 @@
-"""RAMDocs 전처리: 라벨 승계 + A/B 분리 (계획서 Phase 1-1, §3.1.2).
+"""RAMDocs 전처리: 라벨 승계 + A/B 분리 + within-item 매칭 쌍 (Phase 1-1, §3.1.2, §3.3.3).
 
-RAMDocs는 문서별 `type`(correct/misinfo/noise)과 gold/wrong answers가 원본에
-라벨돼 있어 골드 매핑이 불필요하다 — 라벨을 그대로 승계만 한다(가장 기계적).
+원본(`HanNight/RAMDocs`, test 500문항) 실측 구조:
+    {question, documents:[{text, type∈{correct,misinfo,noise}, answer}],
+     disambig_entity, gold_answers[], wrong_answers[]}
+문서별 `type`과 gold/wrong answers가 원본에 라벨돼 있어 골드 매핑이 불필요하다 —
+라벨을 그대로 승계만 한다(세 데이터셋 중 가장 기계적 → 먼저 처리).
 
-A/B 분리:
-    ramdocs_b.jsonl — 원본 결합형(모호성+오정보+노이즈 공존). 향후 과제용 보관.
-    ramdocs_a.jsonl — 분해형(충돌 1요인). 본 실험용. 원본은 '복수 정답(모호성)'과
-        '오정보 충돌' 두 요인이 결합돼 있어 전환 행렬 해석이 흐려지므로,
-        gold answer 단위로 분해해 각 하위 문항이 오정보 충돌 1요인만 갖게 한다:
-        하위 문항 i = {정답 a_i 지지 문서(correct) + misinfo 문서(conflicting) + noise 문서}.
-        오정보가 없는 문항(노이즈만)은 conflict_type="none"으로 유지 — RQ3의
-        within-item(misinfo↔noise) 대조에서 비충돌 조건을 담당한다.
+산출물 3종:
+    ramdocs_b.jsonl     원본 결합형(모호성 + 오정보 + 노이즈 공존). 향후 과제용 보관.
+    ramdocs_a.jsonl     분해형(충돌 1요인) = 본 실험용. 원본은 '복수 정답(모호성)'과
+        '오정보 충돌' 두 요인이 결합돼 전환 행렬 해석이 흐려지므로, gold 단위로 분해해
+        각 하위 문항이 오정보 충돌 1요인만 갖게 한다.
+    ramdocs_pairs.jsonl RQ3 within-item 매칭 대조쌍 (§3.3.3(a)). 같은 문항에서
+        misinfo ↔ noise 만 교체하고 **문서 수를 고정**해 충돌의 순효과를 격리한다.
+
+within-item 쌍 구성 규칙 (실측 기반 설계 결정):
+    노이즈 문서는 질문과 같은 주제의 무응답 지문이라 다른 문항에서 빌려올 수 없다.
+    따라서 같은 문항 안에서만 교체한다. misinfo m개, noise n개일 때 k = min(m, n):
+        conflict 변형 = support + misinfo(k) + noise(n − k)
+        control  변형 = support + noise(n)
+    둘 다 문서 수가 |support| + n으로 같고, 오직 충돌(오정보) 유무만 다르다.
+    m > n인 문항은 초과 misinfo(m − k)가 conflict 변형에서 빠지므로 meta에 기록한다.
+    n = 0인 문항은 교체할 노이즈가 없어 쌍을 만들 수 없다 — 제외하고 건수를 보고한다.
 
 usage: python -m preprocessing.ramdocs_prep [--raw-dir data/raw/ramdocs] [--out-dir data/processed]
 """
@@ -26,87 +37,123 @@ TYPE_TO_LABEL = {"correct": "correct", "misinfo": "conflicting", "noise": "noise
 
 
 def load_raw(raw_dir: Path) -> list[dict]:
-    """HF 스냅샷에서 test set을 찾아 로드한다 (json/jsonl 자동 탐색)."""
-    candidates = sorted(list(raw_dir.rglob("*.jsonl")) + list(raw_dir.rglob("*.json")))
-    candidates = [p for p in candidates if ".cache" not in p.parts]
+    candidates = [p for p in sorted(raw_dir.rglob("*.jsonl")) if ".cache" not in p.parts]
     if not candidates:
-        raise FileNotFoundError(f"{raw_dir}에 원본 파일 없음 — data/raw/download.sh 먼저 실행")
-    path = candidates[0]
-    rows = []
-    with open(path, encoding="utf-8") as f:
-        text = f.read().strip()
-    if path.suffix == ".jsonl" or "\n{" in text:
-        rows = [json.loads(l) for l in text.splitlines() if l.strip()]
-    else:
-        data = json.loads(text)
-        rows = data if isinstance(data, list) else data.get("data", [])
+        raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/raw/download.sh 먼저 실행")
+    path = next((p for p in candidates if "test" in p.name.lower()), candidates[0])
+    rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     print(f"원본 로드: {path} (N={len(rows)})")
     return rows
 
 
 def to_chunks(docs: list[dict]) -> list[Chunk]:
-    return [
-        Chunk(doc_id=i, text=d["text"], label=TYPE_TO_LABEL[d["type"]],
-              supported_answer=d.get("answer"))
-        for i, d in enumerate(docs)
-    ]
+    """doc_id는 렌더링 순서가 아니라 이 문항 안에서의 안정적 식별자다."""
+    return [Chunk(doc_id=i, text=d["text"], label=TYPE_TO_LABEL[d["type"]],
+                  supported_answer=d.get("answer"))
+            for i, d in enumerate(docs)]
 
 
-def conflict_type_of(row: dict) -> str:
-    has_misinfo = any(d["type"] == "misinfo" for d in row["documents"])
-    multi_gold = len(row.get("gold_answers", [])) > 1
-    if has_misinfo:
-        return "misinfo"
-    return "ambiguous" if multi_gold else "none"
+def _by_type(docs: list[dict]) -> tuple[list[dict], list[dict]]:
+    return ([d for d in docs if d["type"] == "misinfo"],
+            [d for d in docs if d["type"] == "noise"])
+
+
+def _supporting(docs: list[dict], gold: str) -> list[dict]:
+    return [d for d in docs if d["type"] == "correct" and d.get("answer") == gold]
 
 
 def build_b(rows: list[dict]) -> list[Item]:
     """원본 결합형: 문항 구조 그대로, any-gold 정답 집합 승계."""
     items = []
     for i, row in enumerate(rows):
+        misinfo, _ = _by_type(row["documents"])
+        multi_gold = len(row.get("gold_answers", [])) > 1
         items.append(Item(
             question_id=f"ramdocs-{i:04d}",
             dataset="ramdocs_b",
             question=row["question"],
-            conflict_type=conflict_type_of(row),
+            conflict_type="misinfo" if misinfo else ("ambiguous" if multi_gold else "none"),
             correct_answers=list(row.get("gold_answers", [])),
             wrong_answers=list(row.get("wrong_answers", [])),
             chunks=to_chunks(row["documents"]),
             behavior_track=bool(row.get("gold_answers")),
             self_consistency_track=True,
-            meta={"source_row": i},
+            meta={"source_row": i, "n_gold": len(row.get("gold_answers", []))},
         ))
     return items
 
 
-def build_a(rows: list[dict]) -> list[Item]:
-    """분해형: gold answer 단위로 분해해 충돌 요인을 오정보 하나로 고정."""
-    items = []
+def build_a(rows: list[dict]) -> tuple[list[Item], dict]:
+    """분해형: gold 단위로 분해해 충돌 요인을 오정보 하나로 고정 (본 실험용)."""
+    items, dropped = [], 0
     for i, row in enumerate(rows):
         docs = row["documents"]
-        misinfo = [d for d in docs if d["type"] == "misinfo"]
-        noise = [d for d in docs if d["type"] == "noise"]
+        misinfo, noise = _by_type(docs)
         golds = list(row.get("gold_answers", []))
-        for j, gold in enumerate(golds or [None]):
-            support = [d for d in docs if d["type"] == "correct"
-                       and (gold is None or d.get("answer") == gold)]
-            if gold is not None and not support:
-                continue  # 지지 문서 없는 gold는 하위 문항 성립 불가 (건수는 집계에 반영)
-            sub = support + misinfo + noise
+        for j, gold in enumerate(golds):
+            support = _supporting(docs, gold)
+            if not support:
+                dropped += 1  # 지지 문서 없는 gold는 하위 문항이 성립하지 않는다
+                continue
             items.append(Item(
                 question_id=f"ramdocs-{i:04d}-a{j}",
                 dataset="ramdocs_a",
                 question=row["question"],
                 conflict_type="misinfo" if misinfo else "none",
-                correct_answers=[gold] if gold else [],
+                correct_answers=[gold],
                 wrong_answers=list(row.get("wrong_answers", [])),
-                chunks=to_chunks(sub),
-                behavior_track=gold is not None,
+                chunks=to_chunks(support + misinfo + noise),
+                behavior_track=True,
                 self_consistency_track=True,
-                meta={"source_row": i, "gold_index": j,
-                      "original_gold_answers": golds},
+                meta={"source_row": i, "gold_index": j, "variant": "full",
+                      "original_gold_answers": golds,
+                      "n_misinfo": len(misinfo), "n_noise": len(noise)},
             ))
-    return items
+    return items, {"dropped_gold_without_support": dropped}
+
+
+def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
+    """RQ3 within-item 매칭 대조쌍: misinfo↔noise 교체, 문서 수 고정 (§3.3.3(a))."""
+    items = []
+    stats = {"pairs": 0, "no_noise_to_swap": 0, "misinfo_truncated": 0,
+             "dropped_gold_without_support": 0}
+    for i, row in enumerate(rows):
+        docs = row["documents"]
+        misinfo, noise = _by_type(docs)
+        if not misinfo:
+            continue  # 충돌 조건을 만들 수 없다 (between-item 대조는 ramdocs_a가 담당)
+        if not noise:
+            stats["no_noise_to_swap"] += 1  # 교체할 노이즈가 없어 문서 수를 맞출 수 없다
+            continue
+        k = min(len(misinfo), len(noise))
+        if k < len(misinfo):
+            stats["misinfo_truncated"] += 1
+
+        for j, gold in enumerate(row.get("gold_answers", [])):
+            support = _supporting(docs, gold)
+            if not support:
+                stats["dropped_gold_without_support"] += 1
+                continue
+            pair_id = f"ramdocs-{i:04d}-a{j}"
+            common = {"dataset": "ramdocs_a", "question": row["question"],
+                      "correct_answers": [gold],
+                      "wrong_answers": list(row.get("wrong_answers", [])),
+                      "behavior_track": True, "self_consistency_track": True}
+            # 충돌 변형: misinfo k개가 noise k개를 밀어낸다
+            items.append(Item(
+                question_id=f"{pair_id}-conflict", conflict_type="misinfo",
+                chunks=to_chunks(support + misinfo[:k] + noise[k:]),
+                meta={"source_row": i, "gold_index": j, "variant": "conflict",
+                      "pair_id": pair_id, "n_swapped": k,
+                      "misinfo_dropped": len(misinfo) - k}, **common))
+            # 대조 변형: 같은 자리에 noise가 그대로 남는다 (문서 수 동일)
+            items.append(Item(
+                question_id=f"{pair_id}-control", conflict_type="none",
+                chunks=to_chunks(support + noise),
+                meta={"source_row": i, "gold_index": j, "variant": "control",
+                      "pair_id": pair_id, "n_swapped": k}, **common))
+            stats["pairs"] += 1
+    return items, stats
 
 
 def main() -> None:
@@ -114,13 +161,32 @@ def main() -> None:
     ap.add_argument("--raw-dir", default="data/raw/ramdocs", type=Path)
     ap.add_argument("--out-dir", default="data/processed", type=Path)
     args = ap.parse_args()
+
     rows = load_raw(args.raw_dir)
-    a, b = build_a(rows), build_b(rows)
+    b = build_b(rows)
+    a, a_stats = build_a(rows)
+    pairs, p_stats = build_pairs(rows)
+
     write_jsonl(a, args.out_dir / "ramdocs_a.jsonl")
     write_jsonl(b, args.out_dir / "ramdocs_b.jsonl")
+    write_jsonl(pairs, args.out_dir / "ramdocs_pairs.jsonl")
+
     n_conf = sum(1 for it in a if it.conflict_type == "misinfo")
-    print(f"ramdocs_a: N={len(a)} (오정보 충돌 {n_conf} / 비충돌 {len(a) - n_conf})")
-    print(f"ramdocs_b: N={len(b)}")
+    print(f"ramdocs_b (원본 결합형): N={len(b)}")
+    print(f"ramdocs_a (분해형, 본 실험용): N={len(a)} "
+          f"— 오정보 충돌 {n_conf} / 비충돌 {len(a) - n_conf}")
+    print(f"   지지 문서 없어 탈락한 gold: {a_stats['dropped_gold_without_support']}")
+    print(f"ramdocs_pairs (RQ3 within-item 매칭): 쌍 {p_stats['pairs']} "
+          f"(문항 {len(pairs) // 2 if pairs else 0}쌍 → 아이템 {len(pairs)})")
+    print(f"   노이즈 부재로 쌍 구성 불가한 문항: {p_stats['no_noise_to_swap']}")
+    print(f"   misinfo 일부가 잘린 문항(m>n): {p_stats['misinfo_truncated']}")
+
+    # 문서 수 고정 확인 — 매칭 대조의 전제 (§3.3.3(a): '동일 문서 수')
+    by_pair: dict[str, list[Item]] = {}
+    for it in pairs:
+        by_pair.setdefault(it.meta["pair_id"], []).append(it)
+    mismatched = [p for p, v in by_pair.items() if len({len(x.chunks) for x in v}) != 1]
+    print(f"   문서 수 불일치 쌍: {len(mismatched)} (0이어야 매칭 대조가 성립)")
 
 
 if __name__ == "__main__":
