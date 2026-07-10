@@ -1,0 +1,119 @@
+"""공통 생성 클라이언트 (계획서 Phase 2-1, §3.3.1(2)).
+
+vLLM OpenAI 호환 엔드포인트에 대해 디코딩을 고정(t=0.6, top-p 0.95)하고
+시드 ≥5를 반복 관리한다. 생성 원문·셔플 순서·디코딩 설정을 전부 JSONL로
+기록해 라벨링(diagnosis/)이 재현 가능하게 한다. raw 생성물은 git 미포함.
+
+usage:
+    python -m serving.client --data data/processed/ramdocs_a.jsonl \
+        --model qwen --env standard --out results/raw/qwen_standard_ramdocs_a.jsonl
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import time
+from dataclasses import dataclass
+from pathlib import Path
+
+from openai import OpenAI
+
+from experiments.exp1_mitigation.envs import build_messages, ENVS
+from preprocessing.schema import read_jsonl, render_documents
+
+# 사전등록 디코딩 (계획서 §3.3.1(2)): 권장 디코딩 고정, 시드 최소 5회 반복
+DECODING = {"temperature": 0.6, "top_p": 0.95}
+SEEDS = (13, 42, 71, 108, 2026)
+
+MODELS = {  # 논리명 → (기본 포트, 기본 model id) — launch_*.sh와 일치
+    "qwen": (8001, "Qwen/Qwen3.6-27B"),
+    "olmo": (8002, "allenai/Olmo-3.1-32B-Think"),
+    "gptoss": (8003, "openai/gpt-oss-20b"),
+}
+
+
+@dataclass
+class GenConfig:
+    model_key: str
+    env: str = "standard"
+    thinking: bool = True        # Qwen 하드 토글 (§3.3.3(b)); 타 모델은 무시됨
+    effort: str | None = None    # gpt-oss reasoning effort (보조 신호 전용)
+    max_tokens: int = 8192
+    base_url: str | None = None
+
+
+def make_client(cfg: GenConfig) -> tuple[OpenAI, str]:
+    port, model_id = MODELS[cfg.model_key]
+    base = cfg.base_url or f"http://localhost:{port}/v1"
+    return OpenAI(base_url=base, api_key="EMPTY"), model_id
+
+
+def generate_one(client: OpenAI, model_id: str, cfg: GenConfig,
+                 messages: list[dict], seed: int) -> dict:
+    extra: dict = {}
+    if cfg.model_key == "qwen":
+        extra["chat_template_kwargs"] = {"enable_thinking": cfg.thinking}
+    if cfg.model_key == "gptoss" and cfg.effort:
+        extra["reasoning_effort"] = cfg.effort
+    for attempt in range(3):
+        try:
+            resp = client.chat.completions.create(
+                model=model_id, messages=messages, seed=seed,
+                max_tokens=cfg.max_tokens, extra_body=extra or None, **DECODING)
+            choice = resp.choices[0]
+            return {"text": choice.message.content,
+                    "reasoning": getattr(choice.message, "reasoning_content", None),
+                    "finish_reason": choice.finish_reason,
+                    "usage": resp.usage.model_dump() if resp.usage else None}
+        except Exception as e:  # noqa: BLE001 — 서빙 일시 오류 재시도
+            if attempt == 2:
+                return {"text": None, "error": str(e)}
+            time.sleep(5 * (attempt + 1))
+    raise AssertionError("unreachable")
+
+
+def run(cfg: GenConfig, data_path: Path, out_path: Path,
+        seeds: tuple[int, ...] = SEEDS) -> None:
+    client, model_id = make_client(cfg)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    done = set()
+    if out_path.exists():  # 중단 지점부터 재개
+        with open(out_path, encoding="utf-8") as f:
+            done = {(r["question_id"], r["seed"]) for r in map(json.loads, f) if "text" in r}
+    with open(out_path, "a", encoding="utf-8") as out:
+        for item in read_jsonl(data_path):
+            for seed in seeds:
+                if (item.question_id, seed) in done:
+                    continue
+                # 셔플 시드를 생성 시드에 결속 — 시드별로 문서 순서가 달라져
+                # 위치 편향이 시드 반복에 걸쳐 평균화된다 (§3.1.1(4))
+                docs_text, doc_order = render_documents(item, shuffle_seed=seed)
+                messages = build_messages(cfg.env, item.question, docs_text)
+                rec = {"question_id": item.question_id, "dataset": item.dataset,
+                       "model": cfg.model_key, "env": cfg.env, "seed": seed,
+                       "thinking": cfg.thinking, "effort": cfg.effort,
+                       "doc_order": doc_order, "decoding": DECODING,
+                       **generate_one(client, model_id, cfg, messages, seed)}
+                out.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                out.flush()
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--data", required=True, type=Path)
+    ap.add_argument("--model", required=True, choices=list(MODELS))
+    ap.add_argument("--env", default="standard", choices=list(ENVS))
+    ap.add_argument("--out", required=True, type=Path)
+    ap.add_argument("--no-thinking", action="store_true",
+                    help="Qwen 하드 토글: 사고 채널 차단 (레짐 통제, §3.3.3(b))")
+    ap.add_argument("--effort", choices=["low", "medium", "high"],
+                    help="gpt-oss reasoning effort (보조 신호 전용)")
+    ap.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS))
+    args = ap.parse_args()
+    cfg = GenConfig(model_key=args.model, env=args.env,
+                    thinking=not args.no_thinking, effort=args.effort)
+    run(cfg, args.data, args.out, tuple(args.seeds))
+
+
+if __name__ == "__main__":
+    main()
