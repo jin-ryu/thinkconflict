@@ -42,15 +42,23 @@ clone_pinned() { # $1=repo_url $2=dest_dir $3=lock_key
   fi
 }
 
+copy_license() { # $1=소스 디렉터리 $2=데이터셋 이름 — 이름을 붙여 서로 덮어쓰지 않게 한다
+  local found=0
+  for f in "$1"/LICENSE* "$1"/NOTICE "$1"/data/LICENSE*; do
+    [[ -f "$f" ]] || continue
+    cp -f "$f" "$LICENSE_DIR/${2}_$(basename "$f")"
+    found=1
+  done
+  [[ $found -eq 1 ]] || echo "  경고: $2 LICENSE를 찾지 못했다 — 수동 확인 필요"
+}
+
 echo "[1/3] DRAGged → $RAW_DIR/dragged"
 clone_pinned "$DRAGGED_REPO" "$RAW_DIR/dragged" "dragged_commit"
-cp -f "$RAW_DIR/dragged/LICENSE"* "$LICENSE_DIR/" 2>/dev/null \
-  || echo "  (LICENSE 파일명 확인 필요 — 수동 복사)"
+copy_license "$RAW_DIR/dragged" dragged
 
 echo "[2/3] QACC → $RAW_DIR/qacc"
 clone_pinned "$QACC_REPO" "$RAW_DIR/qacc" "qacc_commit"
-cp -f "$RAW_DIR/qacc/LICENSE"* "$LICENSE_DIR/" 2>/dev/null \
-  || echo "  (LICENSE 파일명 확인 필요 — 수동 복사; 데이터는 CC BY-SA 3.0)"
+copy_license "$RAW_DIR/qacc" qacc   # 데이터는 CC BY-SA 3.0 (data/LICENSE)
 
 echo "[3/3] RAMDocs → $RAW_DIR/ramdocs"
 RAMDOCS_REV="$(locked_rev ramdocs_revision)"
