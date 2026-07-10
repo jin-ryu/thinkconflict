@@ -1,0 +1,26 @@
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+~$*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# 원본 데이터는 git에 넣지 않는다 — download.sh로 재현 (계획서 §2)
+data/raw/dragged/
+data/raw/qacc/
+data/raw/ramdocs/
+!data/raw/download.sh
+!data/raw/checksums.lock
+!data/raw/LICENSES/
+
+# 실행 산출물: raw 생성물은 git 미포함, 집계만 포함 (계획서 §3)
+results/raw/
+results/**/generations/
+*.log

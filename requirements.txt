@@ -1,0 +1,23 @@
+# 생성·서빙 (서버는 GPU 머신에서 vllm 별도 설치 권장 — serving/launch_*.sh 참조)
+openai>=1.40          # vLLM OpenAI 호환 엔드포인트 클라이언트
+huggingface_hub>=0.24 # RAMDocs 데이터셋 다운로드
+
+# 전처리·라벨링
+datasets>=2.20
+rapidfuzz>=3.0        # 정답-문서 문자열 매칭 (DRAGged 골드 매핑 초안)
+python-dateutil>=2.9  # date 메타데이터 파싱 (최신성 해소 규칙)
+
+# 진단·분석
+numpy>=1.26
+pandas>=2.2
+scipy>=1.13
+statsmodels>=0.14     # 혼합효과 로지스틱 회귀 (RQ3 between-item 보정)
+scikit-learn>=1.5     # Cohen's kappa (부록 A 라벨 신뢰도)
+sentence-transformers>=3.0  # 부록 B.1 Trajectory Semantic Shift
+
+# 시각화·유틸
+matplotlib>=3.9
+tqdm>=4.66
+
+# 테스트 (진단 파이프라인 회귀 — 라벨러·채점기·지표는 측정 도구 자체다)
+pytest>=8.0
