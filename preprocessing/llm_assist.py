@@ -4,10 +4,13 @@
 어느 쪽도 값을 확정하지 않는다 — **초벌 제안을 검토 시트에 채울 뿐, 확정은 사람**이다.
 
   dragged — 청크 라벨 초벌 (PPT 12p ①: "LLM이 초벌 분류한 뒤 사람이 전수 검토").
-            규칙 매칭(문자열·앵커·최신성)이 못 푼 플래그 문항(no_match·오정보 복수
-            매칭)이 우선 대상. 문서별로 "이 문서가 정답을 지지하는가/반대 답을
-            내세우는가/무관한가"를 판정해 제안을 dragged_llm_labels.csv에 쓴다.
-            사람은 dragged_review.csv를 채울 때 이 제안을 참조한다.
+            **사실 충돌 67문항 전수**가 기본 대상이다(--only-flagged로 축소 가능).
+            규칙은 '정답 문자열을 담았는가'만 볼 수 있어 correct만 확정할 수 있고,
+            '다른 답을 주장하는가(conflicting)' vs '무관한가(noise)'는 가르지 못한다
+            — 예: 정답 "at least 1,759"에 "1,762"를 주장하는 문서는 매칭에 실패하지만
+            명백한 충돌 문서다. 그 판정을 LLM이 초벌하고 사람이 확정한다.
+            제안은 dragged_llm_labels.csv에 쌓이고, `dragged_prep sheet`가 이를
+            dragged_review.csv의 llm_label 열로 프리필한다.
 
   qacc    — 게이트 ① sharp/soft 재분류 + conflict_type 초벌 (PPT 13p ①: "QACC엔
             충돌 유형이 없어 LLM이 먼저 나누고 사람이 검수" — 시간차 temporal,
@@ -181,15 +184,15 @@ def main() -> None:
     ap.add_argument("--api-key", default="EMPTY")
     ap.add_argument("--judge", type=int, choices=[1, 2], default=1,
                     help="qacc 전용: 판정자 번호 (2종은 서로 다른 계열이어야 함)")
-    ap.add_argument("--all-docs", action="store_true",
-                    help="dragged 전용: 플래그 문항만이 아니라 사실 충돌 전체를 판정")
+    ap.add_argument("--only-flagged", action="store_true",
+                    help="dragged 전용: 전수(기본) 대신 규칙이 못 푼 플래그 문항만 판정")
     ap.add_argument("--out-dir", default="data/processed", type=Path)
     args = ap.parse_args()
 
     client = make_client(args.base_url, args.api_key)
     if args.dataset == "dragged":
         run_dragged(client, args.model, args.out_dir / "dragged.draft.jsonl",
-                    REVIEW_DIR / "dragged_llm_labels.csv", only_flagged=not args.all_docs)
+                    REVIEW_DIR / "dragged_llm_labels.csv", only_flagged=args.only_flagged)
     else:
         run_qacc(client, args.model, args.out_dir / "qacc.draft.jsonl",
                  REVIEW_DIR / "qacc_screen.csv", args.judge)

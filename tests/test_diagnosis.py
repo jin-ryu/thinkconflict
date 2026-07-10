@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import pytest
+from datetime import datetime
 
 from diagnosis.grading import equivalent, grade
 from diagnosis.labeler import label_generation
@@ -19,8 +20,9 @@ from experiments.exp1_mitigation.transition import flow_matrix, gain_decompositi
 from experiments.exp3_causal.interventions import (analyze, make_filler,
                                                    resample_prefixes,
                                                    truncate_thinking)
-from preprocessing.dragged_prep import (anchor_tokens, doc_text, map_conflict_type,
-                                        match_answer, resolve_by_recency)
+from preprocessing.dragged_prep import (anchor_tokens, build_draft, doc_text,
+                                        map_conflict_type, match_answer, parse_date,
+                                        resolve_by_recency)
 from preprocessing.qacc_prep import as_list, letters_to_indices
 from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, passes_valid_conflict_gate,
@@ -314,6 +316,23 @@ def test_recency_resolves_multi_match_when_an_older_doc_exists():
     assert winners == [0] and flag is None
 
 
+def test_missing_date_tokens_are_not_parsed_as_dates():
+    """원본에는 date='NA'가 181건 있다 — 날짜로 오인하면 최신성 해소가 오염된다."""
+    for token in ("NA", "n/a", "", "  ", "none"):
+        assert parse_date(token) is None
+
+
+def test_relative_dates_resolve_against_corpus_reference():
+    """'2 days ago' 문서가 대개 최신본이다 — 버리면 구버전이 승자가 된다 (실측 반례)."""
+    ref = datetime(2025, 4, 3)
+    assert parse_date("5 days ago", ref) == datetime(2025, 3, 29)
+    assert parse_date("5 days ago") is None      # 기준점 없으면 비교 불가
+    newest_is_relative = [Chunk(0, "t", date="Nov 18, 2024"),
+                          Chunk(1, "t", date="5 days ago")]
+    winners, flag = resolve_by_recency(newest_is_relative, ref)
+    assert winners == [1] and flag is None
+
+
 def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
     """최신 날짜를 공유해도 더 오래된 매칭 문서가 있으면 구버전을 가릴 수 있다."""
     split = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2025-01-01"),
@@ -327,6 +346,36 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
 
 
 # ── QACC 전처리: MTurk 플랫 포맷 파싱 계약 ───────────────────────────────────
+
+def test_draft_leaves_conflicting_vs_noise_unresolved_for_fact_conflicts():
+    """규칙은 '정답을 담았는가'만 안다 — 다른 답을 주장하는 문서(conflicting)와
+    무관한 문서(noise)를 가르지 못하므로 unknown으로 남기고 LLM+사람에게 넘긴다.
+    실측 반례: 정답 'at least 1,759'에 '1,762'를 주장하는 문서는 매칭에 실패한다."""
+    rows = [{
+        "question": "How many tornadoes so far?",
+        "conflict_type": "Conflict due to outdated information",
+        "correct_answer": "at least 1,759",
+        "search_results": [
+            {"short_text": "confirmed at least 1,759 tornadoes", "date": "2025-01-08"},
+            {"short_text": "the count stands at 1,762 tornadoes", "date": "2024-11-02"},
+            {"short_text": "tornado safety tips for families", "date": "2024-05-01"}],
+    }]
+    items, _, _ = build_draft(rows)
+    labels = [c.label for c in items[0].chunks]
+    assert labels[0] == "correct"
+    assert labels[1] == labels[2] == "unknown"   # 충돌/무관을 규칙이 단정하지 않는다
+    hints = items[0].meta["rule_hint"]
+    assert hints[1] == "unmatched" and hints[2] == "unmatched"
+
+
+def test_draft_control_items_get_noise_since_no_conflicting_doc_exists():
+    rows = [{"question": "q", "conflict_type": "No conflict", "correct_answer": "Paris",
+             "search_results": [{"short_text": "the capital is Paris", "date": "2025-01-01"},
+                                {"short_text": "unrelated travel deals", "date": "2025-01-01"}]}]
+    items, _, _ = build_draft(rows)
+    assert [c.label for c in items[0].chunks] == ["correct", "noise"]
+    assert items[0].behavior_track is True   # ⓒ 행동 대조군은 초안에서 바로 확정
+
 
 def test_qacc_letter_codes_index_into_contexts():
     assert letters_to_indices(["A", "C", "J"], 10) == [0, 2, 9]

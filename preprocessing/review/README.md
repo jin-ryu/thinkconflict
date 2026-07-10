@@ -12,16 +12,41 @@
 
 ## LLM 초벌 워크플로 (Phase 1의 LLM 소요 전부 — `preprocessing/llm_assist.py`)
 
+**순서가 중요하다**: `llm_assist dragged`를 먼저 돌려야 `dragged_prep sheet`가
+LLM 제안을 `llm_label` 열로 프리필한다.
+
 ```bash
 # 어떤 OpenAI 호환 엔드포인트든 사용 가능 — 자체 서빙 오픈 모델이면 비용 0
-python -m preprocessing.llm_assist dragged --base-url http://HOST:PORT/v1 --model MODEL
-python -m preprocessing.llm_assist qacc --judge 1 --base-url ... --model MODEL_A
-python -m preprocessing.llm_assist qacc --judge 2 --base-url ... --model MODEL_B  # 다른 계열
+python -m preprocessing.dragged_prep draft                                    # 규칙: correct만 확정
+python -m preprocessing.llm_assist  dragged --base-url http://HOST:PORT/v1 --model MODEL
+python -m preprocessing.dragged_prep sheet                                    # LLM 제안 프리필
+#   ↳ 사람이 dragged_review.csv의 final_label을 확정
+python -m preprocessing.dragged_prep final
+
+python -m preprocessing.qacc_prep   screen                                    # 판정 시트 템플릿
+python -m preprocessing.llm_assist  qacc --judge 1 --base-url ... --model MODEL_A
+python -m preprocessing.llm_assist  qacc --judge 2 --base-url ... --model MODEL_B  # 다른 계열
+#   ↳ 사람이 verdict·final_type을 확정
+python -m preprocessing.qacc_prep   final
 ```
 
 - RAMDocs는 LLM이 필요 없다(라벨 원본 승계).
 - 판정자 2종은 서로 다른 계열이어야 한다(부록 A(a) 자기선호 편향 통제).
 - 중단 후 재실행하면 이미 판정된 행은 건너뛴다(재개 가능).
+
+### `dragged_review.csv` 컬럼 읽는 법
+
+| 컬럼 | 의미 |
+|---|---|
+| `rule_label` | 규칙이 확정한 것 — `correct`만 채워진다 (60문서) |
+| `rule_hint` | `matched_older`(정답 문자열을 담았으나 구버전) / `unmatched`(정답 문자열 없음) — **참고용, 확정 아님** |
+| `llm_label` | LLM 초벌 제안 (`llm_assist dragged` 실행 시) |
+| `final_label` | **검토자가 확정하는 값.** 비워 두면 `llm_label`이 대신 쓰인다 |
+| `doc_excerpt` | 판단을 돕는 본문 앞 40단어 |
+
+`rule_hint = unmatched`라고 해서 무관한 문서가 아니다 — 정답과 **다른 답을 주장하는
+충돌 문서**가 여기 섞여 있다(예: 정답 "at least 1,759"에 "1,762"를 주장하는 문서).
+이 구분이 유효 충돌 게이트를 좌우하므로 본문을 보고 판단해야 한다 (사전등록 §7.6).
 
 ## 검토 규칙
 
