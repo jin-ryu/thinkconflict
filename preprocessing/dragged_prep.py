@@ -56,10 +56,8 @@ from dateutil import parser as dateparser
 from rapidfuzz import fuzz
 
 from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
-from preprocessing.tabular import (export_label_record, label_provenance, read_csv,
-                                   to_items, write_csv)
-
-_draft_cache: list[Item] = []   # build 단계에서 draft의 meta를 되붙이기 위한 캐시
+from preprocessing.tabular import (label_provenance, read_csv, read_meta, to_items,
+                                   write_csv, write_meta)
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
@@ -274,10 +272,9 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
     return items, stats, ref
 
 
-def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
+def build_items(rows: list[dict], meta_by_qid: dict[str, dict]) -> tuple[list[Item], Counter]:
     """CSV 행 → 최종 Item. 라벨 우선순위(사람 > LLM > 규칙)는 tabular.to_items가 적용한다.
     여기서는 DRAGged 고유의 트랙 판정만 한다."""
-    meta_by_qid = {it.question_id: it.meta for it in _draft_cache}
     items = to_items(rows, meta_by_qid=meta_by_qid)
     stats: Counter = Counter(label_provenance(rows))
     for it in items:
@@ -335,7 +332,6 @@ def main() -> None:
     ap.add_argument("stage", choices=["draft", "build"])
     ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
     ap.add_argument("--out-dir", default="data/processed/dragged", type=Path)
-    ap.add_argument("--review-dir", default="preprocessing/review", type=Path)
     ap.add_argument("--csv", type=Path,
                     help="build 입력 CSV (기본: <out-dir>/dragged.llm.csv 있으면 그것, "
                          "없으면 dragged.draft.csv)")
@@ -347,7 +343,7 @@ def main() -> None:
         items, stats, ref = build_draft(load_raw(args.raw_dir))
         hints = {it.question_id: (it.meta.get("rule_hint") or {}) for it in items}
         write_csv(items, draft_csv, hints=hints)
-        write_jsonl(items, args.out_dir / "dragged.draft.jsonl")  # meta 보존용(내부 사용)
+        write_meta(items, args.out_dir / "dragged.meta.json")
         n_open = sum(1 for it in items for c in it.chunks
                      if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
         print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
@@ -360,12 +356,9 @@ def main() -> None:
         src = args.csv or (llm_csv if llm_csv.exists() else draft_csv)
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
-        global _draft_cache
-        _draft_cache = list(read_jsonl(args.out_dir / "dragged.draft.jsonl"))
         rows = read_csv(src)
-        items, stats = build_items(rows)
+        items, stats = build_items(rows, read_meta(args.out_dir / "dragged.meta.json"))
         write_jsonl(items, args.out_dir / "dragged.jsonl")
-        export_label_record(rows, args.review_dir / "dragged_labels.csv")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
         print(f"라벨 출처: 사람 {stats['human']} · LLM {stats['llm']} · 규칙 {stats['rule']} "
@@ -377,7 +370,6 @@ def main() -> None:
               f"(그중 라벨 미확정 {stats['items_with_unresolved_chunks']}건)")
         if stats["answer_corrected"]:
             print(f"정답 정오표 교정: {stats['answer_corrected']}건")
-        print(f"라벨 이력(커밋 대상): {args.review_dir / 'dragged_labels.csv'}")
         report(items)
 
 

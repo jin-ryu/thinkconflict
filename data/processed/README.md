@@ -2,9 +2,14 @@
 
 **이 폴더는 데이터다** (`preprocessing/`는 이 데이터를 만드는 **코드**다).
 
-**git 미포함.** CSV·JSONL 모두 원본 문서 본문을 담고 있어(QACC는 CC BY-SA 3.0 ShareAlike
-대상) 커밋하지 않는다. `data/raw/download.sh` + `preprocessing/` 코드 + `checksums.lock`으로
-완전히 재현된다. 사람이 확정한 라벨 이력만 `preprocessing/review/*_labels.csv`로 커밋한다.
+**git 커밋 대상이다.** 중간 CSV에는 사람이 확정한 라벨이 담기는데, 이는 재현 불가능한
+인간 노동의 산물이므로 이력으로 남긴다 (계획서 §5). 검토가 어디까지 진행됐는지도 그대로
+추적된다.
+
+> ⚠️ **공개 시 라이선스 확인.** 이 산출물은 원본 문서 본문을 포함한다. 논문용 익명 미러를
+> 만들 때 QACC 파생물은 **CC BY-SA 3.0**(저작자 표시 + 동일조건변경허락) 대상임을 확인할 것.
+> 라이선스 사본: `data/raw/LICENSES/`. 원본 자체(`data/raw/`)는 여전히 커밋하지 않으며
+> `download.sh` + `checksums.lock`으로 재현된다.
 
 ## 파이프라인 — 중간 산출물은 전부 CSV
 
@@ -26,10 +31,12 @@ data/processed/
 ├── dragged/
 │   ├── dragged.draft.csv    규칙 초안 — correct만 확정, 나머지 563문서는 빈칸 👈 검토 대상
 │   ├── dragged.llm.csv      LLM 초벌이 llm_label을 채운 것
+│   ├── dragged.meta.json    문항별 부가 정보(출처·문서 길이 공변량) — 본문 없음
 │   └── dragged.jsonl        최종본 (build 산출)
 ├── qacc/
 │   ├── qacc.draft.csv       스키마 변환 + DRAGged 중복 제거
 │   ├── qacc.llm.csv         판정자 2종이 judge{1,2}_verdict/_type을 채운 것
+│   ├── qacc.meta.json       문항별 부가 정보
 │   └── qacc.jsonl           최종본 (sharp 판정분만)
 └── ramdocs/
     ├── ramdocs_a.csv/.jsonl      분해형(충돌 1요인) — 본 실험용

@@ -37,15 +37,12 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
-from preprocessing.tabular import (export_label_record, label_provenance, read_csv,
-                                   to_items, write_csv)
-
-_draft_cache: list[Item] = []
+from preprocessing.schema import Chunk, Item, write_jsonl
+from preprocessing.tabular import (label_provenance, read_csv, read_meta, to_items,
+                                   write_csv, write_meta)
 
 CONFLICT_FLAG = "A"          # secondAnswerExist == "A" 이면 충돌 (실측 381건)
 RECENCY_CODE = "A"           # reasons 코드 A = 최신성 (48건, 계획서와 일치)
-JUDGE_SHEET = Path("preprocessing/review/qacc_screen.csv")
 ANSWER_SLOTS = (("firstAnswer", "firstContext"),
                 ("secondAnswer", "secondContext"),
                 ("thirdAnswer", "thirdContext"))
@@ -187,13 +184,14 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
     return items, stats
 
 
-def dedup_against_dragged(items: list[Item], dragged_path: Path) -> tuple[list[Item], list[str]]:
+def dedup_against_dragged(items: list[Item], dragged_csv: Path) -> tuple[list[Item], list[str]]:
     """게이트 ②: DRAGged 질문 중복 제거. 두 벤치마크의 충돌 판정이 엇갈리는
     문항은 라벨 신뢰의 경계 사례이므로 건수를 따로 보고한다."""
-    if not dragged_path.exists():
-        print(f"경고: {dragged_path} 없음 — 중복 제거 생략 (dragged draft 먼저 생성할 것)")
+    if not dragged_csv.exists():
+        print(f"경고: {dragged_csv} 없음 — 중복 제거 생략 (dragged draft 먼저 실행할 것)")
         return items, []
-    dragged = {norm_q(it.question): it.conflict_type for it in read_jsonl(dragged_path)}
+    dragged = {norm_q(r["question"]): r["rule_conflict_type"]
+               for r in read_csv(dragged_csv)}
     kept, dropped = [], []
     for it in items:
         ct = dragged.get(norm_q(it.question))
@@ -210,10 +208,14 @@ def dedup_against_dragged(items: list[Item], dragged_path: Path) -> tuple[list[I
     return kept, dropped
 
 
-def estimate_cost(items: list[Item]) -> None:
+def estimate_cost_from_csv(rows: list[dict]) -> None:
     """게이트 ① 판정 비용 예측 — 유료 API 집행 전 승인 절차 (계획서 Phase 1-2, 부록 D)."""
-    n = len(items)
-    avg_words = sum(sum(it.meta["doc_len_words"]) for it in items) / max(n, 1)
+    by_item: dict[str, int] = {}
+    for r in rows:
+        by_item[r["question_id"]] = by_item.get(r["question_id"], 0) + len(
+            (r.get("text") or "").split())
+    n = len(by_item)
+    avg_words = sum(by_item.values()) / max(n, 1)
     tok_in = int(n * 2 * (avg_words * 1.4 + 500))   # 판정자 2종, 문항당 프롬프트 ~500tok
     tok_out = n * 2 * 150
     print(f"게이트 ① 판정 대상 N={n} (중복 제거 후), 판정자 2종")
@@ -223,9 +225,9 @@ def estimate_cost(items: list[Item]) -> None:
           "상용 판정자를 쓸 경우에만 단가를 곱해 승인 요청 후 집행 (사전등록 §3.3)")
 
 
-def build_items_from_csv(rows: list[dict]) -> tuple[list[Item], Counter]:
+def build_items_from_csv(rows: list[dict],
+                         meta_by_qid: dict[str, dict]) -> tuple[list[Item], Counter]:
     """CSV 행 → 최종 Item. 게이트 ①(sharp만 투입)과 유형 확정을 여기서 적용한다."""
-    meta_by_qid = {it.question_id: it.meta for it in _draft_cache}
     items, stats = [], Counter(label_provenance(rows))
     for it in to_items(rows, meta_by_qid=meta_by_qid):
         verdict = it.meta.get("screen_verdict", "")
@@ -249,9 +251,8 @@ def main() -> None:
     ap.add_argument("stage", choices=["draft", "estimate-cost", "build"])
     ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
     ap.add_argument("--out-dir", default="data/processed/qacc", type=Path)
-    ap.add_argument("--review-dir", default="preprocessing/review", type=Path)
     ap.add_argument("--dragged-draft",
-                    default="data/processed/dragged/dragged.draft.jsonl", type=Path)
+                    default="data/processed/dragged/dragged.draft.csv", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     args = ap.parse_args()
     draft_csv = args.out_dir / "qacc.draft.csv"
@@ -261,7 +262,7 @@ def main() -> None:
         items, stats = build_items(load_raw(args.raw_dir))
         items, dropped = dedup_against_dragged(items, args.dragged_draft)
         write_csv(items, draft_csv)
-        write_jsonl(items, args.out_dir / "qacc.draft.jsonl")   # meta 보존용(내부 사용)
+        write_meta(items, args.out_dir / "qacc.meta.json")
         print(f"\n초안 CSV: {draft_csv} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건, "
               f"행 {sum(len(it.chunks) for it in items)})")
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
@@ -269,26 +270,22 @@ def main() -> None:
         print("conflict_type(초벌):", dict(Counter(it.conflict_type for it in items)))
         print("→ 다음: llm_assist qacc로 llm_verdict·llm_conflict_type·llm_label을 채운다")
     elif args.stage == "estimate-cost":
-        estimate_cost(list(read_jsonl(args.out_dir / "qacc.draft.jsonl")))
+        estimate_cost_from_csv(read_csv(draft_csv))
     else:  # build
         src = args.csv or (llm_csv if llm_csv.exists() else draft_csv)
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
-        global _draft_cache
-        _draft_cache = list(read_jsonl(args.out_dir / "qacc.draft.jsonl"))
         rows = read_csv(src)
-        items, stats = build_items_from_csv(rows)
+        items, stats = build_items_from_csv(rows, read_meta(args.out_dir / "qacc.meta.json"))
         if not items:
             raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
                              "final_verdict(또는 llm_verdict)를 채울 것 (게이트 ①)")
         write_jsonl(items, args.out_dir / "qacc.jsonl")
-        export_label_record(rows, args.review_dir / "qacc_labels.csv")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'qacc.jsonl'} (게이트 통과 N={len(items)}, "
               f"behavior_track {stats['behavior_track']}건)")
         print("판정 내역:", {k.replace("verdict_", ""): v for k, v in stats.items()
                              if k.startswith("verdict_")})
-        print(f"라벨 이력(커밋 대상): {args.review_dir / 'qacc_labels.csv'}")
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ Excel/Numbers로 열어 정렬·필터하며 검토할 수 있다.
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 from preprocessing.schema import CHUNK_LABELS, Chunk, Item
@@ -193,19 +194,19 @@ def label_provenance(rows: list[dict]) -> dict[str, int]:
     return counts
 
 
-def export_label_record(rows: list[dict], path: str | Path) -> None:
-    """본문을 뺀 라벨 기록만 남긴다 — 검증 이력을 git에 커밋하기 위한 산출물.
+def write_meta(items: list[Item], path: str | Path) -> None:
+    """문항별 meta를 사이드카 JSON으로 저장한다 (본문 없음 — 수백 KB).
 
-    작업용 CSV는 원본 본문을 담고 있어 커밋할 수 없다(QACC는 CC BY-SA 3.0 ShareAlike).
-    반면 "어느 문서를 무엇으로 판정했는가"는 재현 불가능한 인간 노동의 결과이므로
-    반드시 이력으로 남긴다 (계획서 §5).
-    """
-    cols = ["question_id", "doc_id", "rule_label", "rule_hint", "llm_label",
-            "final_label", "corrected_answer", "llm_verdict", "final_verdict", "note"]
+    CSV에는 사람이 볼 열만 두고, 원본 출처·공변량 같은 부가 정보는 여기 둔다.
+    build 단계가 이걸 읽어 최종 JSONL의 meta에 되붙인다."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=cols)
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: r.get(k, "") for k in cols})
+    payload = {it.question_id: it.meta for it in items}
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def read_meta(path: str | Path) -> dict[str, dict]:
+    path = Path(path)
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))

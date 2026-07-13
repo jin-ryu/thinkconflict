@@ -20,12 +20,11 @@ data/raw/ramdocs/
 !data/raw/checksums.lock
 !data/raw/LICENSES/
 
-# 전처리 산출물(CSV·JSONL 모두)은 원본 문서 본문을 담으므로 커밋하지 않는다
-# (QACC는 CC BY-SA 3.0 ShareAlike 대상). download.sh + preprocessing/ 코드 +
-# checksums.lock으로 완전 재현된다.
-# 반면 preprocessing/review/의 라벨 이력(*_labels.csv)은 본문 없이 판정 결과만 담으며,
-# 재현 불가능한 인간 노동의 산물이므로 커밋한다 (계획서 §5).
-data/processed/*/
+# data/processed/는 커밋한다 — 중간 CSV(사람이 채운 라벨)는 재현 불가능한 인간 노동의
+# 산물이라 이력으로 남겨야 하고, 검토 상태를 그대로 추적하기 위해서다 (계획서 §5).
+# ※ 원본 문서 본문이 포함되므로, 논문 공개용 익명 미러를 만들 때는 데이터셋 라이선스를
+#   확인할 것 — QACC 파생물은 CC BY-SA 3.0(저작자 표시 + 동일조건변경허락) 대상이다.
+#   라이선스 사본: data/raw/LICENSES/
 
 # 실행 산출물: raw 생성물은 git 미포함, 집계만 포함 (계획서 §3)
 results/raw/
