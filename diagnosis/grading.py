@@ -102,13 +102,16 @@ def is_abstain(answer: str) -> bool:
     return any(re.search(pat, answer, re.IGNORECASE) for pat in ABSTAIN_PATTERNS)
 
 
-def grade(answer: str | None, correct_answers: list[str],
-          wrong_answers: list[str] | None = None) -> str:
+def grade(answer: str | None, correct_answers: list[str]) -> str:
     """Final Action 라벨을 반환한다: 'correct' | 'wrong' | 'abstain'.
 
     any-gold: correct_answers 중 하나라도 동치면 correct (사전등록 §1.5).
     abstain 판정이 동치 판정보다 우선한다 — 단, 기권 표지가 있어도 정답을
     함께 확정 표출한 경우(예: "정확히 단정할 수 없으나 답은 X")는 correct다.
+
+    오답의 '종류'(오정보 문서의 답을 채택했는지 vs 엉뚱한 답인지)는 이 라벨을
+    바꾸지 않는다 — 사전등록 지표는 correct/wrong/abstain 3분류이므로. 그 구분이
+    필요하면 adopted_wrong_answer()로 별도 관측한다.
     """
     if answer is None or not answer.strip():
         return "abstain"
@@ -117,6 +120,18 @@ def grade(answer: str | None, correct_answers: list[str],
     if is_abstain(answer):
         return "abstain"
     return "wrong"
+
+
+def adopted_wrong_answer(answer: str | None, wrong_answers: list[str]) -> str | None:
+    """모델이 **문서에 실린 특정 오답을 그대로 채택**했는지 (부가 관측, 지표 아님).
+
+    "충돌 문서의 오정보를 삼켰다"와 "엉뚱한 답을 지어냈다"는 실패의 성격이 다르므로
+    구분해 볼 수 있게 한다. FA 라벨(correct/wrong/abstain)에는 영향을 주지 않는다.
+    wrong_answers가 원본에 있는 데이터셋(RAMDocs·QACC)에서만 의미가 있다.
+    """
+    if not answer or not wrong_answers:
+        return None
+    return next((w for w in wrong_answers if equivalent(answer, w)), None)
 
 
 def abstain_rate(labels: list[str]) -> float:

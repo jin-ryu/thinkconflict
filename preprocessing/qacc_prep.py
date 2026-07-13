@@ -145,13 +145,13 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
             elif gold_n and norm_answer(sup) == gold_n:
                 label = "correct"
             else:
-                label = "conflicting"
+                label = "conflict"
             chunks.append(Chunk(doc_id=j, text=text, label=label,
                                 url=(sources[j] if j < len(sources) else None),
                                 supported_answer=sup))
 
         has_pair = (any(c.label == "correct" for c in chunks)
-                    and any(c.label == "conflicting" for c in chunks))
+                    and any(c.label == "conflict" for c in chunks))
         if not has_pair and flag is None:
             flag = "no_valid_conflict_pair"   # 유효 충돌 게이트 (사전등록 §3.1) 미통과
             stats["flag_no_valid_conflict_pair"] += 1

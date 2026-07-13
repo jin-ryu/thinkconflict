@@ -40,7 +40,7 @@ def item() -> Item:
         chunks=[
             Chunk(0, "Pesach 2025 begins before sundown on Saturday April 12, 2025.",
                   "correct", date="2025-01-01", url="https://hebcal.com"),
-            Chunk(1, "It starts at dusk on April 22, 2024.", "conflicting",
+            Chunk(1, "It starts at dusk on April 22, 2024.", "conflict",
                   date="2024-05-01", url="https://blog.example"),
             Chunk(2, "Passover is a Jewish holiday.", "noise", date="2023-01-01"),
         ],
@@ -240,7 +240,7 @@ def test_ramdocs_a_decomposes_to_single_conflict_factor():
     b = build_b(rows)
     assert len(b) == 1 and len(a) == 2               # gold 단위 분해
     assert a[0].correct_answers == ["3,559 people"]  # 하위 문항은 단일 gold
-    assert [c.label for c in a[0].chunks] == ["correct", "conflicting", "noise"]
+    assert [c.label for c in a[0].chunks] == ["correct", "conflict", "noise"]
     assert all(validate_item(x) == [] for x in a + b)
 
 
@@ -264,8 +264,8 @@ def test_ramdocs_within_item_pair_holds_document_count_fixed():
     conflict, control = pairs
     assert len(conflict.chunks) == len(control.chunks)      # 문서 수 고정
     assert conflict.conflict_type == "misinfo" and control.conflict_type == "none"
-    assert any(c.label == "conflicting" for c in conflict.chunks)
-    assert not any(c.label == "conflicting" for c in control.chunks)
+    assert any(c.label == "conflict" for c in conflict.chunks)
+    assert not any(c.label == "conflict" for c in control.chunks)
     assert conflict.meta["pair_id"] == control.meta["pair_id"]
 
 

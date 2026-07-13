@@ -163,7 +163,7 @@ def run(spec: InterventionSpec, gens_path: Path, labels_path: Path,
                     "model": model_key, "env": env, "mode": spec.mode,
                     "origin_path": lab.get("path"), **meta,
                     "answer": answer,
-                    "fa": grade(answer, item.correct_answers, item.wrong_answers),
+                    "fa": grade(answer, item.correct_answers),
                 }, ensure_ascii=False) + "\n")
                 out.flush()
 

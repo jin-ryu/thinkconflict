@@ -6,7 +6,7 @@
   dragged — 청크 라벨 초벌 (PPT 12p ①: "LLM이 초벌 분류한 뒤 사람이 전수 검토").
             **사실 충돌 67문항 전수**가 기본 대상이다(--only-flagged로 축소 가능).
             규칙은 '정답 문자열을 담았는가'만 볼 수 있어 correct만 확정할 수 있고,
-            '다른 답을 주장하는가(conflicting)' vs '무관한가(noise)'는 가르지 못한다
+            '다른 답을 주장하는가(conflict)' vs '무관한가(noise)'는 가르지 못한다
             — 예: 정답 "at least 1,759"에 "1,762"를 주장하는 문서는 매칭에 실패하지만
             명백한 충돌 문서다. 그 판정을 LLM이 초벌하고 사람이 확정한다.
             제안은 dragged_llm_labels.csv에 쌓이고, `dragged_prep sheet`가 이를
@@ -81,7 +81,7 @@ IRRELEVANT to deciding the answer?
 Fill the form with one word.
 label ∈ {{support, contradict, irrelevant}} = """
 
-LLM_TO_CHUNK_LABEL = {"support": "correct", "contradict": "conflicting",
+LLM_TO_CHUNK_LABEL = {"support": "correct", "contradict": "conflict",
                       "irrelevant": "noise"}
 
 

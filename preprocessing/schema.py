@@ -5,7 +5,7 @@
 
 문서(chunk) 라벨:
     correct     — 정답을 지지하는 유효 문서
-    conflicting — 정답과 상충하는 문서 (구버전·오정보·반대 관점)
+    conflict    — 정답과 상충하는 문서 (구버전·오정보·반대 관점)
     noise       — 질문과 무관하거나 어느 답도 지지하지 않는 문서
     unknown     — 미확정 (골드 매핑 전 초안 상태에서만 허용)
 
@@ -24,7 +24,7 @@ from typing import Iterator
 
 DATASETS = ("dragged", "qacc", "ramdocs_a", "ramdocs_b")
 CONFLICT_TYPES = ("temporal", "misinfo", "opinion", "complementary", "none", "ambiguous")
-CHUNK_LABELS = ("correct", "conflicting", "noise", "unknown")
+CHUNK_LABELS = ("correct", "conflict", "noise", "unknown")
 
 
 @dataclass
@@ -45,6 +45,10 @@ class Item:
     question: str
     conflict_type: str
     correct_answers: list[str]         # any-gold: 이 중 하나면 correct (사전등록 §1.5)
+    # 문서에 실린 '틀린 답'들. 채점(FA 라벨)에는 쓰이지 않는다 — 오답은 어차피 wrong이다.
+    # 용도는 부가 관측 하나뿐: 모델이 오정보 문서의 답을 그대로 삼켰는지(adopted_wrong_answer)와
+    # 엉뚱한 답을 지어냈는지를 가른다. 원본이 주는 데이터셋에서만 채워진다:
+    # RAMDocs(gold/wrong 내장) · QACC(다른 후보 답) · DRAGged는 원본에 없어 빈 리스트.
     wrong_answers: list[str] = field(default_factory=list)
     chunks: list[Chunk] = field(default_factory=list)
     behavior_track: bool = False       # 채점 가능 (사실 충돌 + 골드 매핑 확정)
@@ -114,7 +118,7 @@ def passes_valid_conflict_gate(item: Item) -> bool:
     """유효 충돌 게이트 (사전등록 §3.1): 정답 지지 문서와 충돌 문서가 공존해야
     채점 트랙 투입 가능. 라벨 미확정(unknown) 문항은 통과할 수 없다."""
     labels = {c.label for c in item.chunks}
-    return "correct" in labels and "conflicting" in labels
+    return "correct" in labels and "conflict" in labels
 
 
 # ── 표준 렌더링 (계획서 §3.1: 셔플링 + [Document i] 포맷, 메타데이터 유지) ──────

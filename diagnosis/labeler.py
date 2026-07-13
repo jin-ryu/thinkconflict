@@ -16,7 +16,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Protocol
 
-from diagnosis.grading import grade
+from diagnosis.grading import adopted_wrong_answer, grade
 from diagnosis.trace_parser import ParsedTrace
 from preprocessing.schema import Item
 
@@ -50,6 +50,7 @@ class StageLabels:
     path: str | None            # legitimate | shortcut | discordant_hit | blind_hit | None(오답·기권)
     type_recognition: str | None = None   # correct_type | surface_only | None(L1 미탐지)
     l2_flip_count: int = 0      # 번복 횟수 (부가 신호, 부록 B 연계)
+    adopted_wrong: str | None = None   # 문서에 실린 오답을 그대로 채택했는가 (부가 관측)
     l2_char_offset: int | None = None  # 해소 확정 지점 (RCPD·resampling 국소화용)
     implicit_leaning: str | None = None  # 암묵적 기울기 백스톱 (부가 라벨 전용)
     provenance: dict = field(default_factory=dict)  # rule/judge 판정 출처
@@ -91,7 +92,7 @@ def last_explicit_support(thinking: str, doc_order: list[int],
         if not support and not reject:
             continue
         doc_label = label_by_id.get(doc_order[pos - 1], "unknown")
-        if doc_label not in ("correct", "conflicting"):
+        if doc_label not in ("correct", "conflict"):
             continue
         backs_gold = (doc_label == "correct") == bool(support and not reject)
         stances.append((m.start(), "correct" if backs_gold else "wrong"))
@@ -105,7 +106,7 @@ def last_explicit_support(thinking: str, doc_order: list[int],
 def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
                      judge: JudgeFn | None = None) -> StageLabels:
     """생성 1건의 3단계 라벨 + 4경로 귀속 (사전등록 §1.1~1.7)."""
-    fa = grade(parsed.answer, item.correct_answers, item.wrong_answers)
+    fa = grade(parsed.answer, item.correct_answers)
     thinking = parsed.thinking or ""
     l1_detected = detect_l1(thinking)
     prov = {"l1": "rule", "l2": "rule", "fa": "rule"}
@@ -141,6 +142,8 @@ def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
         type_recognition=(recognize_type(thinking, item.conflict_type)
                           if l1_detected and item.conflict_type in TYPE_CUES else None),
         l2_flip_count=flips, l2_char_offset=offset, provenance=prov,
+        adopted_wrong=(adopted_wrong_answer(parsed.answer, item.wrong_answers)
+                       if fa == "wrong" else None),
     )
 
 

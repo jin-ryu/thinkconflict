@@ -61,7 +61,7 @@ CONFLICT_TYPE_MAP = {
     "no conflict": "none",              # No conflict (161)
 }
 FACT_CONFLICT_TYPES = ("temporal", "misinfo")  # 행동 트랙 대상 (명목 67건)
-CHUNK_LABELS_FINAL = ("correct", "conflicting", "noise")  # 시트에서 허용되는 확정 라벨
+CHUNK_LABELS_FINAL = ("correct", "conflict", "noise")  # 시트에서 허용되는 확정 라벨
 TEXT_FIELDS = ("short_text", "snippet", "response_str")  # 폴백 순서 (실측 기반)
 MAX_DOC_WORDS = 420   # response_str 폴백이 컨텍스트를 삼키지 않도록 상한 (short_text 최대 412)
 FUZZ_THRESHOLD = 85   # 문장 전체 부분 일치 임계
@@ -218,7 +218,7 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
                     if c.doc_id in winners:
                         c.label = "correct"
             # 나머지 문서는 unknown으로 남긴다. 규칙은 '정답을 담았는가'만 볼 수 있을 뿐
-            # '다른 답을 주장하는가(conflicting)'와 '무관한가(noise)'를 가를 수 없다 —
+            # '다른 답을 주장하는가(conflict)'와 '무관한가(noise)'를 가를 수 없다 —
             # 실측 반례: 정답 "at least 1,759"에 "1,762"를 주장하는 문서는 정답 문자열이
             # 없어 매칭에 실패하지만 명백한 충돌 문서다. 이 구분은 LLM 초벌 + 사람
             # 전수 검토가 확정한다 (PPT 12p ①, 사전등록 §7.7).
@@ -285,7 +285,7 @@ def export_review_sheet(items: list[Item], out_csv: Path, llm_csv: Path) -> None
         w.writerow(["question_id", "conflict_type", "question", "correct_answer",
                     "corrected_answer(정오표: 수정 시만)", "doc_id", "date", "url",
                     "rule_label", "rule_hint", "llm_label",
-                    "final_label(correct/conflicting/noise)",
+                    "final_label(correct/conflict/noise)",
                     "exclusion_flag", "doc_excerpt", "note"])
         for it in items:
             if it.conflict_type not in FACT_CONFLICT_TYPES:
@@ -321,7 +321,7 @@ def finalize(items: list[Item], review_csv: Path) -> tuple[list[Item], Counter]:
         for row in csv.DictReader(f):
             qid = row["question_id"]
             e = sheet.setdefault(qid, {"labels": {}, "src": {}, "answer": None})
-            human = row.get("final_label(correct/conflicting/noise)", "").strip()
+            human = row.get("final_label(correct/conflict/noise)", "").strip()
             llm = row.get("llm_label", "").strip()
             label = human or llm
             if label in CHUNK_LABELS_FINAL:
@@ -345,7 +345,7 @@ def finalize(items: list[Item], review_csv: Path) -> tuple[list[Item], Counter]:
                 it.correct_answers = [e["answer"]]
                 stats["answer_corrected"] += 1
             it.meta["mapping"] = "human-verified"
-            # 사람이 correct·conflicting을 모두 확정했으면 규칙 단계의 플래그는 해소된 것이다
+            # 사람이 correct·conflict를 모두 확정했으면 규칙 단계의 플래그는 해소된 것이다
             if any(c.label == "correct" for c in it.chunks):
                 it.exclusion_flag = None
 
@@ -357,7 +357,7 @@ def finalize(items: list[Item], review_csv: Path) -> tuple[list[Item], Counter]:
             it.behavior_track = (it.exclusion_flag is None
                                  and bool(it.correct_answers)
                                  and any(c.label == "correct" for c in it.chunks)
-                                 and any(c.label == "conflicting" for c in it.chunks))
+                                 and any(c.label == "conflict" for c in it.chunks))
             stats["behavior_track" if it.behavior_track else "fact_excluded"] += 1
     return items, stats
 

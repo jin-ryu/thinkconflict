@@ -33,7 +33,7 @@ from pathlib import Path
 
 from preprocessing.schema import Chunk, Item, write_jsonl
 
-TYPE_TO_LABEL = {"correct": "correct", "misinfo": "conflicting", "noise": "noise"}
+TYPE_TO_LABEL = {"correct": "correct", "misinfo": "conflict", "noise": "noise"}
 
 
 def load_raw(raw_dir: Path) -> list[dict]:
