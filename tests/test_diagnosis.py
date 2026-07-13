@@ -384,8 +384,8 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
 # ── 검토 전 데이터로 실험하는 사고 방지 ──────────────────────────────────────
 
 @pytest.mark.parametrize("path", [
-    "data/interim/dragged/dragged.draft.csv",
-    "data/interim/dragged/dragged.llm.csv",
+    "data/review/dragged/dragged.draft.csv",
+    "data/review/dragged/dragged.llm.csv",
     "data/processed/dragged.draft.jsonl",     # 이름에 draft가 있으면 경로 무관하게 차단
 ])
 def test_unreviewed_input_is_refused(path):

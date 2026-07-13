@@ -1,7 +1,7 @@
 # 최종 산출물 (실험이 읽는 유일한 입력)
 
-여기 있는 JSONL은 **검토가 끝난 것만** 들어온다. 작업 중인 초안은 `data/interim/`에 있고,
-`serving/client.py`·`diagnosis/run_labeling.py`는 `data/interim/` 경로를 **거부한다** —
+여기 있는 JSONL은 **검토가 끝난 것만** 들어온다. 작업 중인 초안은 `data/review/`에 있고,
+`serving/client.py`·`diagnosis/run_labeling.py`는 `data/review/` 경로를 **거부한다** —
 검토 전 데이터로 실험을 돌려 놓고 결과를 믿는 사고를 코드로 막는다.
 
 | 파일 | 생성 | 상태 |

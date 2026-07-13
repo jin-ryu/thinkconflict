@@ -331,14 +331,14 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "build"])
     ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
-    ap.add_argument("--interim-dir", default="data/interim/dragged", type=Path)
+    ap.add_argument("--review-dir", default="data/review/dragged", type=Path)
     ap.add_argument("--out-dir", default="data/processed", type=Path)
     ap.add_argument("--csv", type=Path,
                     help="build 입력 CSV (기본: dragged.llm.csv 있으면 그것, 없으면 draft)")
     args = ap.parse_args()
-    draft_csv = args.interim_dir / "dragged.draft.csv"
-    llm_csv = args.interim_dir / "dragged.llm.csv"
-    meta_path = args.interim_dir / "dragged.meta.json"
+    draft_csv = args.review_dir / "dragged.draft.csv"
+    llm_csv = args.review_dir / "dragged.llm.csv"
+    meta_path = args.review_dir / "dragged.meta.json"
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))

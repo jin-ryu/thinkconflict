@@ -250,15 +250,15 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "estimate-cost", "build"])
     ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
-    ap.add_argument("--interim-dir", default="data/interim/qacc", type=Path)
+    ap.add_argument("--review-dir", default="data/review/qacc", type=Path)
     ap.add_argument("--out-dir", default="data/processed", type=Path)
     ap.add_argument("--dragged-draft",
-                    default="data/interim/dragged/dragged.draft.csv", type=Path)
+                    default="data/review/dragged/dragged.draft.csv", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     args = ap.parse_args()
-    draft_csv = args.interim_dir / "qacc.draft.csv"
-    llm_csv = args.interim_dir / "qacc.llm.csv"
-    meta_path = args.interim_dir / "qacc.meta.json"
+    draft_csv = args.review_dir / "qacc.draft.csv"
+    llm_csv = args.review_dir / "qacc.llm.csv"
+    meta_path = args.review_dir / "qacc.meta.json"
 
     if args.stage == "draft":
         items, stats = build_items(load_raw(args.raw_dir))

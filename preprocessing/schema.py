@@ -117,11 +117,11 @@ def validate_item(item: Item) -> list[str]:
 def assert_reviewed(path: str | Path) -> None:
     """실험 입력이 검토 완료본인지 확인한다.
 
-    `data/interim/`의 초안(CSV·draft)은 라벨이 미확정일 수 있으므로 실험에 쓰면 안 된다.
+    `data/review/`의 초안(CSV·draft)은 라벨이 미확정일 수 있으므로 실험에 쓰면 안 된다.
     실험 스크립트는 반드시 `data/processed/`의 최종 JSONL만 읽는다 — 이 불변식을
     코드로 강제해, 검토가 끝나기 전에 돌려 놓고 결과를 믿는 사고를 막는다."""
     p = Path(path)
-    if "interim" in p.parts or ".draft." in p.name:
+    if "review" in p.parts or ".draft." in p.name:
         raise SystemExit(
             f"검토 전 초안을 실험 입력으로 쓸 수 없다: {p}\n"
             "  → data/processed/ 의 최종 JSONL을 쓸 것 "

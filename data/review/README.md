@@ -4,7 +4,7 @@
 
 ```
 data/raw/         원본           (git 미포함 — download.sh + checksums.lock으로 재현)
-data/interim/     작업용 CSV     (커밋) ← 지금 이 폴더. 검토 상태가 git 이력에 남는다
+data/review/     작업용 CSV     (커밋) ← 지금 이 폴더. 검토 상태가 git 이력에 남는다
 data/processed/   최종 JSONL     (커밋) ← 실험이 읽는 유일한 입력
 ```
 
@@ -15,7 +15,7 @@ data/processed/   최종 JSONL     (커밋) ← 실험이 읽는 유일한 입�
 JSONL은 **맨 마지막에만** 나온다. 그 전 단계는 Excel/Numbers로 열어 보고 고칠 수 있다.
 
 ```
-원본 → [draft] → interim/<ds>.draft.csv → [llm] → interim/<ds>.llm.csv → [사람] → [build] → processed/<ds>.jsonl
+원본 → [draft] → review/<ds>.draft.csv → [llm] → review/<ds>.llm.csv → [사람] → [build] → processed/<ds>.jsonl
                   규칙이 채움                       LLM이 빈칸 채움          final_* 확정        최종본
 ```
 
@@ -24,12 +24,12 @@ JSONL은 **맨 마지막에만** 나온다. 그 전 단계는 Excel/Numbers로 �
 남고, `unknown`이 있는 문항은 채점 트랙에 못 들어간다(스키마 검증이 막는다).
 
 검토가 끝나기 전 초안으로 실험을 돌리는 사고는 **코드가 막는다** —
-`serving/client.py`와 `diagnosis/run_labeling.py`는 `data/interim/` 경로를 거부한다.
+`serving/client.py`와 `diagnosis/run_labeling.py`는 `data/review/` 경로를 거부한다.
 
 ## 구조
 
 ```
-data/interim/
+data/review/
 ├── dragged/
 │   ├── dragged.draft.csv    규칙 초안 — correct만 확정, 나머지 563문서는 빈칸 👈 검토 대상
 │   ├── dragged.llm.csv      LLM 초벌이 llm_label을 채운 것
@@ -52,14 +52,14 @@ python -m preprocessing.ramdocs_prep
 # DRAGged — 규칙 초안 → LLM 초벌 → 사람 확정 → 최종본
 python -m preprocessing.dragged_prep draft
 python -m preprocessing.llm_assist  dragged --base-url http://HOST:PORT/v1 --model MODEL
-#   ↳ interim/dragged/dragged.llm.csv 를 열어 final_label 확정 (빈칸이면 llm_label이 쓰인다)
+#   ↳ review/dragged/dragged.llm.csv 를 열어 final_label 확정 (빈칸이면 llm_label이 쓰인다)
 python -m preprocessing.dragged_prep build    # → data/processed/dragged.jsonl
 
 # QACC — 스키마 변환 → 판정자 2종 → 사람 확정 → 최종본
 python -m preprocessing.qacc_prep   draft
 python -m preprocessing.llm_assist  qacc --judge 1 --base-url ... --model MODEL_A
 python -m preprocessing.llm_assist  qacc --judge 2 --base-url ... --model MODEL_B  # 다른 계열
-#   ↳ interim/qacc/qacc.llm.csv 를 열어 final_verdict(sharp/soft)·final_conflict_type 확정
+#   ↳ review/qacc/qacc.llm.csv 를 열어 final_verdict(sharp/soft)·final_conflict_type 확정
 python -m preprocessing.qacc_prep   build     # → data/processed/qacc.jsonl
 
 python -m preprocessing.schema data/processed/*.jsonl   # 산출물 검증 + 게이트 통과율

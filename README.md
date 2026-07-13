@@ -16,7 +16,7 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 ```
 docs/            정본 계획서 · 구축 계획 · 사전등록 규약
 data/raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
-data/interim/    작업용 CSV — 사람이 검토·수정하는 중간 산출물 (커밋)
+data/review/    작업용 CSV — 사람이 검토·수정하는 중간 산출물 (커밋)
 data/processed/  최종 JSONL — 실험이 읽는 유일한 입력 (커밋)
 preprocessing/   공통 스키마·CSV 계층 + 데이터셋별 전처리 + LLM 초벌
 serving/         3모델 vLLM 서빙 스크립트 + 공통 생성 클라이언트
@@ -35,7 +35,7 @@ pytest tests/                        # 진단 파이프라인 회귀 테스트 (
 
 bash data/raw/download.sh            # DRAGged · QACC · RAMDocs 원 출처 다운로드 + 체크섬 고정
 python -m preprocessing.ramdocs_prep # 공통 스키마 변환 (LLM 불필요 — Phase 1-1)
-python -m preprocessing.dragged_prep draft   # → data/interim/dragged/dragged.draft.csv
+python -m preprocessing.dragged_prep draft   # → data/review/dragged/dragged.draft.csv
 ```
 
 Phase 2 이후 (GPU 필요):
