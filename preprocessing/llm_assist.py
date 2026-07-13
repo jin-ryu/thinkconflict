@@ -229,23 +229,39 @@ def main() -> None:
     args = ap.parse_args()
 
     ds = args.dataset
-    draft_csv = args.data_dir / ds / f"{ds}.draft.csv"
-    llm_csv = args.data_dir / ds / f"{ds}.llm.csv"
-    src = llm_csv if llm_csv.exists() else draft_csv   # 재개: 채우던 파일에 이어 쓴다
-    if not src.exists():
-        raise SystemExit(f"입력 CSV 없음: {src} — `python -m preprocessing.{ds}_prep draft` 먼저 실행")
-
-    rows = read_csv(src)
+    review_dir = args.data_dir / ds
     client = make_client(args.base_url, args.api_key)
-    if ds == "dragged":
-        n = run_dragged(client, args.model, rows, args.only_flagged)
-    else:
-        n = run_qacc(client, args.model, rows, args.judge,
-                     args.data_dir / ds / "judges")
 
-    write_rows(rows, llm_csv)
-    print(f"\n{n}건 판정 → {llm_csv}")
-    print(f"→ 이 CSV를 열어 확인·수정한 뒤 `python -m preprocessing.{ds}_prep build` 실행")
+    if ds == "dragged":
+        # 검토가 필요한 것은 사실 충돌뿐 — 나머지 유형은 정답이 없어 라벨이 채점에 쓰이지 않는다
+        total = 0
+        for ctype in FACT_CONFLICT_TYPES:
+            draft = review_dir / f"{ds}_{ctype}.draft.csv"
+            llm = review_dir / f"{ds}_{ctype}.llm.csv"
+            if not draft.exists():
+                raise SystemExit(f"입력 CSV 없음: {draft} — "
+                                 f"`python -m preprocessing.{ds}_prep draft` 먼저 실행")
+            src = llm if llm.exists() else draft     # 재개: 채우던 파일에 이어 쓴다
+            rows = read_csv(src)
+            n = run_dragged(client, args.model, rows, args.only_flagged)
+            write_rows(rows, llm)
+            print(f"  {ctype}: {n}건 판정 → {llm.name}")
+            total += n
+        print(f"\n총 {total}건 판정")
+        print(f"→ {review_dir}/dragged_{{temporal,misinfo}}.llm.csv 를 열어 `label`을 확인·수정한 뒤 "
+              f"`python -m preprocessing.{ds}_prep build` 실행")
+    else:
+        draft_csv = review_dir / f"{ds}.draft.csv"
+        llm_csv = review_dir / f"{ds}.llm.csv"
+        src = llm_csv if llm_csv.exists() else draft_csv
+        if not src.exists():
+            raise SystemExit(f"입력 CSV 없음: {src} — "
+                             f"`python -m preprocessing.{ds}_prep draft` 먼저 실행")
+        rows = read_csv(src)
+        n = run_qacc(client, args.model, rows, args.judge, review_dir / "judges")
+        write_rows(rows, llm_csv)
+        print(f"\n{n}건 판정 → {llm_csv}")
+        print(f"→ 이 CSV를 열어 확인·수정한 뒤 `python -m preprocessing.{ds}_prep build` 실행")
 
 
 if __name__ == "__main__":

@@ -166,6 +166,48 @@ def write_by_type(items: list[Item], out_dir: str | Path,
     return written
 
 
+def write_csv_by_type(items: list[Item], review_dir: str | Path, dataset: str,
+                      stage: str = "draft") -> list[tuple[str, int, int]]:
+    """검토 CSV도 **충돌 유형별로 나눠 쓴다** — 검토자가 볼 파일만 열 수 있게.
+
+    한 파일에 다 넣으면 검토 대상이 아닌 문항이 시야를 가린다(실측: DRAGged 4,212행 중
+    실제 검토 대상은 623행뿐이고, 나머지 3,589행은 라벨이 채점에 쓰이지 않는다).
+
+    반환: (파일명, 행 수, 빈칸 수) 목록.
+    """
+    review_dir = Path(review_dir)
+    by_type: dict[str, list[Item]] = {}
+    for it in items:
+        by_type.setdefault(it.conflict_type, []).append(it)
+    out = []
+    for ctype, group in sorted(by_type.items()):
+        name = f"{dataset}_{ctype}.{stage}.csv"
+        write_csv(group, review_dir / name)
+        n_rows = sum(len(it.chunks) for it in group)
+        n_blank = sum(1 for it in group for c in it.chunks if c.label == "unknown")
+        out.append((name, n_rows, n_blank))
+    return out
+
+
+def read_csv_by_type(review_dir: str | Path, dataset: str,
+                     types: list[str] | None = None) -> tuple[list[dict], list[Path]]:
+    """유형별 CSV를 모아 읽는다. 같은 유형에 `.llm.csv`가 있으면 그쪽을 쓴다(더 나중 단계).
+
+    반환: (합친 행 목록, 실제로 읽은 파일 경로 목록).
+    """
+    review_dir = Path(review_dir)
+    rows, used = [], []
+    for draft in sorted(review_dir.glob(f"{dataset}_*.draft.csv")):
+        ctype = draft.name[len(dataset) + 1:-len(".draft.csv")]
+        if types is not None and ctype not in types:
+            continue
+        llm = draft.with_name(f"{dataset}_{ctype}.llm.csv")
+        src = llm if llm.exists() else draft
+        rows.extend(read_csv(src))
+        used.append(src)
+    return rows, used
+
+
 def original_answers(path: str | Path) -> dict[str, str]:
     """초안 CSV에서 문항별 원본 정답을 읽는다 (정오표 비교용).
     초안 CSV는 커밋되므로, 사람이 고친 값과 원본의 차이가 git에도 그대로 남는다."""

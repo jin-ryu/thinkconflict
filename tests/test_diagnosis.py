@@ -435,10 +435,13 @@ def test_build_refuses_to_emit_final_output_before_review(tmp_path, monkeypatch)
 
     assert subprocess.run(base + ["draft"] + args, env=env,
                           capture_output=True).returncode == 0
+    # 초안 CSV는 유형별로 나뉜다 — 검토할 파일만 열 수 있게
+    assert (review / "dragged_temporal.draft.csv").exists()
+
     done = subprocess.run(base + ["build"] + args, env=env, capture_output=True, text=True)
     assert done.returncode != 0                       # 검토 전이므로 거부
     assert "검토가 끝나지 않았다" in done.stderr
-    assert not list(out.glob("*.jsonl"))              # 최종본을 만들지 않았다
+    assert not list(out.rglob("*.jsonl"))             # 최종본을 만들지 않았다
 
 
 @pytest.mark.parametrize("path", [

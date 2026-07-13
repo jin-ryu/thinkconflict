@@ -27,12 +27,13 @@
 
 파이프라인 (중간 산출물은 CSV — 사람이 열어 보고 고친다):
 
-    draft  →  dragged.draft.csv   규칙이 아는 것(correct)만 채우고 나머지 `label`은 빈칸.
-                                  (규칙은 '정답을 담았는가'만 알 뿐, '다른 답을 주장하는가'와
-                                   '무관한가'를 가르지 못한다 — 사전등록 §7.6)
-    llm    →  dragged.llm.csv     llm_assist가 빈 `label` 칸을 채운다 (초벌)
+    draft  →  dragged_<유형>.draft.csv   **유형별로 나뉜다.** 규칙이 아는 것(correct)만 채우고
+                                        나머지 `label`은 빈칸. 검토 대상은 사실 충돌 2개 파일뿐
+                                        (temporal 578행 · misinfo 45행) — 나머지 3,589행은
+                                        정답이 없어 라벨이 채점에 쓰이지 않는다.
+    llm    →  dragged_<유형>.llm.csv     llm_assist가 빈 `label` 칸을 채운다 (사실 충돌만)
     사람    →  CSV를 열어 `label`을 확인·수정 (채우는 칸은 이것 하나뿐)
-    build  →  dragged.jsonl       CSV에 적힌 값을 그대로 읽어 최종본 생성
+    build  →  3_processed/dragged/dragged_<유형>.jsonl   CSV 값을 그대로 읽어 최종본 생성
 
 규칙이 하는 일: 문자열·앵커 매칭으로 정답 문서를 찾고, 복수 매칭은 제외가 아니라
 `date` 최신성으로 해소한다(사전등록 §3.2). 해소 불가만 플래그한다. 오정보 충돌은
@@ -58,8 +59,8 @@ from rapidfuzz import fuzz
 
 from preprocessing.schema import (Chunk, Item, is_scorable,
                                   passes_valid_conflict_gate, read_jsonl, write_jsonl)
-from preprocessing.tabular import (label_provenance, original_answers, read_csv,
-                                   to_items, write_by_type, write_csv)
+from preprocessing.tabular import (label_provenance, read_csv, read_csv_by_type,
+                                   to_items, write_by_type, write_csv_by_type)
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
@@ -329,32 +330,32 @@ def main() -> None:
     ap.add_argument("--raw-dir", default="data/1_raw/dragged", type=Path)
     ap.add_argument("--review-dir", default="data/2_review/dragged", type=Path)
     ap.add_argument("--out-dir", default="data/3_processed", type=Path)
-    ap.add_argument("--csv", type=Path,
-                    help="build 입력 CSV (기본: dragged.llm.csv 있으면 그것, 없으면 draft)")
     ap.add_argument("--allow-unresolved", action="store_true",
                     help="라벨 미확정인 채로 최종본 생성 (검토 전 테스트용 — 채점 표본 0건)")
     args = ap.parse_args()
-    draft_csv = args.review_dir / "dragged.draft.csv"
-    llm_csv = args.review_dir / "dragged.llm.csv"
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))
-        write_csv(items, draft_csv)
-        n_open = sum(1 for it in items for c in it.chunks
-                     if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
-        print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
-        print(f"  확정 필요 문서(사실 충돌): {n_open}건 — `label` 열의 빈칸을 채우면 된다")
+        written = write_csv_by_type(items, args.review_dir, "dragged")
+        print(f"초안 CSV → {args.review_dir}/  (유형별로 분리 — 검토할 파일만 열면 된다)")
+        for name, n_rows, n_blank in written:
+            ctype = name.split(".")[0].removeprefix("dragged_")
+            mark = "👈 검토 대상" if ctype in FACT_CONFLICT_TYPES else ""
+            print(f"   {name:36s} {n_rows:5d}행  빈칸 {n_blank:5d}  {mark}")
         print(f"  상대 날짜 기준점(코퍼스 최신 절대일): {ref}")
         print("  매칭 버킷(0=무매칭 1=유일 2=복수):",
               {k: v for k, v in sorted(stats.items()) if "_match_" in k})
         report(items)
     else:  # build
-        src = args.csv or (llm_csv if llm_csv.exists() else draft_csv)
-        if not src.exists():
-            raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
-        rows = read_csv(src)
-        items, stats = build_items(rows, original_answers(draft_csv),
-                                   read_csv(draft_csv))
+        rows, used = read_csv_by_type(args.review_dir, "dragged")
+        if not rows:
+            raise SystemExit(f"입력 CSV 없음: {args.review_dir} — `draft` 단계 먼저 실행")
+        # 초안 CSV는 원본 정답(정오표 비교)과 '규칙이 채운 값' 대조에 쓴다
+        drafts = [read_csv(p) for p in sorted(args.review_dir.glob("dragged_*.draft.csv"))]
+        draft_rows = [r for d in drafts for r in d]
+        originals = {r["question_id"]: (r.get("correct_answer") or "").strip()
+                     for r in draft_rows}
+        items, stats = build_items(rows, originals, draft_rows)
 
         # data/3_processed/ 는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
         # 여기서 막는다. 초안 그대로 최종본을 만들면 채점 표본이 조용히 0건이 된다.
@@ -366,11 +367,12 @@ def main() -> None:
                 f"검토가 끝나지 않았다: 사실 충돌 {len(pending)}문항에 라벨 미확정 문서가 남아 있다.\n"
                 f"  → LLM 초벌:  python -m preprocessing.llm_assist dragged "
                 f"--base-url ... --model ...\n"
-                f"  → 그 뒤 {llm_csv} 의 빈 `label` 칸을 확인·수정하고 build를 다시 실행한다.\n"
+                f"  → 그 뒤 {args.review_dir}/dragged_{{temporal,misinfo}}.llm.csv 의 빈 `label` 칸을 "
+                f"확인·수정하고 build를 다시 실행한다.\n"
                 f"  (검토 없이 강행하려면 --allow-unresolved — 채점 표본이 0건이 된다)")
 
         written = write_by_type(items, args.out_dir, "dragged")
-        print(f"입력: {src}")
+        print("입력:", ", ".join(p.name for p in used))
         print("유형별 파일:")
         for name, n in written:
             print(f"   {name:32s} N={n}")

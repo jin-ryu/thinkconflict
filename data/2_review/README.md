@@ -31,11 +31,23 @@ CSV에 적힌 값이 그대로 최종본이 된다(우선순위 규칙 같은 �
 
 ```
 data/2_review/
-├── dragged/
-│   ├── dragged.draft.csv    규칙 초안 — 563문서의 `label`이 빈칸 👈 검토 대상
-│   └── dragged.llm.csv      LLM이 빈칸을 채운 것 (사람이 여기서 확인·수정)
-├── qacc/                    (동일 구조: draft.csv · llm.csv)
-└── ramdocs/                 CSV만 — 눈으로 확인하는 용도 (검토 불필요)
+├── dragged/                          **유형별로 나뉜다** — 검토할 파일만 열면 된다
+│   ├── dragged_temporal.draft.csv      578행 · 빈칸 518  👈 검토 대상
+│   ├── dragged_misinfo.draft.csv        45행 · 빈칸  45  👈 검토 대상
+│   ├── dragged_temporal.llm.csv        LLM이 빈칸을 채운 것 (사람이 여기서 확인·수정)
+│   ├── dragged_misinfo.llm.csv         〃
+│   ├── dragged_opinion.draft.csv     1123행 — 정답이 없어 라벨이 채점에 쓰이지 않는다
+│   ├── dragged_complementary.draft.csv 1067행 — 〃
+│   └── dragged_none.draft.csv        1399행 — 규칙이 전부 채움 (대조군)
+├── qacc/                             draft.csv · llm.csv · judges/
+└── ramdocs/                          CSV만 — 눈으로 확인하는 용도 (검토 불필요)
+
+**검토 대상은 사실 충돌 2개 파일(623행)뿐이다.** 한 파일에 다 넣으면 나머지 3,589행이
+시야를 가린다 — 그 문항들은 정답이 없어(의견·상보) 라벨이 채점에 쓰이지 않거나,
+규칙이 이미 다 채웠다(비충돌).
+
+QACC는 유형이 아직 **잠정값**이다(LLM 판정자가 확정한다) — 잠정 유형으로 파일을 쪼개면
+판정 후 행이 파일 사이를 옮겨다니므로, 게이트 ①이 끝날 때까지 한 파일로 둔다.
 ```
 
 **RAMDocs는 LLM·사람 검토가 없다.** 문서별 `type`과 정답이 원본에 라벨돼 있어 승계만 하면
