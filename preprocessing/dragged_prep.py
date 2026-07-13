@@ -1,4 +1,4 @@
-"""DRAGged 전처리: 골드 매핑 초안 → 사람 전수 검토 시트 → 확정 (Phase 1-3, §3.1.1).
+"""DRAGged 전처리: 규칙 초안(CSV) → LLM 초벌 → 사람 확정 → JSONL (Phase 1-3, §3.1.1).
 
 원본(`google-research-datasets/rag_conflicts`, conflicts.jsonl) 실측 구조:
     {source, question, conflict_type, correct_answer,
@@ -25,16 +25,21 @@
 따라서 **행동 트랙의 대조군은 비충돌 161건**이고(사전등록 §7.2), 상보·의견은
 정답 채점 없이 자기일관성 비교(충돌 182 vs 비상충 276)에 쓴다(§3.2 이중 트랙).
 
-3단계 파이프라인 (CLI 서브커맨드):
-    draft   — 문자열·앵커 토큰 매칭으로 정답 문서 자동 매핑 초안. 복수 매칭은 제외가
-              아니라 `date` 최신성으로 해소한다(사전등록 §3.2). 해소 불가만 플래그.
-              오정보 충돌은 최신성이 아니라 출처 권위로 갈라야 하므로 자동 해소하지
-              않고 사람에게 넘긴다(5건뿐이라 전수 검증이 가능).
-    sheet   — 사실 충돌(시간+오정보) 전수 인간 검토 시트(CSV). 정답 오탈자 교정 컬럼 포함
-              (실측 확인: "Boston Celtis", "Bolovia").
-    final   — 검토 완료 시트를 반영해 data/processed/dragged/dragged.jsonl 확정.
+파이프라인 (중간 산출물은 CSV — 사람이 열어 보고 고친다):
 
-usage: python -m preprocessing.dragged_prep {draft|sheet|final}
+    draft  →  dragged.draft.csv   규칙이 correct만 확정. conflict/noise는 빈칸으로 남긴다.
+                                  (규칙은 '정답을 담았는가'만 알 뿐, '다른 답을 주장하는가'와
+                                   '무관한가'를 가르지 못한다 — 사전등록 §7.6)
+    llm    →  dragged.llm.csv     llm_assist가 빈 llm_label을 채운다 (초벌)
+    사람    →  llm.csv의 final_label 확정 (빈칸이면 llm_label이 대신 쓰인다)
+    build  →  dragged.jsonl       라벨 우선순위 사람 > LLM > 규칙으로 최종본 생성
+
+규칙이 하는 일: 문자열·앵커 매칭으로 정답 문서를 찾고, 복수 매칭은 제외가 아니라
+`date` 최신성으로 해소한다(사전등록 §3.2). 해소 불가만 플래그한다. 오정보 충돌은
+최신성이 아니라 출처 권위로 갈리므로 자동 해소하지 않고 사람에게 넘긴다(5건뿐).
+정답 오탈자는 corrected_answer 열로 교정한다(실측: "Boston Celtis", "Bolovia").
+
+usage: python -m preprocessing.dragged_prep {draft|build}
 """
 from __future__ import annotations
 
@@ -51,6 +56,10 @@ from dateutil import parser as dateparser
 from rapidfuzz import fuzz
 
 from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
+from preprocessing.tabular import (export_label_record, label_provenance, read_csv,
+                                   to_items, write_csv)
+
+_draft_cache: list[Item] = []   # build 단계에서 draft의 meta를 되붙이기 위한 캐시
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
@@ -265,93 +274,23 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
     return items, stats, ref
 
 
-def load_llm_labels(path: Path) -> dict[tuple[str, int], str]:
-    """llm_assist가 만든 초벌 제안을 (question_id, doc_id) → label로 읽는다."""
-    if not path.exists():
-        return {}
-    with open(path, encoding="utf-8") as f:
-        return {(r["question_id"], int(r["doc_id"])): r.get("llm_label", "").strip()
-                for r in csv.DictReader(f)}
-
-
-def export_review_sheet(items: list[Item], out_csv: Path, llm_csv: Path) -> None:
-    """사실 충돌 전수 검토 시트. 규칙 힌트와 LLM 초벌 제안을 나란히 실어
-    검토자가 final_label만 확정하면 되게 한다 (PPT 12p ①)."""
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-    llm = load_llm_labels(llm_csv)
-    n_items = n_open = 0
-    with open(out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        w.writerow(["question_id", "conflict_type", "question", "correct_answer",
-                    "corrected_answer(정오표: 수정 시만)", "doc_id", "date", "url",
-                    "rule_label", "rule_hint", "llm_label",
-                    "final_label(correct/conflict/noise)",
-                    "exclusion_flag", "doc_excerpt", "note"])
-        for it in items:
-            if it.conflict_type not in FACT_CONFLICT_TYPES:
-                continue
-            n_items += 1
-            hints = it.meta.get("rule_hint") or {}
-            for c in it.chunks:
-                if c.label == "unknown":
-                    n_open += 1
-                w.writerow([it.question_id, it.conflict_type, it.question,
-                            it.correct_answers[0] if it.correct_answers else "", "",
-                            c.doc_id, c.date or "", c.url or "",
-                            "" if c.label == "unknown" else c.label,
-                            hints.get(str(c.doc_id)) or hints.get(c.doc_id) or "",
-                            llm.get((it.question_id, c.doc_id), ""),
-                            "", it.exclusion_flag or "",
-                            " ".join(c.text.split()[:40]), ""])
-    src = "LLM 제안 프리필됨" if llm else "LLM 제안 없음 — llm_assist dragged 먼저 실행 권장"
-    print(f"검토 시트 생성: {out_csv} (사실 충돌 {n_items}문항 전수, "
-          f"확정 필요 문서 {n_open}건; {src})")
-
-
-def finalize(items: list[Item], review_csv: Path) -> tuple[list[Item], Counter]:
-    """검토 시트를 반영해 라벨을 확정하고 behavior_track을 결정한다.
-
-    라벨 우선순위: final_label(사람) > llm_label(초벌) > rule_label(규칙).
-    사람이 비운 칸을 LLM 제안으로 메우되, 어느 것도 없어 `unknown`으로 남은 문서가
-    있으면 그 문항은 채점 트랙에 넣지 않는다(스키마 검증도 이를 막는다)."""
-    if not review_csv.exists():
-        raise SystemExit(f"검토 완료 시트 없음: {review_csv} — 먼저 `sheet` 단계 실행 후 검토")
-    sheet: dict[str, dict] = {}
-    with open(review_csv, encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            qid = row["question_id"]
-            e = sheet.setdefault(qid, {"labels": {}, "src": {}, "answer": None})
-            human = row.get("final_label(correct/conflict/noise)", "").strip()
-            llm = row.get("llm_label", "").strip()
-            label = human or llm
-            if label in CHUNK_LABELS_FINAL:
-                doc_id = int(row["doc_id"])
-                e["labels"][doc_id] = label
-                e["src"][doc_id] = "human" if human else "llm"
-            corr = row.get("corrected_answer(정오표: 수정 시만)", "").strip()
-            if corr:
-                e["answer"] = corr
-
-    stats: Counter = Counter()
+def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
+    """CSV 행 → 최종 Item. 라벨 우선순위(사람 > LLM > 규칙)는 tabular.to_items가 적용한다.
+    여기서는 DRAGged 고유의 트랙 판정만 한다."""
+    meta_by_qid = {it.question_id: it.meta for it in _draft_cache}
+    items = to_items(rows, meta_by_qid=meta_by_qid)
+    stats: Counter = Counter(label_provenance(rows))
     for it in items:
-        e = sheet.get(it.question_id)
-        if e and (e["labels"] or e["answer"]):
-            for c in it.chunks:
-                if c.doc_id in e["labels"]:
-                    c.label = e["labels"][c.doc_id]
-                    stats[f"label_src_{e['src'][c.doc_id]}"] += 1
-            if e["answer"]:
-                it.meta["answer_errata"] = it.correct_answers[0] if it.correct_answers else ""
-                it.correct_answers = [e["answer"]]
-                stats["answer_corrected"] += 1
-            it.meta["mapping"] = "human-verified"
-            # 사람이 correct·conflict를 모두 확정했으면 규칙 단계의 플래그는 해소된 것이다
-            if any(c.label == "correct" for c in it.chunks):
-                it.exclusion_flag = None
+        it.self_consistency_track = True    # 다섯 유형 전부 (§3.2 이중 트랙)
+        if it.meta.get("answer_errata"):
+            stats["answer_corrected"] += 1
 
         if it.conflict_type in FACT_CONFLICT_TYPES:
-            unresolved = [c.doc_id for c in it.chunks if c.label == "unknown"]
-            if unresolved:
+            # 사람/LLM이 correct를 확정했으면 규칙 단계의 보류 플래그는 해소된 것이다
+            if it.exclusion_flag in ("no_match", "multi_match_needs_authority") \
+                    and any(c.label == "correct" for c in it.chunks):
+                it.exclusion_flag = None
+            if any(c.label == "unknown" for c in it.chunks):
                 it.exclusion_flag = it.exclusion_flag or "unresolved_chunk_labels"
                 stats["items_with_unresolved_chunks"] += 1
             it.behavior_track = (it.exclusion_flag is None
@@ -359,6 +298,11 @@ def finalize(items: list[Item], review_csv: Path) -> tuple[list[Item], Counter]:
                                  and any(c.label == "correct" for c in it.chunks)
                                  and any(c.label == "conflict" for c in it.chunks))
             stats["behavior_track" if it.behavior_track else "fact_excluded"] += 1
+        elif it.conflict_type == "none":
+            # ⓒ 행동 대조군: 매핑이 자명해 규칙만으로 확정된다
+            it.behavior_track = (it.exclusion_flag is None
+                                 and bool(it.correct_answers)
+                                 and any(c.label == "correct" for c in it.chunks))
     return items, stats
 
 
@@ -388,37 +332,52 @@ def report(items: list[Item]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["draft", "sheet", "final"])
+    ap.add_argument("stage", choices=["draft", "build"])
     ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
     ap.add_argument("--out-dir", default="data/processed/dragged", type=Path)
     ap.add_argument("--review-dir", default="preprocessing/review", type=Path)
+    ap.add_argument("--csv", type=Path,
+                    help="build 입력 CSV (기본: <out-dir>/dragged.llm.csv 있으면 그것, "
+                         "없으면 dragged.draft.csv)")
     args = ap.parse_args()
-    draft_path = args.out_dir / "dragged.draft.jsonl"
+    draft_csv = args.out_dir / "dragged.draft.csv"
+    llm_csv = args.out_dir / "dragged.llm.csv"
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))
-        write_jsonl(items, draft_path)
-        print(f"초안 생성: {draft_path} (N={len(items)})")
-        print(f"상대 날짜 기준점(코퍼스 최신 절대일): {ref}")
-        print("매칭 버킷(0=무매칭 1=유일 2=복수):",
+        hints = {it.question_id: (it.meta.get("rule_hint") or {}) for it in items}
+        write_csv(items, draft_csv, hints=hints)
+        write_jsonl(items, args.out_dir / "dragged.draft.jsonl")  # meta 보존용(내부 사용)
+        n_open = sum(1 for it in items for c in it.chunks
+                     if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
+        print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
+        print(f"  확정 필요 문서(사실 충돌): {n_open}건 — final_label 열을 채우면 된다")
+        print(f"  상대 날짜 기준점(코퍼스 최신 절대일): {ref}")
+        print("  매칭 버킷(0=무매칭 1=유일 2=복수):",
               {k: v for k, v in sorted(stats.items()) if "_match_" in k})
         report(items)
-    elif args.stage == "sheet":
-        export_review_sheet(list(read_jsonl(draft_path)),
-                            args.review_dir / "dragged_review.csv",
-                            args.review_dir / "dragged_llm_labels.csv")
-    else:
-        items, stats = finalize(list(read_jsonl(draft_path)),
-                                args.review_dir / "dragged_review.csv")
+    else:  # build
+        src = args.csv or (llm_csv if llm_csv.exists() else draft_csv)
+        if not src.exists():
+            raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
+        global _draft_cache
+        _draft_cache = list(read_jsonl(args.out_dir / "dragged.draft.jsonl"))
+        rows = read_csv(src)
+        items, stats = build_items(rows)
         write_jsonl(items, args.out_dir / "dragged.jsonl")
-        print(f"확정: dragged.jsonl (N={len(items)})")
-        print("라벨 출처:", {k.replace("label_src_", ""): v for k, v in stats.items()
-                             if k.startswith("label_src_")})
+        export_label_record(rows, args.review_dir / "dragged_labels.csv")
+        print(f"입력: {src}")
+        print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
+        print(f"라벨 출처: 사람 {stats['human']} · LLM {stats['llm']} · 규칙 {stats['rule']} "
+              f"· 미확정 {stats['unresolved']}")
+        if stats["rule_llm_disagree"]:
+            print(f"  ⚠ 규칙↔LLM 불일치 {stats['rule_llm_disagree']}건 — 사람이 확인할 것")
         print(f"사실 충돌: behavior_track {stats['behavior_track']}건 / "
               f"제외 {stats['fact_excluded']}건 "
               f"(그중 라벨 미확정 {stats['items_with_unresolved_chunks']}건)")
         if stats["answer_corrected"]:
             print(f"정답 정오표 교정: {stats['answer_corrected']}건")
+        print(f"라벨 이력(커밋 대상): {args.review_dir / 'dragged_labels.csv'}")
         report(items)
 
 

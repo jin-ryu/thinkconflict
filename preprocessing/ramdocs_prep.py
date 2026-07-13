@@ -32,6 +32,7 @@ import json
 from pathlib import Path
 
 from preprocessing.schema import Chunk, Item, write_jsonl
+from preprocessing.tabular import write_csv
 
 TYPE_TO_LABEL = {"correct": "correct", "misinfo": "conflict", "noise": "noise"}
 
@@ -180,11 +181,12 @@ def main() -> None:
     a, a_stats = build_a(rows)
     pairs, p_stats = build_pairs(rows)
 
-    write_jsonl(a, args.out_dir / "ramdocs_a.jsonl")
-    write_jsonl(b, args.out_dir / "ramdocs_b.jsonl")
-    write_jsonl(pairs, args.out_dir / "ramdocs_pairs.jsonl")
+    for items, name in ((a, "ramdocs_a"), (b, "ramdocs_b"), (pairs, "ramdocs_pairs")):
+        write_jsonl(items, args.out_dir / f"{name}.jsonl")
+        write_csv(items, args.out_dir / f"{name}.csv")   # 눈으로 확인하는 용도 (LLM 불필요)
 
     n_conf = sum(1 for it in a if it.conflict_type == "misinfo")
+    print("CSV도 함께 생성 — 라벨이 원본에 내장돼 있어 LLM·사람 검토가 필요 없다")
     print(f"ramdocs_b (원본 결합형): N={len(b)}")
     print(f"ramdocs_a (분해형, 본 실험용): N={len(a)} "
           f"— 오정보 충돌 {n_conf} / 비충돌 {len(a) - n_conf}")

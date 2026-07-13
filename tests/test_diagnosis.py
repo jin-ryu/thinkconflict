@@ -27,6 +27,7 @@ from preprocessing.qacc_prep import as_list, letters_to_indices
 from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, passes_valid_conflict_gate,
                                   render_documents, validate_item)
+from preprocessing.tabular import label_provenance, read_csv, to_items, write_csv
 
 GOLD = "begins at sundown on Saturday, April 12."
 
@@ -377,6 +378,64 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
     all_same = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2025-01-01")]
     assert resolve_by_recency(all_same) == ([], "date_tie")
     assert resolve_by_recency([Chunk(0, "t"), Chunk(1, "t")]) == ([], "date_absent")
+
+
+# ── CSV 계층: 파이프라인의 중간 표현 (draft → llm → build) ───────────────────
+
+def test_csv_round_trip_preserves_items(tmp_path, item):
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    back = to_items(read_csv(path))[0]
+    assert back.question_id == item.question_id
+    assert back.correct_answers == item.correct_answers
+    assert [c.label for c in back.chunks] == [c.label for c in item.chunks]
+    assert [c.text for c in back.chunks] == [c.text for c in item.chunks]
+    assert back.chunks[0].date == item.chunks[0].date
+
+
+def test_label_priority_is_human_then_llm_then_rule(tmp_path, item):
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    rows = read_csv(path)
+    rows[0]["rule_label"], rows[0]["llm_label"] = "correct", "noise"
+    rows[0]["final_label"] = "conflict"          # 사람이 이긴다
+    rows[1]["rule_label"], rows[1]["llm_label"] = "noise", "conflict"  # LLM이 규칙을 이긴다
+    rows[1]["final_label"] = ""
+    rows[2]["rule_label"], rows[2]["llm_label"], rows[2]["final_label"] = "noise", "", ""
+    labels = [c.label for c in to_items(rows)[0].chunks]
+    assert labels == ["conflict", "conflict", "noise"]
+
+
+def test_blank_labels_become_unknown_and_block_scoring(tmp_path, item):
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    rows = read_csv(path)
+    for r in rows:
+        r["rule_label"] = r["llm_label"] = r["final_label"] = ""
+    built = to_items(rows)[0]
+    assert all(c.label == "unknown" for c in built.chunks)
+    built.behavior_track = True
+    assert any("unknown" in e for e in validate_item(built))   # 스키마가 막는다
+
+
+def test_corrected_answer_overrides_gold_and_is_preserved(tmp_path):
+    it = Item("dragged-0090", "dragged", "q", "temporal", ["Boston Celtis"],
+              chunks=[Chunk(0, "the Celtics won", "correct")])
+    path = tmp_path / "x.csv"
+    write_csv([it], path)
+    rows = read_csv(path)
+    rows[0]["corrected_answer"] = "Boston Celtics"
+    built = to_items(rows)[0]
+    assert built.correct_answers == ["Boston Celtics"]
+    assert built.meta["answer_errata"] == "Boston Celtis"   # 원본 값 보존
+
+
+def test_provenance_flags_rule_llm_disagreement():
+    rows = [{"rule_label": "correct", "llm_label": "noise", "final_label": ""},
+            {"rule_label": "correct", "llm_label": "correct", "final_label": ""},
+            {"rule_label": "", "llm_label": "", "final_label": ""}]
+    p = label_provenance(rows)
+    assert p["rule_llm_disagree"] == 1 and p["llm"] == 2 and p["unresolved"] == 1
 
 
 # ── QACC 전처리: MTurk 플랫 포맷 파싱 계약 ───────────────────────────────────

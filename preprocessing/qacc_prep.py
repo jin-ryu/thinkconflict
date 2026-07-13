@@ -38,6 +38,10 @@ from collections import Counter
 from pathlib import Path
 
 from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
+from preprocessing.tabular import (export_label_record, label_provenance, read_csv,
+                                   to_items, write_csv)
+
+_draft_cache: list[Item] = []
 
 CONFLICT_FLAG = "A"          # secondAnswerExist == "A" 이면 충돌 (실측 381건)
 RECENCY_CODE = "A"           # reasons 코드 A = 최신성 (48건, 계획서와 일치)
@@ -219,85 +223,72 @@ def estimate_cost(items: list[Item]) -> None:
           "상용 판정자를 쓸 경우에만 단가를 곱해 승인 요청 후 집행 (사전등록 §3.3)")
 
 
-def write_screen_template(items: list[Item], out_csv: Path) -> None:
-    """게이트 ①·③ 판정 시트 템플릿. 판정자 2종 결과와 인간 스팟체크를 채워 넣는다."""
-    out_csv.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        w.writerow(["question_id", "question", "correct_answer", "conflicting_answers",
-                    "conflict_type", "exclusion_flag",
-                    "judge1(sharp/soft)", "judge1_type",
-                    "judge2(sharp/soft)", "judge2_type",
-                    "human_spotcheck(sharp/soft)", "gold_reverified(y/n/corrected)",
-                    "verdict(sharp/soft)", "final_type"])
-        for it in items:
-            w.writerow([it.question_id, it.question,
-                        it.correct_answers[0] if it.correct_answers else "",
-                        " | ".join(it.wrong_answers), it.conflict_type,
-                        it.exclusion_flag or "", "", "", "", "", "", "", "", ""])
-    print(f"판정 시트 템플릿: {out_csv} (N={len(items)})")
+def build_items_from_csv(rows: list[dict]) -> tuple[list[Item], Counter]:
+    """CSV 행 → 최종 Item. 게이트 ①(sharp만 투입)과 유형 확정을 여기서 적용한다."""
+    meta_by_qid = {it.question_id: it.meta for it in _draft_cache}
+    items, stats = [], Counter(label_provenance(rows))
+    for it in to_items(rows, meta_by_qid=meta_by_qid):
+        verdict = it.meta.get("screen_verdict", "")
+        stats[f"verdict_{verdict or 'unjudged'}"] += 1
+        if verdict != "sharp":
+            continue          # soft(사이비 충돌)·미판정은 채점 트랙에서 드롭 (게이트 ①)
+        it.self_consistency_track = True
+        # opinion으로 확정되면 단일 정답이 없어 채점 대상이 아니다 (§3.2 이중 트랙)
+        it.behavior_track = (it.exclusion_flag is None
+                             and bool(it.correct_answers)
+                             and it.conflict_type != "opinion"
+                             and any(c.label == "correct" for c in it.chunks)
+                             and any(c.label == "conflict" for c in it.chunks))
+        stats["behavior_track" if it.behavior_track else "excluded"] += 1
+        items.append(it)
+    return items, stats
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["convert", "estimate-cost", "screen", "final"])
+    ap.add_argument("stage", choices=["draft", "estimate-cost", "build"])
     ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
     ap.add_argument("--out-dir", default="data/processed/qacc", type=Path)
+    ap.add_argument("--review-dir", default="preprocessing/review", type=Path)
     ap.add_argument("--dragged-draft",
                     default="data/processed/dragged/dragged.draft.jsonl", type=Path)
+    ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     args = ap.parse_args()
-    draft_path = args.out_dir / "qacc.draft.jsonl"
+    draft_csv = args.out_dir / "qacc.draft.csv"
+    llm_csv = args.out_dir / "qacc.llm.csv"
 
-    if args.stage == "convert":
+    if args.stage == "draft":
         items, stats = build_items(load_raw(args.raw_dir))
         items, dropped = dedup_against_dragged(items, args.dragged_draft)
-        write_jsonl(items, draft_path)
-        print(f"\n초안 생성: {draft_path} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건)")
-        # 플래그는 중복 제거 후 남은 문항 기준으로 센다 (최종 산출물과 일치시킨다)
+        write_csv(items, draft_csv)
+        write_jsonl(items, args.out_dir / "qacc.draft.jsonl")   # meta 보존용(내부 사용)
+        print(f"\n초안 CSV: {draft_csv} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건, "
+              f"행 {sum(len(it.chunks) for it in items)})")
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
         print(f"플래그 {sum(flags.values())}건 (채점 트랙 진입 차단): {dict(flags)}")
-        print("conflict_type:", dict(Counter(it.conflict_type for it in items)))
-        print(f"  temporal(최신성 사유) {sum(1 for it in items if it.conflict_type == 'temporal')}건 "
-              f"— 계획서 실측 48건 대비 (중복 제거분 반영)")
+        print("conflict_type(초벌):", dict(Counter(it.conflict_type for it in items)))
+        print("→ 다음: llm_assist qacc로 llm_verdict·llm_conflict_type·llm_label을 채운다")
     elif args.stage == "estimate-cost":
-        estimate_cost(list(read_jsonl(draft_path)))
-    elif args.stage == "screen":
-        write_screen_template(list(read_jsonl(draft_path)), JUDGE_SHEET)
-        print("\n다음: 판정자 2종을 돌려 judge1/judge2 열을, 인간 스팟체크로 verdict 열을 채운 뒤 "
-              "`final` 단계를 실행한다.")
-    else:  # final
-        if not JUDGE_SHEET.exists():
-            raise SystemExit(f"게이트 ① 판정 시트 없음: {JUDGE_SHEET} — screen 단계 선행")
-        verdicts: dict[str, dict] = {}
-        with open(JUDGE_SHEET, encoding="utf-8") as f:
-            for r in csv.DictReader(f):
-                verdicts[r["question_id"]] = r
-        if not any(r.get("verdict(sharp/soft)", "").strip() for r in verdicts.values()):
-            raise SystemExit("verdict 열이 비어 있다 — llm_assist qacc(판정자 2종) 후 인간 확정 필요")
-        items = []
-        for it in read_jsonl(draft_path):
-            row = verdicts.get(it.question_id, {})
-            if row.get("verdict(sharp/soft)", "").strip() != "sharp":
-                continue  # soft(사이비 충돌)·미판정은 채점 트랙에서 드롭 (게이트 ①)
-            # 유형 확정: 인간 확정 열 > 판정자 일치 > reasons prior (PPT 13p)
-            j1, j2 = row.get("judge1_type", "").strip(), row.get("judge2_type", "").strip()
-            human_type = row.get("final_type", "").strip()
-            if human_type in ("temporal", "misinfo", "opinion"):
-                it.conflict_type = human_type
-            elif j1 and j1 == j2 and j1 in ("temporal", "misinfo", "opinion"):
-                it.conflict_type = j1
-            it.meta["type_provenance"] = ("human" if human_type else
-                                          "judges_agree" if j1 and j1 == j2 else "reasons_prior")
-            # opinion으로 확정되면 단일 정답이 없으므로 채점 트랙에서 제외 (§3.2 이중 트랙)
-            it.behavior_track = (it.exclusion_flag is None and bool(it.correct_answers)
-                                 and it.conflict_type != "opinion")
-            it.meta["screen"] = "sharp"
-            items.append(it)
+        estimate_cost(list(read_jsonl(args.out_dir / "qacc.draft.jsonl")))
+    else:  # build
+        src = args.csv or (llm_csv if llm_csv.exists() else draft_csv)
+        if not src.exists():
+            raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
+        global _draft_cache
+        _draft_cache = list(read_jsonl(args.out_dir / "qacc.draft.jsonl"))
+        rows = read_csv(src)
+        items, stats = build_items_from_csv(rows)
+        if not items:
+            raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
+                             "final_verdict(또는 llm_verdict)를 채울 것 (게이트 ①)")
         write_jsonl(items, args.out_dir / "qacc.jsonl")
-        n_behav = sum(1 for it in items if it.behavior_track)
-        print(f"확정: qacc.jsonl (게이트 통과 N={len(items)}, behavior_track {n_behav}건 "
-              f"— 보수 가정 ~134)")
-        print("유형 출처:", dict(Counter(it.meta["type_provenance"] for it in items)))
+        export_label_record(rows, args.review_dir / "qacc_labels.csv")
+        print(f"입력: {src}")
+        print(f"확정: {args.out_dir / 'qacc.jsonl'} (게이트 통과 N={len(items)}, "
+              f"behavior_track {stats['behavior_track']}건)")
+        print("판정 내역:", {k.replace("verdict_", ""): v for k, v in stats.items()
+                             if k.startswith("verdict_")})
+        print(f"라벨 이력(커밋 대상): {args.review_dir / 'qacc_labels.csv'}")
 
 
 if __name__ == "__main__":
