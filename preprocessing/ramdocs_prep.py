@@ -49,10 +49,19 @@ def load_raw(raw_dir: Path) -> list[dict]:
 
 
 def to_chunks(docs: list[dict]) -> list[Chunk]:
-    """doc_id는 렌더링 순서가 아니라 이 문항 안에서의 안정적 식별자다."""
-    return [Chunk(doc_id=i, text=d["text"], label=TYPE_TO_LABEL[d["type"]],
-                  supported_answer=d.get("answer"))
-            for i, d in enumerate(docs)]
+    """doc_id는 렌더링 순서가 아니라 이 문항 안에서의 안정적 식별자다.
+
+    supported_answer는 '이 문서가 주장하는 답'이다 — noise 문서는 질문에 답하지 않으므로
+    비운다(원본은 'unknown' 같은 자리표시자를 넣어 두었다; 공통 스키마 규약)."""
+    out = []
+    for i, d in enumerate(docs):
+        label = TYPE_TO_LABEL[d["type"]]
+        answer = (d.get("answer") or "").strip()
+        if label == "noise" or answer.lower() in ("unknown", "none", "n/a"):
+            answer = ""
+        out.append(Chunk(doc_id=i, text=d["text"], label=label,
+                         supported_answer=answer or None))
+    return out
 
 
 def _by_type(docs: list[dict]) -> tuple[list[dict], list[dict]]:

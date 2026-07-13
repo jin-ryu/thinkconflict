@@ -149,7 +149,8 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
                 label = "conflict"
             chunks.append(Chunk(doc_id=j, text=text, label=label,
                                 url=(sources[j] if j < len(sources) else None),
-                                supported_answer=sup))
+                                # noise = 어느 답도 지지하지 않음 → 주장하는 답이 없다
+                                supported_answer=(sup if label != "noise" else None)))
 
         has_pair = (any(c.label == "correct" for c in chunks)
                     and any(c.label == "conflict" for c in chunks))

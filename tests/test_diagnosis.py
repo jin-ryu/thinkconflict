@@ -22,7 +22,7 @@ from experiments.exp3_causal.interventions import (analyze, make_filler,
                                                    truncate_thinking)
 from preprocessing.dragged_prep import (anchor_tokens, build_draft, doc_text,
                                         map_conflict_type, match_answer, parse_date,
-                                        resolve_by_recency)
+                                        resolve_by_recency, to_iso)
 from preprocessing.qacc_prep import as_list, letters_to_indices
 from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, assert_reviewed,
@@ -414,6 +414,28 @@ def test_csv_round_trip_preserves_items(tmp_path, item):
     assert [c.label for c in back.chunks] == [c.label for c in item.chunks]
     assert [c.text for c in back.chunks] == [c.text for c in item.chunks]
     assert back.chunks[0].date == item.chunks[0].date
+
+
+def test_dates_are_normalized_to_iso():
+    """원본 date는 ISO·자연어·상대표기·NA가 뒤섞여 있다 — 저장 시점에 ISO로 통일한다."""
+    ref = datetime(2025, 4, 3)
+    assert to_iso("2025-01-20 00:00:00") == "2025-01-20"   # ISO+시각
+    assert to_iso("Nov 2, 2024") == "2024-11-02"           # 자연어
+    assert to_iso("5 days ago", ref) == "2025-03-29"       # 상대 표기
+    assert to_iso("NA") is None and to_iso(None) is None   # 날짜 없음
+
+
+def test_schema_rejects_non_iso_dates():
+    bad = Item("dragged-0001", "dragged", "q", "temporal", ["x"],
+               chunks=[Chunk(0, "t", "correct", date="Nov 2, 2024")])
+    assert any("ISO-8601" in e for e in validate_item(bad))
+
+
+def test_noise_chunk_carries_no_supported_answer():
+    """supported_answer = '이 문서가 주장하는 답' — noise는 질문에 답하지 않으므로 비운다."""
+    bad = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+               chunks=[Chunk(0, "t", "noise", supported_answer="A")])
+    assert any("noise chunk must not carry" in e for e in validate_item(bad))
 
 
 def test_csv_columns_are_schema_fields_only(tmp_path, item):

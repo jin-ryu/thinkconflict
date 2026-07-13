@@ -4,10 +4,12 @@
 이미 값이 있는 칸(규칙이 확정한 것)은 건드리지 않는다. 사람은 그 CSV를 열어 아무 칸이나
 고쳐 쓰면 되고(맨 나중에 적힌 값이 그대로 최종본이 된다), `<ds>_prep build`가 JSONL을 만든다.
 
-    dragged  →  빈 `label` 칸 (correct / conflict / noise)
+    dragged  →  빈 `label`(correct/conflict/noise)과 `supported_answer`(이 문서가 주장하는 답)
                 규칙은 '정답을 담았는가'만 알 뿐 '다른 답을 주장하는가(conflict)'와
                 '무관한가(noise)'를 가르지 못한다 — 그 판정을 LLM이 초벌한다.
                 실측 반례: 정답 "at least 1,759"에 "1,762"를 주장하는 문서.
+                RAMDocs·QACC는 supported_answer가 원본 주석에 있으나 DRAGged는 없으므로,
+                같은 판정에서 함께 뽑아 세 데이터셋의 공통 구조를 맞춘다.
 
     qacc     →  게이트 ①(sharp/soft). 판정자 2종의 **원 판정은 judges/judge{N}.csv에 따로**
                 남기고(검토 CSV는 공통 스키마 열만 유지), **둘이 일치할 때만** 검토 CSV에
@@ -74,12 +76,16 @@ Gold answer: {answer}
 Document (excerpt):
 {doc}
 
-Does this document SUPPORT the gold answer, CONTRADICT it by asserting a different
-answer to the same question (e.g. an outdated date or a different figure), or is it
-IRRELEVANT to deciding the answer?
+Two judgments:
+1. Does this document SUPPORT the gold answer, CONTRADICT it by asserting a different
+   answer to the same question (e.g. an outdated date or a different figure), or is it
+   IRRELEVANT to deciding the answer?
+2. What answer to the question does this document assert? Quote it briefly from the
+   document. Write NONE if the document does not answer the question.
 
-Fill the form with one word.
-label ∈ {{support, contradict, irrelevant}} = """
+Fill the form, one line each.
+label ∈ {{support, contradict, irrelevant}} =
+answer = """
 
 TO_LABEL = {"support": "correct", "contradict": "conflict", "irrelevant": "noise"}
 
@@ -95,13 +101,24 @@ def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool
     for r in tqdm(targets, desc=f"dragged/{model}", unit="doc"):
         doc = " ".join((r.get("text") or "").split()[:MAX_DOC_WORDS])
         raw = ask(client, model, DRAGGED_PROMPT.format(
-            question=r["question"],
-            answer=(r.get("correct_answer") or ""),
-            doc=doc))
-        label = TO_LABEL.get(first_token(raw, tuple(TO_LABEL)) or "", "")
-        if label:
-            r["label"], r["label_source"] = label, "llm"
+            question=r["question"], answer=(r.get("correct_answer") or ""), doc=doc),
+            max_tokens=60)
+        lines = [l for l in raw.splitlines() if l.strip()]
+        label = TO_LABEL.get(first_token(lines[0] if lines else "", tuple(TO_LABEL)) or "", "")
+        if not label:
+            continue
+        r["label"] = label
+        # noise 문서는 질문에 답하지 않으므로 supported_answer가 없다 (스키마 규약)
+        r["supported_answer"] = "" if label == "noise" else _asserted(lines)
     return len(targets)
+
+
+def _asserted(lines: list[str]) -> str:
+    """폼 응답 2번째 줄에서 '이 문서가 주장하는 답'을 뽑는다."""
+    if len(lines) < 2:
+        return ""
+    val = lines[1].split("=", 1)[-1].strip().strip('"\'')
+    return "" if val.lower() in ("none", "n/a", "") else val
 
 
 # ── QACC: sharp/soft + conflict_type 초벌 (게이트 ①) ──────────────────────────

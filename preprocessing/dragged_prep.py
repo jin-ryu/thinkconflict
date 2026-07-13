@@ -165,6 +165,16 @@ def parse_date(s: str | None, ref: datetime | None = None) -> datetime | None:
         return None
 
 
+def to_iso(s: str | None, ref: datetime | None = None) -> str | None:
+    """원본 date를 공통 형식(ISO-8601 YYYY-MM-DD)으로 정규화한다.
+
+    실측(문서 4,212개): NA/없음 53% · 자연어 22% · ISO 18% · ISO+시각 7% · 상대표기 1%.
+    실제 웹 크롤 결과라 사이트마다 표기가 다르다 — 최신성 해소가 이 값을 비교하므로
+    저장 시점에 형식을 통일한다. 파싱 불가·부재는 None (사전등록 §7.5)."""
+    d = parse_date(s, ref)
+    return d.strftime("%Y-%m-%d") if d else None
+
+
 def corpus_reference_date(rows: list[dict]) -> datetime | None:
     """상대 날짜의 기준점 = 코퍼스 내 최신 절대일(크롤 시점 근사, 사전등록 §7.6)."""
     dates = [d for r in rows for doc in r["search_results"]
@@ -174,6 +184,7 @@ def corpus_reference_date(rows: list[dict]) -> datetime | None:
 
 def resolve_by_recency(matched: list[Chunk],
                        ref: datetime | None = None) -> tuple[list[int], str | None]:
+    # 청크의 date는 이미 ISO로 정규화돼 있다 (to_iso). ref는 하위 호환용.
     """복수 매칭 해소: date 최신 문서를 correct로 선정 (사전등록 §3.2).
 
     반환: (correct로 확정할 doc_id 목록, exclusion_flag 또는 None).
@@ -204,7 +215,7 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
             if not text:
                 stats["empty_doc_skipped"] += 1
                 continue
-            chunks.append(Chunk(doc_id=j, text=text, date=(d.get("date") or None),
+            chunks.append(Chunk(doc_id=j, text=text, date=to_iso(d.get("date"), ref),
                                 url=d.get("url"), title=d.get("title")))
         answer = str(row.get("correct_answer") or "").strip()
         flag = None
@@ -241,6 +252,11 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
                 flag = "no_match"
                 stats["flag_control_no_match"] += 1
         # 상보·의견: 정답이 대개 비어 있어 문서 라벨을 확정할 수 없다 → unknown 유지
+
+        # 규칙이 correct로 확정한 문서 = 정답을 주장하는 문서 (공통 스키마 규약)
+        for c in chunks:
+            if c.label == "correct" and answer:
+                c.supported_answer = answer
 
         scorable = bool(answer) and flag is None
         items.append(Item(

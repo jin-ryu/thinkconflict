@@ -76,7 +76,12 @@ python -m preprocessing.schema data/processed/*.jsonl   # 산출물 검증 + 게
 | `correct_answer` | `Item.correct_answers` | 👈 정답. 오타면 그 자리에서 고친다 (실측: `Boston Celtis`, `Bolovia`) |
 | `conflict_type` | `Item.conflict_type` | 👈 규칙 초벌값이 들어 있다. 틀렸으면 고친다 |
 | `exclusion_flag` | `Item.exclusion_flag` | 👈 **비우면 채점 트랙에 들어간다.** 사유가 있으면 적는다 |
-| `question_id` · `dataset` · `question` · `doc_id` · `date` · `url` · `supported_answer` · `text` | 그대로 | 읽기용 |
+| `supported_answer` | `Chunk.supported_answer` | 👈 **이 문서가 주장하는 답** (정답이 아니다) — `correct`면 정답, `conflict`면 그 문서가 내세우는 틀린 답, `noise`면 비움 |
+| `question_id` · `dataset` · `question` · `doc_id` · `date` · `url` · `text` | 그대로 | 읽기용 |
+
+`date`는 원본이 ISO·자연어(`Nov 2, 2024`)·상대표기(`2 days ago`)·`NA`로 뒤섞여 있으나,
+**저장 시점에 ISO-8601(`YYYY-MM-DD`)로 정규화**한다 — 최신성 해소가 이 값을 비교하기 때문이다
+(사전등록 §7.5). 알 수 없으면 빈칸.
 
 ### QACC 게이트 ①은 `exclusion_flag`로 표현한다
 

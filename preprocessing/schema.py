@@ -22,20 +22,32 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Iterator
 
+import re
+
 DATASETS = ("dragged", "qacc", "ramdocs_a", "ramdocs_b")
+ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")   # 공통 날짜 형식
 CONFLICT_TYPES = ("temporal", "misinfo", "opinion", "complementary", "none", "ambiguous")
 CHUNK_LABELS = ("correct", "conflict", "noise", "unknown")
 
 
 @dataclass
 class Chunk:
+    """검색 문서 1개. 세 데이터셋이 이 구조로 통일된다."""
     doc_id: int
     text: str
     label: str = "unknown"
-    date: str | None = None            # ISO-8601 권장; 최신성 해소 규칙의 근거
+    # 작성일. **ISO-8601 날짜(YYYY-MM-DD)로 정규화**해 저장한다 — 원본은 ISO·자연어·
+    # 상대표기("2 days ago")·"NA"가 뒤섞여 있으나(DRAGged 실측), 최신성 해소가 이 값을
+    # 비교하므로 형식을 통일한다. 날짜를 알 수 없으면 None (사전등록 §7.5).
+    date: str | None = None
     url: str | None = None             # 권위 대조의 근거 (RAMDocs는 None)
     title: str | None = None
-    supported_answer: str | None = None  # 이 문서가 지지하는 답 (QACC 귀속 주석 / RAMDocs answer)
+    # **이 문서가 주장하는 답**. 정답이 아니라 '이 문서의 주장'이다:
+    #   label=correct  → 정답과 동치인 답
+    #   label=conflict → 정답과 다른 답 (구버전 날짜·오정보 등)
+    #   label=noise    → 질문에 답하지 않음 → None
+    # 세 데이터셋 공통으로 채운다 (RAMDocs·QACC는 원본 주석, DRAGged는 LLM+사람).
+    supported_answer: str | None = None
 
 
 @dataclass
@@ -104,6 +116,10 @@ def validate_item(item: Item) -> list[str]:
             errs.append(f"chunk {c.doc_id}: label '{c.label}' not in {CHUNK_LABELS}")
         if not c.text.strip():
             errs.append(f"chunk {c.doc_id}: text is empty")
+        if c.date and not ISO_DATE_RE.fullmatch(c.date):
+            errs.append(f"chunk {c.doc_id}: date '{c.date}' is not ISO-8601 (YYYY-MM-DD)")
+        if c.label == "noise" and c.supported_answer:
+            errs.append(f"chunk {c.doc_id}: noise chunk must not carry supported_answer")
     if item.behavior_track:
         if not item.correct_answers:
             errs.append("behavior_track requires correct_answers (any-gold set)")
