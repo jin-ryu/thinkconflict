@@ -56,9 +56,10 @@ from datetime import datetime, timedelta
 from dateutil import parser as dateparser
 from rapidfuzz import fuzz
 
-from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
+from preprocessing.schema import (Chunk, Item, is_scorable,
+                                  passes_valid_conflict_gate, read_jsonl, write_jsonl)
 from preprocessing.tabular import (label_provenance, original_answers, read_csv,
-                                   to_items, write_csv)
+                                   to_items, write_by_type, write_csv)
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
@@ -258,7 +259,6 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
             if c.label == "correct" and answer:
                 c.supported_answer = answer
 
-        scorable = bool(answer) and flag is None
         items.append(Item(
             question_id=f"dragged-{i:04d}",
             dataset="dragged",
@@ -266,12 +266,6 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
             conflict_type=ctype,
             correct_answers=[answer] if answer else [],
             chunks=chunks,
-            # 사실 충돌의 behavior_track은 인간 검증 후 final에서 확정한다.
-            # 비충돌 대조군(RQ3 행동 트랙 분모)은 매핑이 자명해 초안에서 바로 확정한다.
-            behavior_track=(ctype == "none" and scorable),
-            # 자기일관성 비교는 충돌측(temporal·misinfo·opinion = 182) vs
-            # 비상충측(complementary·none = 276) — 다섯 유형 전부가 대상이다 (§3.2 이중 트랙)
-            self_consistency_track=True,
             exclusion_flag=flag,
             meta={"source_row": i, "source": row.get("source"),
                   "raw_conflict_type": row["conflict_type"],
@@ -288,10 +282,8 @@ def build_items(rows: list[dict], originals: dict[str, str] | None = None,
     items = to_items(rows, original_answers=originals)
     stats: Counter = Counter(label_provenance(rows, draft_rows))
     for it in items:
-        it.self_consistency_track = True    # 다섯 유형 전부 (§3.2 이중 트랙)
         if it.meta.get("answer_errata"):
             stats["answer_corrected"] += 1
-
         if it.conflict_type in FACT_CONFLICT_TYPES:
             # 사람/LLM이 correct를 확정했으면 규칙 단계의 보류 플래그는 해소된 것이다
             if it.exclusion_flag in ("no_match", "multi_match_needs_authority") \
@@ -300,16 +292,10 @@ def build_items(rows: list[dict], originals: dict[str, str] | None = None,
             if any(c.label == "unknown" for c in it.chunks):
                 it.exclusion_flag = it.exclusion_flag or "unresolved_chunk_labels"
                 stats["items_with_unresolved_chunks"] += 1
-            it.behavior_track = (it.exclusion_flag is None
-                                 and bool(it.correct_answers)
-                                 and any(c.label == "correct" for c in it.chunks)
-                                 and any(c.label == "conflict" for c in it.chunks))
-            stats["behavior_track" if it.behavior_track else "fact_excluded"] += 1
-        elif it.conflict_type == "none":
-            # ⓒ 행동 대조군: 매핑이 자명해 규칙만으로 확정된다
-            it.behavior_track = (it.exclusion_flag is None
-                                 and bool(it.correct_answers)
-                                 and any(c.label == "correct" for c in it.chunks))
+            # 유효 충돌 게이트: 정답 문서와 충돌 문서가 공존해야 채점 트랙에 들어간다
+            if it.exclusion_flag is None and not passes_valid_conflict_gate(it):
+                it.exclusion_flag = "no_valid_conflict_pair"
+            stats["scorable" if is_scorable(it) else "fact_excluded"] += 1
     return items, stats
 
 
@@ -327,13 +313,13 @@ def report(items: list[Item]) -> None:
           f"/ 해소 불가(날짜): {flags['date_tie'] + flags['date_absent']}건")
     print(f"  → 인간 검증 후 채점 가능 상한 {n_auto + pending}건 (계획서 사전 점검 예상 56~61)")
     ctrl = [it for it in items if it.conflict_type == "none"]
-    print(f"비충돌 대조군(ⓒ 행동): {len(ctrl)}건, 그중 behavior_track "
-          f"{sum(1 for it in ctrl if it.behavior_track)}건")
+    print(f"비충돌 대조군(ⓒ): {len(ctrl)}건, 그중 채점 가능 "
+          f"{sum(1 for it in ctrl if is_scorable(it))}건")
     sc_conflict = sum(1 for it in items
                       if it.conflict_type in ("temporal", "misinfo", "opinion"))
     sc_control = sum(1 for it in items
                      if it.conflict_type in ("complementary", "none"))
-    print(f"자기일관성 트랙: 충돌측 {sc_conflict}건(목표 182) vs 비상충측 {sc_control}건(목표 276)")
+    print(f"자기일관성 비교: 충돌측 {sc_conflict}건(목표 182) vs 비상충측 {sc_control}건(목표 276)")
     print("채점 미사용 유형: opinion(정답 없음) · complementary(정답 108/115 부재) — PPT 10·22p")
 
 
@@ -367,13 +353,14 @@ def main() -> None:
         rows = read_csv(src)
         items, stats = build_items(rows, original_answers(draft_csv),
                                    read_csv(draft_csv))
-        write_jsonl(items, args.out_dir / "dragged.jsonl")
+        written = write_by_type(items, args.out_dir, "dragged")
         print(f"입력: {src}")
-        print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
+        print("유형별 파일:")
+        for name, n in written:
+            print(f"   {name:32s} N={n}")
         print(f"라벨: 규칙 그대로 {stats['rule']} · 이후 채움(LLM·사람) {stats['filled']} "
               f"· 미확정 {stats['unresolved']}")
-        print(f"사실 충돌: behavior_track {stats['behavior_track']}건 / "
-              f"제외 {stats['fact_excluded']}건 "
+        print(f"사실 충돌: 채점 가능 {stats['scorable']}건 / 제외 {stats['fact_excluded']}건 "
               f"(그중 라벨 미확정 {stats['items_with_unresolved_chunks']}건)")
         if stats["answer_corrected"]:
             print(f"정답 정오표 교정: {stats['answer_corrected']}건")

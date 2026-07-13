@@ -63,9 +63,7 @@ class Item:
     # RAMDocs(gold/wrong 내장) · QACC(다른 후보 답) · DRAGged는 원본에 없어 빈 리스트.
     wrong_answers: list[str] = field(default_factory=list)
     chunks: list[Chunk] = field(default_factory=list)
-    behavior_track: bool = False       # 채점 가능 (사실 충돌 + 골드 매핑 확정)
-    self_consistency_track: bool = False
-    exclusion_flag: str | None = None  # 예: "no_match", "date_tie" — L2 의존 지표 제외 사유
+    exclusion_flag: str | None = None  # 예: "no_match", "date_tie" — 채점 제외 사유
     meta: dict = field(default_factory=dict)  # 원본 필드 보존 (source_row, mapping_provenance 등)
 
 
@@ -120,14 +118,22 @@ def validate_item(item: Item) -> list[str]:
             errs.append(f"chunk {c.doc_id}: date '{c.date}' is not ISO-8601 (YYYY-MM-DD)")
         if c.label == "noise" and c.supported_answer:
             errs.append(f"chunk {c.doc_id}: noise chunk must not carry supported_answer")
-    if item.behavior_track:
-        if not item.correct_answers:
-            errs.append("behavior_track requires correct_answers (any-gold set)")
-        if any(c.label == "unknown" for c in item.chunks):
-            errs.append("behavior_track requires finalized chunk labels (no 'unknown')")
-        if item.exclusion_flag:
-            errs.append(f"behavior_track item carries exclusion_flag '{item.exclusion_flag}'")
     return errs
+
+
+def is_scorable(item: Item) -> bool:
+    """정답 채점(정확도·AIR)이 성립하는 문항인가.
+
+    트랙을 별도 플래그로 들고 다니지 않는다 — **데이터셋 파일이 곧 트랙**이다
+    (유형별로 파일이 분리돼 있다). 채점 가능 여부는 여기서 파생한다:
+    정답이 있고, 제외 사유가 없고, 문서 라벨이 전부 확정됐는가.
+
+    의견 충돌(`opinion`)은 정답이 없어 항상 False다 — 이 문항들은 정확도가 아니라
+    자기일관성(트레이스 입장↔답변)만 잰다 (§3.2 이중 트랙).
+    """
+    return (bool(item.correct_answers)
+            and item.exclusion_flag is None
+            and all(c.label != "unknown" for c in item.chunks))
 
 
 def assert_reviewed(path: str | Path) -> None:
@@ -187,13 +193,12 @@ def main() -> None:
     for path in args.paths:
         items = list(read_jsonl(path))
         n_err = sum(1 for it in items if validate_item(it))
-        behav = [it for it in items if it.behavior_track]
+        scorable = [it for it in items if is_scorable(it)]
         # 게이트는 충돌 문항에만 적용된다 — 비충돌 대조군은 정의상 충돌 문서가 없다
-        conflict = [it for it in behav if it.conflict_type in CONFLICT_CONDITIONS]
-        control = [it for it in behav if it.conflict_type not in CONFLICT_CONDITIONS]
+        conflict = [it for it in scorable if it.conflict_type in CONFLICT_CONDITIONS]
         gate = sum(1 for it in conflict if passes_valid_conflict_gate(it))
-        msg = (f"{path}: N={len(items)}  스키마 위반={n_err}  "
-               f"behavior_track={len(behav)} (충돌 {len(conflict)} / 대조군 {len(control)})")
+        msg = (f"{Path(path).name}: N={len(items)}  스키마 위반={n_err}  "
+               f"채점 가능={len(scorable)}")
         if conflict:
             msg += f"  유효충돌게이트 {gate}/{len(conflict)} ({gate / len(conflict):.1%})"
         print(msg)

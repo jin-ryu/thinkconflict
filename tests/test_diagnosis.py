@@ -25,7 +25,7 @@ from preprocessing.dragged_prep import (anchor_tokens, build_draft, doc_text,
                                         resolve_by_recency, to_iso)
 from preprocessing.qacc_prep import as_list, letters_to_indices
 from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
-from preprocessing.schema import (Chunk, Item, assert_reviewed,
+from preprocessing.schema import (Chunk, Item, assert_reviewed, is_scorable,
                                   passes_valid_conflict_gate, render_documents,
                                   validate_item)
 from preprocessing.tabular import (COLUMNS, PENDING_SCREEN, SOFT_CONFLICT,
@@ -48,7 +48,7 @@ def item() -> Item:
                   date="2024-05-01", url="https://blog.example"),
             Chunk(2, "Passover is a Jewish holiday.", "noise", date="2023-01-01"),
         ],
-        behavior_track=True, self_consistency_track=True)
+        )
 
 
 # ── 스키마 ────────────────────────────────────────────────────────────────────
@@ -58,11 +58,37 @@ def test_valid_item_passes_conflict_gate(item):
     assert passes_valid_conflict_gate(item)
 
 
-def test_behavior_track_rejects_unfinalized_labels():
-    bad = Item("dragged-0002", "dragged", "q", "temporal", [],
-               chunks=[Chunk(0, "t", "unknown")], behavior_track=True)
-    errs = validate_item(bad)
-    assert any("unknown" in e for e in errs) and any("correct_answers" in e for e in errs)
+def test_scorability_is_derived_not_flagged():
+    """트랙 플래그를 들고 다니지 않는다 — 정답·제외사유·라벨 확정 여부로 파생한다."""
+    ok = Item("dragged-0001", "dragged", "q", "temporal", ["A"],
+              chunks=[Chunk(0, "t", "correct"), Chunk(1, "t", "conflict")])
+    assert is_scorable(ok)
+    # 정답이 없는 문항(의견 충돌)은 채점 대상이 아니다
+    assert not is_scorable(Item("dragged-0002", "dragged", "q", "opinion", [],
+                                chunks=[Chunk(0, "t", "noise")]))
+    # 라벨이 미확정이면 채점할 수 없다
+    assert not is_scorable(Item("dragged-0003", "dragged", "q", "temporal", ["A"],
+                                chunks=[Chunk(0, "t", "unknown")]))
+    # 제외 사유가 붙으면 빠진다
+    assert not is_scorable(Item("dragged-0004", "dragged", "q", "temporal", ["A"],
+                                chunks=[Chunk(0, "t", "correct")],
+                                exclusion_flag="date_tie"))
+
+
+def test_opinion_items_are_not_graded():
+    """정답이 없는 문항을 wrong으로 세면 자기일관성 트랙이 통째로 오염된다."""
+    assert grade("Yes, it may be possible.", []) is None
+    assert grade("No, humans cannot.", []) is None
+
+
+def test_hedge_is_counted_separately_not_as_inconsistency():
+    """양쪽 병기(hedge)는 불일치가 아니다 — 의견 질의에서 정당한 행동일 수 있다 (§1.8)."""
+    op = Item("dragged-0002", "dragged", "Can humans live past 150?", "opinion", [],
+              chunks=[Chunk(0, "Experts say yes.", "noise")])
+    lab = label_generation(parse_think(
+        "<think>Experts lean yes.</think>\nExperts disagree; both views exist."), op, [0])
+    assert lab.stance == "hedge"
+    assert lab.fa is None          # 채점하지 않는다
 
 
 def test_render_is_deterministic_per_seed(item):
@@ -477,8 +503,7 @@ def test_blank_label_becomes_unknown_and_blocks_scoring(tmp_path, item):
         r["label"] = ""
     built = to_items(rows)[0]
     assert all(c.label == "unknown" for c in built.chunks)
-    built.behavior_track = True
-    assert any("unknown" in e for e in validate_item(built))   # 스키마가 막는다
+    assert not is_scorable(built)   # 미확정 라벨이 있으면 채점 대상이 아니다
 
 
 def test_gold_typo_is_fixed_in_place_and_original_preserved(tmp_path):
@@ -568,7 +593,7 @@ def test_draft_control_items_get_noise_since_no_conflicting_doc_exists():
                                 {"short_text": "unrelated travel deals", "date": "2025-01-01"}]}]
     items, _, _ = build_draft(rows)
     assert [c.label for c in items[0].chunks] == ["correct", "noise"]
-    assert items[0].behavior_track is True   # ⓒ 행동 대조군은 초안에서 바로 확정
+    assert is_scorable(items[0])    # ⓒ 대조군은 매핑이 자명해 초안에서 바로 채점 가능
 
 
 def test_qacc_letter_codes_index_into_contexts():

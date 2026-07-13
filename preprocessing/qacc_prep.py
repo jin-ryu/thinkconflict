@@ -37,9 +37,10 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from preprocessing.schema import Chunk, Item, write_jsonl
+from preprocessing.schema import Chunk, Item, is_scorable, write_jsonl
 from preprocessing.tabular import (PENDING_SCREEN, SOFT_CONFLICT, label_provenance,
-                                   original_answers, read_csv, to_items, write_csv)
+                                   original_answers, read_csv, to_items, write_by_type,
+                                   write_csv)
 
 CONFLICT_FLAG = "A"          # secondAnswerExist == "A" 이면 충돌 (실측 381건)
 RECENCY_CODE = "A"           # reasons 코드 A = 최신성 (48건, 계획서와 일치)
@@ -171,8 +172,6 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
             wrong_answers=[str(row.get(f)) for f, _ in ANSWER_SLOTS
                            if not is_nan(row.get(f)) and norm_answer(row.get(f)) != gold_n],
             chunks=chunks,
-            behavior_track=False,        # 게이트 통과 후 final에서 확정
-            self_consistency_track=True,
             exclusion_flag=flag,
             meta={"source_row": i, "split": row.get("split"),
                   "reasons": as_list(row.get("reasons")),
@@ -238,14 +237,11 @@ def build_items_from_csv(rows: list[dict], originals: dict[str, str] | None = No
     for it in to_items(rows, original_answers=originals):
         stats[f"flag_{it.exclusion_flag or 'sharp(빈칸)'}"] += 1
         if it.exclusion_flag is not None:
-            continue          # soft·미판정·유효충돌 미통과는 채점 트랙에서 드롭
-        it.self_consistency_track = True
-        # opinion으로 확정되면 단일 정답이 없어 채점 대상이 아니다 (§3.2 이중 트랙)
-        it.behavior_track = (bool(it.correct_answers)
-                             and it.conflict_type != "opinion"
-                             and any(c.label == "correct" for c in it.chunks)
-                             and any(c.label == "conflict" for c in it.chunks))
-        stats["behavior_track" if it.behavior_track else "excluded"] += 1
+            continue          # soft·미판정·유효충돌 미통과는 드롭 (게이트 ①)
+        # opinion으로 확정되면 단일 정답이 없다 → 채점 파일이 아니라 opinion 파일로 간다
+        if it.conflict_type == "opinion":
+            it.correct_answers = []
+        stats["scorable" if is_scorable(it) else "excluded"] += 1
         items.append(it)
     return items, stats
 
@@ -287,10 +283,12 @@ def main() -> None:
             raise SystemExit(
                 "sharp 판정 문항이 없다 — llm_assist qacc(판정자 2종)를 돌리거나, "
                 f"CSV에서 sharp 문항의 exclusion_flag('{PENDING_SCREEN}')를 비울 것 (게이트 ①)")
-        write_jsonl(items, args.out_dir / "qacc.jsonl")
+        written = write_by_type(items, args.out_dir, "qacc")
         print(f"입력: {src}")
-        print(f"확정: {args.out_dir / 'qacc.jsonl'} (게이트 통과 N={len(items)}, "
-              f"behavior_track {stats['behavior_track']}건)")
+        print(f"게이트 통과 N={len(items)} (채점 가능 {stats['scorable']}건)")
+        print("유형별 파일:")
+        for name, n in written:
+            print(f"   {name:32s} N={n}")
         print("게이트 ① 내역:", {k.replace("flag_", ""): v for k, v in stats.items()
                                 if k.startswith("flag_")})
 

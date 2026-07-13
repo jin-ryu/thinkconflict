@@ -96,8 +96,6 @@ def build_b(rows: list[dict]) -> list[Item]:
             correct_answers=list(row.get("gold_answers", [])),
             wrong_answers=list(row.get("wrong_answers", [])),
             chunks=(ch := to_chunks(row["documents"])),
-            behavior_track=bool(row.get("gold_answers")),
-            self_consistency_track=True,
             meta={**_common_meta(row, ch, i),
                   "n_gold": len(row.get("gold_answers", []))},
         ))
@@ -124,8 +122,6 @@ def build_a(rows: list[dict]) -> tuple[list[Item], dict]:
                 correct_answers=[gold],
                 wrong_answers=list(row.get("wrong_answers", [])),
                 chunks=(ch := to_chunks(support + misinfo + noise)),
-                behavior_track=True,
-                self_consistency_track=True,
                 meta={**_common_meta(row, ch, i),
                       "gold_index": j, "variant": "full",
                       "original_gold_answers": golds,
@@ -160,7 +156,7 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
             common = {"dataset": "ramdocs_a", "question": row["question"],
                       "correct_answers": [gold],
                       "wrong_answers": list(row.get("wrong_answers", [])),
-                      "behavior_track": True, "self_consistency_track": True}
+                      }
             # 충돌 변형: misinfo k개가 noise k개를 밀어낸다
             items.append(Item(
                 question_id=f"{pair_id}-conflict", conflict_type="misinfo",

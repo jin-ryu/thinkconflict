@@ -102,17 +102,23 @@ def is_abstain(answer: str) -> bool:
     return any(re.search(pat, answer, re.IGNORECASE) for pat in ABSTAIN_PATTERNS)
 
 
-def grade(answer: str | None, correct_answers: list[str]) -> str:
-    """Final Action 라벨을 반환한다: 'correct' | 'wrong' | 'abstain'.
+def grade(answer: str | None, correct_answers: list[str]) -> str | None:
+    """Final Action 라벨을 반환한다: 'correct' | 'wrong' | 'abstain' | None.
 
     any-gold: correct_answers 중 하나라도 동치면 correct (사전등록 §1.5).
     abstain 판정이 동치 판정보다 우선한다 — 단, 기권 표지가 있어도 정답을
     함께 확정 표출한 경우(예: "정확히 단정할 수 없으나 답은 X")는 correct다.
 
+    **정답이 없는 문항(의견 충돌 등)은 None을 반환한다** — 채점이 성립하지 않는다.
+    이를 `wrong`으로 세면 모델이 무엇을 답하든 오답이 되어 자기일관성 트랙이 오염된다
+    (§3.2 이중 트랙: 이 문항들은 정확도가 아니라 '트레이스 입장↔답변'만 잰다).
+
     오답의 '종류'(오정보 문서의 답을 채택했는지 vs 엉뚱한 답인지)는 이 라벨을
     바꾸지 않는다 — 사전등록 지표는 correct/wrong/abstain 3분류이므로. 그 구분이
     필요하면 adopted_wrong_answer()로 별도 관측한다.
     """
+    if not correct_answers:
+        return None                     # 채점 불가 — 정답이 정의되지 않은 문항
     if answer is None or not answer.strip():
         return "abstain"
     if any(equivalent(answer, gold) for gold in correct_answers):

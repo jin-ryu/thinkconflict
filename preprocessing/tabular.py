@@ -143,6 +143,29 @@ def to_items(rows: list[dict], *,
     return items
 
 
+def write_by_type(items: list[Item], out_dir: str | Path,
+                  dataset: str) -> list[tuple[str, int]]:
+    """**충돌 유형별로 파일을 나눠 쓴다** — 파일 하나가 곧 하나의 실험 조건이다.
+
+    트랙 플래그를 아이템에 달고 다니는 대신, 분석이 필요한 파일만 골라 합친다:
+        정확도·AIR   : <ds>_temporal + <ds>_misinfo (충돌) vs <ds>_none (대조군)
+        자기일관성    : + <ds>_opinion (충돌측) vs <ds>_complementary (비상충측)
+    의견 충돌은 정답이 없어 채점 파일에 섞이지 않는다 — 파일이 분리돼 있으므로
+    실수로 채점 파이프라인에 넣을 수 없다.
+    """
+    from preprocessing.schema import write_jsonl
+    out_dir = Path(out_dir)
+    by_type: dict[str, list[Item]] = {}
+    for it in items:
+        by_type.setdefault(it.conflict_type, []).append(it)
+    written = []
+    for ctype, group in sorted(by_type.items()):
+        name = f"{dataset}_{ctype}.jsonl"
+        write_jsonl(group, out_dir / name)
+        written.append((name, len(group)))
+    return written
+
+
 def original_answers(path: str | Path) -> dict[str, str]:
     """초안 CSV에서 문항별 원본 정답을 읽는다 (정오표 비교용).
     초안 CSV는 커밋되므로, 사람이 고친 값과 원본의 차이가 git에도 그대로 남는다."""

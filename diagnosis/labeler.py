@@ -42,12 +42,24 @@ SUPPORT_CUES = r"(?:correct|right|accurate|valid|reliable|most recent|latest|up.
 REJECT_CUES = r"(?:outdated|incorrect|wrong|unreliable|misinformation|stale|old|reject|dismiss|ignore)"
 
 
+# 자기일관성 트랙의 답변 입장 라벨 (§3.2 이중 트랙, 사전등록 §1.8)
+STANCE_LABELS = ("maintain", "flip", "hedge")
+HEDGE_CUES = [
+    r"\bboth (?:views|sides|positions|answers)", r"\bexperts? (?:disagree|are divided)",
+    r"\bon the one hand\b.{0,200}\bon the other hand\b",
+    r"\bsources? (?:disagree|differ|conflict)", r"\bit depends\b",
+    r"\bsome (?:say|argue|claim).{0,120}\bothers (?:say|argue|claim)",
+    r"\bno (?:clear|single|definitive) (?:answer|consensus)",
+]
+
+
 @dataclass
 class StageLabels:
     l1: str                     # detected | unrecognized  (언어화 기준)
     l2: str | None              # correct | wrong | unresolved | None(비채점 트랙)
-    fa: str                     # correct | wrong | abstain
-    path: str | None            # legitimate | shortcut | discordant_hit | blind_hit | None(오답·기권)
+    fa: str | None              # correct | wrong | abstain | None(정답 없는 문항 = 채점 불가)
+    stance: str | None = None   # maintain | flip | hedge | None(자기일관성 트랙 아님)
+    path: str | None = None     # legitimate | shortcut | discordant_hit | blind_hit | None
     type_recognition: str | None = None   # correct_type | surface_only | None(L1 미탐지)
     l2_flip_count: int = 0      # 번복 횟수 (부가 신호, 부록 B 연계)
     adopted_wrong: str | None = None   # 문서에 실린 오답을 그대로 채택했는가 (부가 관측)
@@ -103,9 +115,38 @@ def last_explicit_support(thinking: str, doc_order: list[int],
     return verdict, flips, offset
 
 
+def detect_hedge(answer: str | None) -> bool:
+    """답변이 양쪽 입장을 나란히 병기했는가 (§3.2: hedge는 불일치가 아니다)."""
+    if not answer:
+        return False
+    return any(re.search(p, answer, re.IGNORECASE) for p in HEDGE_CUES)
+
+
+def label_stance(parsed: ParsedTrace, item: Item,
+                 judge: JudgeFn | None = None) -> str | None:
+    """자기일관성 트랙: 트레이스가 잡은 입장을 최종 답변이 유지했는가 (§3.2 이중 트랙).
+
+    정답이 없는 문항(의견 충돌)에서도 "사고에서 A라 해놓고 답변은 B라 했는가"는 잴 수 있다.
+    hedge(양쪽 병기)는 **불일치가 아니라 별도 집계**다 — 의견 질의에서 병기는 정당한 행동일
+    수 있으므로 오분류를 막는다(사전등록 §1.8).
+    """
+    if not parsed.thinking or not parsed.answer:
+        return None
+    if detect_hedge(parsed.answer):
+        return "hedge"
+    if judge is None:
+        return None          # 규칙으로는 입장 대조가 불가 — 판정자가 필요하다
+    verdict = judge(item.question, parsed.thinking, parsed.answer,
+                    task="answer_stance_vs_trace")
+    return verdict if verdict in STANCE_LABELS else None
+
+
 def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
                      judge: JudgeFn | None = None) -> StageLabels:
-    """생성 1건의 3단계 라벨 + 4경로 귀속 (사전등록 §1.1~1.7)."""
+    """생성 1건의 3단계 라벨 + 4경로 귀속 (사전등록 §1.1~1.7).
+
+    정답이 없는 문항(의견 충돌 115건)은 채점(FA)이 성립하지 않으므로 fa=None이 되고,
+    대신 자기일관성 라벨(stance)만 산출한다 — 이중 트랙(§3.2)."""
     fa = grade(parsed.answer, item.correct_answers)
     thinking = parsed.thinking or ""
     l1_detected = detect_l1(thinking)
@@ -113,7 +154,8 @@ def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
 
     l2 = None
     flips, offset = 0, None
-    if item.behavior_track and l1_detected:
+    # L2(해소)는 정답과 확정된 문서 라벨이 있어야 판정된다 — 의견 충돌엔 성립하지 않는다
+    if item.correct_answers and l1_detected:
         verdict, flips, offset = last_explicit_support(thinking, doc_order, item)
         l2 = verdict or "unresolved"
         if verdict is None and judge is not None:
@@ -139,6 +181,7 @@ def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
     return StageLabels(
         l1="detected" if l1_detected else "unrecognized",
         l2=l2, fa=fa, path=path,
+        stance=label_stance(parsed, item, judge),
         type_recognition=(recognize_type(thinking, item.conflict_type)
                           if l1_detected and item.conflict_type in TYPE_CUES else None),
         l2_flip_count=flips, l2_char_offset=offset, provenance=prov,

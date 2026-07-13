@@ -46,7 +46,7 @@ def aggregate(records: list[dict]) -> dict:
         unstable = [q for q, v in majority_path_by_item(recs).items() if v["unstable"]]
         cell = {
             "n_records": len(recs),
-            "n_behavior_track": len(behav),
+            "n_scorable": len(behav),
             "transition_matrix": {f"{l1}|{l2}|{fa}": n for (l1, l2, fa), n
                                   in sorted(transition_matrix(recs).items())},
             "unstable_items": len(unstable),
