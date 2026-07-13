@@ -7,7 +7,7 @@ results/labels/*.jsonl로 쓴다. 판정자는 대상 모델과 **다른 계열*
 usage:
     python -m diagnosis.run_labeling \
         --generations results/raw/qwen_standard_dragged.jsonl \
-        --data data/processed/dragged/dragged_temporal.jsonl \
+        --data data/3_processed/dragged/dragged_temporal.jsonl \
         --out results/labels/qwen_standard_dragged.jsonl \
         [--judge-model gptoss --judge-url http://localhost:8003/v1]
 """

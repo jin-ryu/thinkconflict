@@ -416,7 +416,7 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
 # ── 검토 전 데이터로 실험하는 사고 방지 ──────────────────────────────────────
 
 def test_build_refuses_to_emit_final_output_before_review(tmp_path, monkeypatch):
-    """data/processed/는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
+    """data/3_processed/는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
     build가 최종본을 만들지 않는다. 그러지 않으면 채점 표본이 조용히 0건이 된다."""
     import subprocess, sys, textwrap
     raw = tmp_path / "raw"; raw.mkdir()
@@ -442,9 +442,10 @@ def test_build_refuses_to_emit_final_output_before_review(tmp_path, monkeypatch)
 
 
 @pytest.mark.parametrize("path", [
-    "data/review/dragged/dragged.draft.csv",
-    "data/review/dragged/dragged.llm.csv",
-    "data/processed/dragged.draft.jsonl",     # 이름에 draft가 있으면 경로 무관하게 차단
+    "data/2_review/dragged/dragged.draft.csv",
+    "data/2_review/dragged/dragged.llm.csv",     # 순번(2_)이 붙어도 review 단계로 인식해야 한다
+    "data/review/dragged/dragged.llm.csv",       # 순번이 없어도 마찬가지
+    "data/3_processed/dragged.draft.jsonl",      # 이름에 draft가 있으면 경로 무관하게 차단
 ])
 def test_unreviewed_input_is_refused(path):
     with pytest.raises(SystemExit):
@@ -452,8 +453,8 @@ def test_unreviewed_input_is_refused(path):
 
 
 @pytest.mark.parametrize("path", [
-    "data/processed/dragged.jsonl",
-    "data/processed/ramdocs_a.jsonl",
+    "data/3_processed/dragged/dragged_temporal.jsonl",
+    "data/3_processed/ramdocs/ramdocs_a.jsonl",
 ])
 def test_final_input_is_accepted(path):
     assert_reviewed(path)   # 예외가 나지 않아야 한다

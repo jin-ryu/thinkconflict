@@ -15,7 +15,7 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 
 ```
 docs/            정본 계획서 · 구축 계획 · 사전등록 규약
-data/raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
+data/1_raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
 data/            raw / review / processed 세 단계, 각 단계 안에 데이터셋별 폴더
   raw/           원본 (git 미포함 — download.sh + checksums.lock으로 재현)
   review/        작업용 CSV — 사람이 검토·수정하는 중간 산출물 (커밋)
@@ -35,20 +35,20 @@ tests/           진단 파이프라인 회귀 테스트
 pip install -r requirements.txt
 pytest tests/                        # 진단 파이프라인 회귀 테스트 (34건)
 
-bash data/raw/download.sh            # DRAGged · QACC · RAMDocs 원 출처 다운로드 + 체크섬 고정
+bash data/1_raw/download.sh            # DRAGged · QACC · RAMDocs 원 출처 다운로드 + 체크섬 고정
 python -m preprocessing.ramdocs_prep # 공통 스키마 변환 (LLM 불필요 — Phase 1-1)
-python -m preprocessing.dragged_prep draft   # → data/review/dragged/dragged.draft.csv
+python -m preprocessing.dragged_prep draft   # → data/2_review/dragged/dragged.draft.csv
 ```
 
 Phase 2 이후 (GPU 필요):
 
 ```bash
 bash serving/launch_qwen.sh &                                       # 모델 서빙
-python -m serving.client --data data/processed/dragged/dragged_temporal.jsonl \
+python -m serving.client --data data/3_processed/dragged/dragged_temporal.jsonl \
     --model qwen --env standard --out results/raw/qwen_standard_dragged.jsonl
 python -m diagnosis.trace_parser results/raw/*.jsonl                # 파싱 실패율 점검
 python -m diagnosis.run_labeling --generations results/raw/qwen_standard_dragged.jsonl \
-    --data data/processed/dragged/dragged_temporal.jsonl --out results/labels/qwen_temporal.jsonl
+    --data data/3_processed/dragged/dragged_temporal.jsonl --out results/labels/qwen_temporal.jsonl
 python -m experiments.exp2_specificity.regime_control --gate \
     --thinking ... --masked ...                                     # go/no-go 게이트
 python -m analysis.aggregate                                        # 집계 → 즉시 커밋

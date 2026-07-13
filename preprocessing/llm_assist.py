@@ -225,7 +225,7 @@ def main() -> None:
                     help="qacc 전용: 판정자 번호. 2종은 서로 다른 계열이어야 한다")
     ap.add_argument("--only-flagged", action="store_true",
                     help="dragged 전용: 전수(기본) 대신 규칙이 못 푼 플래그 문항만")
-    ap.add_argument("--data-dir", default="data/review", type=Path)
+    ap.add_argument("--data-dir", default="data/2_review", type=Path)
     args = ap.parse_args()
 
     ds = args.dataset

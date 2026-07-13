@@ -116,7 +116,7 @@ def load_raw(raw_dir: Path) -> list[dict]:
     if not path.exists():
         cands = [p for p in sorted(raw_dir.rglob("*.jsonl")) if ".git" not in p.parts]
         if not cands:
-            raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/raw/download.sh 먼저 실행")
+            raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/1_raw/download.sh 먼저 실행")
         path = cands[0]
     rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     print(f"원본 로드: {path} (N={len(rows)})")
@@ -326,9 +326,9 @@ def report(items: list[Item]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "build"])
-    ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
-    ap.add_argument("--review-dir", default="data/review/dragged", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
+    ap.add_argument("--raw-dir", default="data/1_raw/dragged", type=Path)
+    ap.add_argument("--review-dir", default="data/2_review/dragged", type=Path)
+    ap.add_argument("--out-dir", default="data/3_processed", type=Path)
     ap.add_argument("--csv", type=Path,
                     help="build 입력 CSV (기본: dragged.llm.csv 있으면 그것, 없으면 draft)")
     ap.add_argument("--allow-unresolved", action="store_true",
@@ -356,7 +356,7 @@ def main() -> None:
         items, stats = build_items(rows, original_answers(draft_csv),
                                    read_csv(draft_csv))
 
-        # data/processed/ 는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
+        # data/3_processed/ 는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
         # 여기서 막는다. 초안 그대로 최종본을 만들면 채점 표본이 조용히 0건이 된다.
         pending = [it.question_id for it in items
                    if it.conflict_type in FACT_CONFLICT_TYPES

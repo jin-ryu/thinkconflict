@@ -2,8 +2,8 @@
 # DRAGged · QACC · RAMDocs 원본 데이터셋 일괄 다운로드 (계획서 §2 시작점 원칙).
 #
 # 원본 파일은 git에 넣지 않는다. 이 스크립트 + checksums.lock 만으로 전부 재현한다.
-#   bash data/raw/download.sh            # 다운로드 + lock 파일 검증 (lock 없으면 생성)
-#   bash data/raw/download.sh --record   # lock 파일 강제 재생성 (버전 갱신 시에만; 커밋 필수)
+#   bash data/1_raw/download.sh            # 다운로드 + lock 파일 검증 (lock 없으면 생성)
+#   bash data/1_raw/download.sh --record   # lock 파일 강제 재생성 (버전 갱신 시에만; 커밋 필수)
 #
 # 버전 고정: 각 소스의 git commit SHA / HF revision과 데이터 파일 sha256을
 # checksums.lock에 기록·커밋해 고정한다. LICENSE 사본은 LICENSES/에 복사·커밋한다.

@@ -92,7 +92,7 @@ def load_raw(raw_dir: Path) -> list[dict]:
     if not path.exists():
         cands = [p for p in sorted(raw_dir.rglob("*.json")) if ".git" not in p.parts]
         if not cands:
-            raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/raw/download.sh 먼저 실행")
+            raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/1_raw/download.sh 먼저 실행")
         path = cands[0]
     rows = json.loads(path.read_text(encoding="utf-8"))
     print(f"원본 로드: {path} (N={len(rows)})")
@@ -249,11 +249,11 @@ def build_items_from_csv(rows: list[dict], originals: dict[str, str] | None = No
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "estimate-cost", "build"])
-    ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
-    ap.add_argument("--review-dir", default="data/review/qacc", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
+    ap.add_argument("--raw-dir", default="data/1_raw/qacc", type=Path)
+    ap.add_argument("--review-dir", default="data/2_review/qacc", type=Path)
+    ap.add_argument("--out-dir", default="data/3_processed", type=Path)
     ap.add_argument("--dragged-draft",
-                    default="data/review/dragged/dragged.draft.csv", type=Path)
+                    default="data/2_review/dragged/dragged.draft.csv", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     ap.add_argument("--allow-unresolved", action="store_true",
                     help="게이트 ① 미완료 상태로 최종본 생성 (테스트용)")

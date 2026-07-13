@@ -4,7 +4,7 @@
 
 1. **`build`가 미완료 상태의 최종본을 만들지 않는다.** 사실 충돌에 라벨 미확정 문서가
    남아 있으면(DRAGged), 게이트 ①이 안 끝났으면(QACC) 오류로 중단한다.
-2. **실험이 `data/review/` 경로를 거부한다.** `serving/client.py`·`diagnosis/run_labeling.py`가
+2. **실험이 `data/2_review/` 경로를 거부한다.** `serving/client.py`·`diagnosis/run_labeling.py`가
    초안 경로를 입력으로 받으면 실행을 멈춘다.
 
 검토 전 데이터로 실험을 돌려 놓고 결과를 믿는 사고를 코드로 막는 장치다 —
@@ -13,7 +13,7 @@
 ## 현재 상태
 
 RAMDocs만 최종본이 있다. 원본에 라벨이 내장돼 있어 **검토가 필요 없는 유일한 데이터셋**이다.
-DRAGged·QACC는 `data/review/`에서 검토 중이며, 끝나면 여기에 유형별 파일이 생긴다.
+DRAGged·QACC는 `data/2_review/`에서 검토 중이며, 끝나면 여기에 유형별 파일이 생긴다.
 
 ## 파일 하나가 곧 하나의 실험 조건이다
 
@@ -43,6 +43,6 @@ RQ3 매칭 대조              : ramdocs_pairs (단일 파일)
 
 > ⚠️ **공개 시 라이선스 확인.** 이 산출물은 원본 문서 본문을 포함한다. 논문용 익명 미러를
 > 만들 때 QACC 파생물은 **CC BY-SA 3.0**(저작자 표시 + 동일조건변경허락) 대상임을 확인할 것.
-> 라이선스 사본: `data/raw/LICENSES/`.
+> 라이선스 사본: `data/1_raw/LICENSES/`.
 
-검증: `python -m preprocessing.schema data/processed/*/*.jsonl`
+검증: `python -m preprocessing.schema data/3_processed/*/*.jsonl`

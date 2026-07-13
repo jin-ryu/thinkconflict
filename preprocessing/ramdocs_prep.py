@@ -24,7 +24,7 @@ within-item 쌍 구성 규칙 (실측 기반 설계 결정):
     n = 0인 문항은 교체할 노이즈가 없어 쌍을 만들 수 없다 — 제외하고 건수를 보고한다.
 
 usage: python -m preprocessing.ramdocs_prep
-       (CSV → data/review/ramdocs/ · 최종 JSONL → data/processed/ramdocs/)
+       (CSV → data/2_review/ramdocs/ · 최종 JSONL → data/3_processed/ramdocs/)
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ TYPE_TO_LABEL = {"correct": "correct", "misinfo": "conflict", "noise": "noise"}
 def load_raw(raw_dir: Path) -> list[dict]:
     candidates = [p for p in sorted(raw_dir.rglob("*.jsonl")) if ".cache" not in p.parts]
     if not candidates:
-        raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/raw/download.sh 먼저 실행")
+        raise FileNotFoundError(f"{raw_dir}에 원본 없음 — data/1_raw/download.sh 먼저 실행")
     path = next((p for p in candidates if "test" in p.name.lower()), candidates[0])
     rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
     print(f"원본 로드: {path} (N={len(rows)})")
@@ -178,9 +178,9 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--raw-dir", default="data/raw/ramdocs", type=Path)
-    ap.add_argument("--review-dir", default="data/review/ramdocs", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
+    ap.add_argument("--raw-dir", default="data/1_raw/ramdocs", type=Path)
+    ap.add_argument("--review-dir", default="data/2_review/ramdocs", type=Path)
+    ap.add_argument("--out-dir", default="data/3_processed", type=Path)
     args = ap.parse_args()
 
     rows = load_raw(args.raw_dir)

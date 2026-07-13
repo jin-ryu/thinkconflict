@@ -32,7 +32,7 @@
 
 - **가져오는 것**: `docs/연구계획서_ThinkConflict.md`(정본 계획서)와 이 문서. 끝.
 - **데이터**: DRAGged·QACC·RAMDocs 3종 모두 원 출처에서 새로 받는다.
-  `data/raw/download.sh` 하나로 전부 재현되게 만들고, 원본 파일 자체는 git에 넣지 않는다
+  `data/1_raw/download.sh` 하나로 전부 재현되게 만들고, 원본 파일 자체는 git에 넣지 않는다
   (LICENSE 사본과 다운로드 스크립트만 커밋).
 - **코드**: 전부 새로 작성한다. 기존 레포의 파이프라인은 참고하지도, 복사하지도 않는다 —
   공통 스키마와 전처리 규약은 연구계획서에 이미 명세돼 있으므로 그것만 보고 구현한다.
@@ -96,7 +96,7 @@ thinkconflict/
 
 **Phase 0 — 부트스트랩 + 사전등록 (실험 코드 작성 전)**
 1. 레포 생성, 이 문서와 연구계획서 커밋
-2. `data/raw/download.sh` 작성 — 3개 데이터셋 원 출처·버전·체크섬 고정
+2. `data/1_raw/download.sh` 작성 — 3개 데이터셋 원 출처·버전·체크섬 고정
 3. `docs/preregistration.md` 작성·커밋: 라벨 규약(결론 확정·기권 분리·동치 채점·any-gold),
    N<20 셀 비교 금지, 인과 해석 규칙(filler-token 상한 확인 후 해석), 데이터셋별 분리 보고 원칙
 4. 공통 스키마 확정 (`preprocessing/schema.py`)

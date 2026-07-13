@@ -10,7 +10,7 @@
     unknown     — 미확정 (골드 매핑 전 초안 상태에서만 허용)
 
 트랙은 플래그가 아니라 **파일**로 가른다 (사전등록 §7.2):
-    data/processed/<ds>/<ds>_<유형>.jsonl — 충돌 유형별로 파일이 분리돼 있고,
+    data/3_processed/<ds>/<ds>_<유형>.jsonl — 충돌 유형별로 파일이 분리돼 있고,
     분석이 필요한 파일만 골라 합친다. 채점 가능 여부는 is_scorable()로 파생한다.
 """
 from __future__ import annotations
@@ -25,6 +25,11 @@ from typing import Iterator
 
 DATASETS = ("dragged", "qacc", "ramdocs_a", "ramdocs_b")
 ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")   # 공통 날짜 형식
+
+# 데이터 단계는 폴더명에 순번을 달아 절차를 드러낸다 (1 → 2 → 3)
+RAW_DIR = "1_raw"              # 원본 (git 미포함 — download.sh로 재현)
+REVIEW_DIR = "2_review"        # 작업용 CSV (사람이 검토·수정)
+PROCESSED_DIR = "3_processed"  # 최종 JSONL (검토 완료본만 — 실험이 읽는 유일한 입력)
 CONFLICT_TYPES = ("temporal", "misinfo", "opinion", "complementary", "none", "ambiguous")
 CHUNK_LABELS = ("correct", "conflict", "noise", "unknown")
 
@@ -138,14 +143,17 @@ def is_scorable(item: Item) -> bool:
 def assert_reviewed(path: str | Path) -> None:
     """실험 입력이 검토 완료본인지 확인한다.
 
-    `data/review/`의 초안(CSV·draft)은 라벨이 미확정일 수 있으므로 실험에 쓰면 안 된다.
-    실험 스크립트는 반드시 `data/processed/`의 최종 JSONL만 읽는다 — 이 불변식을
+    `data/2_review/`의 초안(CSV·draft)은 라벨이 미확정일 수 있으므로 실험에 쓰면 안 된다.
+    실험 스크립트는 반드시 `data/3_processed/`의 최종 JSONL만 읽는다 — 이 불변식을
     코드로 강제해, 검토가 끝나기 전에 돌려 놓고 결과를 믿는 사고를 막는다."""
     p = Path(path)
-    if "review" in p.parts or ".draft." in p.name:
+    # 폴더명에 순번이 붙어 있으므로(2_review) 접두 숫자를 떼고 비교한다 —
+    # 단순 문자열 일치로 검사하면 순번을 바꾸는 순간 가드가 조용히 뚫린다.
+    in_review = any(re.sub(r"^\d+_", "", part) == "review" for part in p.parts)
+    if in_review or ".draft." in p.name:
         raise SystemExit(
             f"검토 전 초안을 실험 입력으로 쓸 수 없다: {p}\n"
-            "  → data/processed/ 의 최종 JSONL을 쓸 것 "
+            f"  → {PROCESSED_DIR}/ 의 최종 JSONL을 쓸 것 "
             "(`python -m preprocessing.<ds>_prep build`로 생성)")
 
 
@@ -187,7 +195,7 @@ CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="공통 스키마 JSONL 검증 + 유효 충돌 게이트 통과율")
-    ap.add_argument("paths", nargs="+", help="data/processed/*/*.jsonl")
+    ap.add_argument("paths", nargs="+", help="data/3_processed/*/*.jsonl")
     args = ap.parse_args()
     for path in args.paths:
         items = list(read_jsonl(path))
