@@ -331,6 +331,8 @@ def main() -> None:
     ap.add_argument("--out-dir", default="data/processed", type=Path)
     ap.add_argument("--csv", type=Path,
                     help="build 입력 CSV (기본: dragged.llm.csv 있으면 그것, 없으면 draft)")
+    ap.add_argument("--allow-unresolved", action="store_true",
+                    help="라벨 미확정인 채로 최종본 생성 (검토 전 테스트용 — 채점 표본 0건)")
     args = ap.parse_args()
     draft_csv = args.review_dir / "dragged.draft.csv"
     llm_csv = args.review_dir / "dragged.llm.csv"
@@ -353,6 +355,20 @@ def main() -> None:
         rows = read_csv(src)
         items, stats = build_items(rows, original_answers(draft_csv),
                                    read_csv(draft_csv))
+
+        # data/processed/ 는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
+        # 여기서 막는다. 초안 그대로 최종본을 만들면 채점 표본이 조용히 0건이 된다.
+        pending = [it.question_id for it in items
+                   if it.conflict_type in FACT_CONFLICT_TYPES
+                   and any(c.label == "unknown" for c in it.chunks)]
+        if pending and not args.allow_unresolved:
+            raise SystemExit(
+                f"검토가 끝나지 않았다: 사실 충돌 {len(pending)}문항에 라벨 미확정 문서가 남아 있다.\n"
+                f"  → LLM 초벌:  python -m preprocessing.llm_assist dragged "
+                f"--base-url ... --model ...\n"
+                f"  → 그 뒤 {llm_csv} 의 빈 `label` 칸을 확인·수정하고 build를 다시 실행한다.\n"
+                f"  (검토 없이 강행하려면 --allow-unresolved — 채점 표본이 0건이 된다)")
+
         written = write_by_type(items, args.out_dir, "dragged")
         print(f"입력: {src}")
         print("유형별 파일:")

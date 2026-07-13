@@ -7,8 +7,12 @@
 """
 from __future__ import annotations
 
-import pytest
+import json
+import os
 from datetime import datetime
+from pathlib import Path
+
+import pytest
 
 from diagnosis.grading import equivalent, grade
 from diagnosis.labeler import label_generation
@@ -410,6 +414,32 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
 
 
 # ── 검토 전 데이터로 실험하는 사고 방지 ──────────────────────────────────────
+
+def test_build_refuses_to_emit_final_output_before_review(tmp_path, monkeypatch):
+    """data/processed/는 '검토 끝난 것만' 들어오는 곳이다 — 미확정 라벨이 남아 있으면
+    build가 최종본을 만들지 않는다. 그러지 않으면 채점 표본이 조용히 0건이 된다."""
+    import subprocess, sys, textwrap
+    raw = tmp_path / "raw"; raw.mkdir()
+    (raw / "conflicts.jsonl").write_text(json.dumps({
+        "question": "How many tornadoes?",
+        "conflict_type": "Conflict due to outdated information",
+        "correct_answer": "at least 1,759",
+        "search_results": [
+            {"short_text": "confirmed at least 1,759 tornadoes", "date": "2025-01-08"},
+            {"short_text": "the count stands at 1,762 tornadoes", "date": "2024-11-02"}],
+    }) + "\n", encoding="utf-8")
+    review, out = tmp_path / "review", tmp_path / "processed"
+    env = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1])}
+    base = [sys.executable, "-m", "preprocessing.dragged_prep"]
+    args = ["--raw-dir", str(raw), "--review-dir", str(review), "--out-dir", str(out)]
+
+    assert subprocess.run(base + ["draft"] + args, env=env,
+                          capture_output=True).returncode == 0
+    done = subprocess.run(base + ["build"] + args, env=env, capture_output=True, text=True)
+    assert done.returncode != 0                       # 검토 전이므로 거부
+    assert "검토가 끝나지 않았다" in done.stderr
+    assert not list(out.glob("*.jsonl"))              # 최종본을 만들지 않았다
+
 
 @pytest.mark.parametrize("path", [
     "data/review/dragged/dragged.draft.csv",

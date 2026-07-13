@@ -255,6 +255,8 @@ def main() -> None:
     ap.add_argument("--dragged-draft",
                     default="data/review/dragged/dragged.draft.csv", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
+    ap.add_argument("--allow-unresolved", action="store_true",
+                    help="게이트 ① 미완료 상태로 최종본 생성 (테스트용)")
     args = ap.parse_args()
     draft_csv = args.review_dir / "qacc.draft.csv"
     llm_csv = args.review_dir / "qacc.llm.csv"
@@ -277,12 +279,20 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
+        pending = {r["question_id"] for r in rows
+                   if (r.get("exclusion_flag") or "").strip() == PENDING_SCREEN}
+        if pending and not args.allow_unresolved:
+            raise SystemExit(
+                f"게이트 ①이 끝나지 않았다: {len(pending)}문항이 아직 '{PENDING_SCREEN}' 상태다.\n"
+                f"  → 판정자 2종:  python -m preprocessing.llm_assist qacc --judge 1 ... "
+                f"(그리고 --judge 2)\n"
+                f"  → 그 뒤 {llm_csv} 에서 sharp 문항의 exclusion_flag를 비우고 build를 재실행한다.\n"
+                f"  (강행하려면 --allow-unresolved)")
+
         items, stats = build_items_from_csv(rows, original_answers(draft_csv),
                                             read_csv(draft_csv))
         if not items:
-            raise SystemExit(
-                "sharp 판정 문항이 없다 — llm_assist qacc(판정자 2종)를 돌리거나, "
-                f"CSV에서 sharp 문항의 exclusion_flag('{PENDING_SCREEN}')를 비울 것 (게이트 ①)")
+            raise SystemExit("게이트 ① 통과 문항이 없다 — sharp로 판정된 문항이 하나도 없다")
         written = write_by_type(items, args.out_dir, "qacc")
         print(f"입력: {src}")
         print(f"게이트 통과 N={len(items)} (채점 가능 {stats['scorable']}건)")
