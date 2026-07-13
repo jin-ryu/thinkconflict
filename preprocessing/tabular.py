@@ -30,9 +30,7 @@ COLUMNS = [
     "question_id", "dataset", "question",
     "conflict_type",                # 👈 채우는 칸 (규칙 초벌값이 들어 있음, 고쳐 써도 된다)
     "conflict_type_source",         # 참고: rule / llm / 빈칸=사람
-    "correct_answer",               # 원본 정답
-    "corrected_answer",             # 👈 채우는 칸: 정답 오타가 있을 때만 기입 (정오표)
-    "wrong_answers",                # 문서에 실린 오답들 ('|'로 구분, 부가 관측용)
+    "correct_answer",               # 👈 채우는 칸: 원본 정답. 오타면 여기서 직접 고친다
     "verdict",                      # 👈 채우는 칸: QACC 게이트 ① (sharp / soft)
     "verdict_source",               # 참고: rule / llm / 빈칸=사람
     "exclusion_flag",               # 규칙이 붙인 제외·보류 사유
@@ -45,14 +43,6 @@ COLUMNS = [
     "note",                         # 검토자 메모 (파이프라인은 읽지 않음)
 ]
 VALID_LABELS = tuple(l for l in CHUNK_LABELS if l != "unknown")
-
-
-def _join(values: list[str] | None) -> str:
-    return " | ".join(v for v in (values or []) if v)
-
-
-def _split(cell: str) -> list[str]:
-    return [v.strip() for v in (cell or "").split("|") if v.strip()]
 
 
 def _cell(row: dict, key: str) -> str:
@@ -80,8 +70,6 @@ def write_csv(items: list[Item], path: str | Path, *,
                     "conflict_type": it.conflict_type,
                     "conflict_type_source": "rule",
                     "correct_answer": it.correct_answers[0] if it.correct_answers else "",
-                    "corrected_answer": "",
-                    "wrong_answers": _join(it.wrong_answers),
                     "verdict": verdict,
                     "verdict_source": "rule" if verdict else "",
                     "exclusion_flag": it.exclusion_flag or "",
@@ -117,13 +105,17 @@ def write_rows(rows: list[dict], path: str | Path,
             w.writerow({k: r.get(k, "") for k in cols})
 
 
-def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) -> list[Item]:
+def to_items(rows: list[dict], *,
+             original_answers: dict[str, str] | None = None) -> list[Item]:
     """CSV 행 → Item 목록. CSV에 적힌 값을 그대로 읽는다 (우선순위 규칙 없음).
 
     `label`이 빈칸이거나 알 수 없는 값이면 `unknown`으로 두고, `unknown`이 남은 문항은
     채점 트랙에 들어가지 못한다(schema.validate_item이 막는다).
+
+    부가 정보(문서 길이 공변량·오답 목록 등)는 별도 파일 없이 **CSV에서 직접 파생**한다.
+    original_answers(초안 CSV의 정답)를 주면 사람이 고친 오타를 meta.answer_errata에 남긴다.
     """
-    meta_by_qid = meta_by_qid or {}
+    original_answers = original_answers or {}
     by_item: dict[str, dict] = {}
     for r in rows:
         by_item.setdefault(r["question_id"], {"rows": [], "first": r})["rows"].append(r)
@@ -131,7 +123,7 @@ def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) ->
     items = []
     for qid, entry in by_item.items():
         head = entry["first"]
-        answer = _cell(head, "corrected_answer") or _cell(head, "correct_answer")
+        answer = _cell(head, "correct_answer")
         chunks = []
         for r in sorted(entry["rows"], key=lambda x: int(x["doc_id"])):
             label = _cell(r, "label")
@@ -141,9 +133,16 @@ def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) ->
                 date=_cell(r, "date") or None, url=_cell(r, "url") or None,
                 supported_answer=_cell(r, "supported_answer") or None,
             ))
-        meta = dict(meta_by_qid.get(qid, {}))
-        if _cell(head, "corrected_answer"):
-            meta["answer_errata"] = head.get("correct_answer", "")
+        # 문서에 실린 오답 = 문서별 지지 답 중 정답이 아닌 것 (원본 귀속 주석에서 파생)
+        wrong = sorted({(r.get("supported_answer") or "").strip()
+                        for r in entry["rows"]} - {"", answer})
+        meta = {
+            "n_docs": len(chunks),                                   # RQ3 공변량
+            "doc_len_words": [len(c.text.split()) for c in chunks],  # RQ3 공변량
+        }
+        original = original_answers.get(qid)
+        if original is not None and answer != original:
+            meta["answer_errata"] = original      # 사람이 정답 오타를 고쳤다 (원본 보존)
         if _cell(head, "verdict"):
             meta["screen_verdict"] = _cell(head, "verdict")
         notes = [_cell(r, "note") for r in entry["rows"] if _cell(r, "note")]
@@ -156,12 +155,22 @@ def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) ->
             question=head["question"],
             conflict_type=_cell(head, "conflict_type"),
             correct_answers=[answer] if answer else [],
-            wrong_answers=_split(head.get("wrong_answers", "")),
+            wrong_answers=wrong,
             chunks=chunks,
             exclusion_flag=(_cell(head, "exclusion_flag") or None),
             meta=meta,
         ))
     return items
+
+
+def original_answers(path: str | Path) -> dict[str, str]:
+    """초안 CSV에서 문항별 원본 정답을 읽는다 (정오표 비교용).
+    초안 CSV는 커밋되므로, 사람이 고친 값과 원본의 차이가 git에도 그대로 남는다."""
+    p = Path(path)
+    if not p.exists():
+        return {}
+    return {r["question_id"]: (r.get("correct_answer") or "").strip()
+            for r in read_csv(p)}
 
 
 def label_provenance(rows: list[dict]) -> dict[str, int]:
@@ -177,19 +186,3 @@ def label_provenance(rows: list[dict]) -> dict[str, int]:
         src = _cell(r, "label_source")
         counts[src if src in ("rule", "llm") else "human"] += 1
     return counts
-
-
-def write_meta(items: list[Item], path: str | Path) -> None:
-    """문항별 meta를 사이드카 JSON으로 저장한다 (본문 없음 — 수백 KB).
-
-    CSV에는 사람이 볼 열만 두고, 원본 출처·문서 길이 공변량 같은 부가 정보는 여기 둔다.
-    build 단계가 이걸 읽어 최종 JSONL의 meta에 되붙인다."""
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({it.question_id: it.meta for it in items},
-                               ensure_ascii=False, indent=1), encoding="utf-8")
-
-
-def read_meta(path: str | Path) -> dict[str, dict]:
-    path = Path(path)
-    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}

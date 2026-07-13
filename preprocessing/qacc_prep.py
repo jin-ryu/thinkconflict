@@ -38,8 +38,8 @@ from collections import Counter
 from pathlib import Path
 
 from preprocessing.schema import Chunk, Item, write_jsonl
-from preprocessing.tabular import (label_provenance, read_csv, read_meta, to_items,
-                                   write_csv, write_meta)
+from preprocessing.tabular import (label_provenance, original_answers, read_csv,
+                                   to_items, write_csv)
 
 CONFLICT_FLAG = "A"          # secondAnswerExist == "A" 이면 충돌 (실측 381건)
 RECENCY_CODE = "A"           # reasons 코드 A = 최신성 (48건, 계획서와 일치)
@@ -226,10 +226,10 @@ def estimate_cost_from_csv(rows: list[dict]) -> None:
 
 
 def build_items_from_csv(rows: list[dict],
-                         meta_by_qid: dict[str, dict]) -> tuple[list[Item], Counter]:
+                         originals: dict[str, str] | None = None) -> tuple[list[Item], Counter]:
     """CSV 행 → 최종 Item. 게이트 ①(sharp만 투입)과 유형 확정을 여기서 적용한다."""
     items, stats = [], Counter(label_provenance(rows))
-    for it in to_items(rows, meta_by_qid=meta_by_qid):
+    for it in to_items(rows, original_answers=originals):
         verdict = it.meta.get("screen_verdict", "")
         stats[f"verdict_{verdict or 'unjudged'}"] += 1
         if verdict != "sharp":
@@ -258,13 +258,11 @@ def main() -> None:
     args = ap.parse_args()
     draft_csv = args.review_dir / "qacc.draft.csv"
     llm_csv = args.review_dir / "qacc.llm.csv"
-    meta_path = args.review_dir / "qacc.meta.json"
 
     if args.stage == "draft":
         items, stats = build_items(load_raw(args.raw_dir))
         items, dropped = dedup_against_dragged(items, args.dragged_draft)
         write_csv(items, draft_csv)
-        write_meta(items, meta_path)
         print(f"\n초안 CSV: {draft_csv} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건, "
               f"행 {sum(len(it.chunks) for it in items)})")
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
@@ -278,7 +276,7 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items_from_csv(rows, read_meta(meta_path))
+        items, stats = build_items_from_csv(rows, original_answers(draft_csv))
         if not items:
             raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
                              "`verdict` 열을 채울 것 (게이트 ①)")

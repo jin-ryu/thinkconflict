@@ -37,7 +37,8 @@
 규칙이 하는 일: 문자열·앵커 매칭으로 정답 문서를 찾고, 복수 매칭은 제외가 아니라
 `date` 최신성으로 해소한다(사전등록 §3.2). 해소 불가만 플래그한다. 오정보 충돌은
 최신성이 아니라 출처 권위로 갈리므로 자동 해소하지 않고 사람에게 넘긴다(5건뿐).
-정답 오탈자는 corrected_answer 열로 교정한다(실측: "Boston Celtis", "Bolovia").
+정답 오탈자는 `correct_answer` 열을 직접 고쳐 교정한다 — 원본 값은 meta에 보존되어
+최종본의 `meta.answer_errata`로 남는다 (실측: "Boston Celtis", "Bolovia").
 
 usage: python -m preprocessing.dragged_prep {draft|build}
 """
@@ -56,8 +57,8 @@ from dateutil import parser as dateparser
 from rapidfuzz import fuzz
 
 from preprocessing.schema import Chunk, Item, read_jsonl, write_jsonl
-from preprocessing.tabular import (label_provenance, read_csv, read_meta, to_items,
-                                   write_csv, write_meta)
+from preprocessing.tabular import (label_provenance, original_answers, read_csv,
+                                   to_items, write_csv)
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
@@ -272,10 +273,11 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
     return items, stats, ref
 
 
-def build_items(rows: list[dict], meta_by_qid: dict[str, dict]) -> tuple[list[Item], Counter]:
+def build_items(rows: list[dict],
+                originals: dict[str, str] | None = None) -> tuple[list[Item], Counter]:
     """CSV 행 → 최종 Item. 라벨 우선순위(사람 > LLM > 규칙)는 tabular.to_items가 적용한다.
     여기서는 DRAGged 고유의 트랙 판정만 한다."""
-    items = to_items(rows, meta_by_qid=meta_by_qid)
+    items = to_items(rows, original_answers=originals)
     stats: Counter = Counter(label_provenance(rows))
     for it in items:
         it.self_consistency_track = True    # 다섯 유형 전부 (§3.2 이중 트랙)
@@ -338,13 +340,11 @@ def main() -> None:
     args = ap.parse_args()
     draft_csv = args.review_dir / "dragged.draft.csv"
     llm_csv = args.review_dir / "dragged.llm.csv"
-    meta_path = args.review_dir / "dragged.meta.json"
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))
         hints = {it.question_id: (it.meta.get("rule_hint") or {}) for it in items}
         write_csv(items, draft_csv, hints=hints)
-        write_meta(items, meta_path)
         n_open = sum(1 for it in items for c in it.chunks
                      if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
         print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
@@ -358,7 +358,7 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items(rows, read_meta(meta_path))
+        items, stats = build_items(rows, original_answers(draft_csv))
         write_jsonl(items, args.out_dir / "dragged.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")

@@ -33,9 +33,8 @@ CSV에 적힌 값이 그대로 최종본이 된다(우선순위 규칙 같은 �
 data/review/
 ├── dragged/
 │   ├── dragged.draft.csv    규칙 초안 — 563문서의 `label`이 빈칸 👈 검토 대상
-│   ├── dragged.llm.csv      LLM이 빈칸을 채운 것
-│   └── dragged.meta.json    문항별 부가 정보(출처·문서 길이 공변량) — 본문 없음
-├── qacc/                    (동일 구조: draft.csv · llm.csv · meta.json)
+│   └── dragged.llm.csv      LLM이 빈칸을 채운 것 (사람이 여기서 확인·수정)
+├── qacc/                    (동일 구조: draft.csv · llm.csv)
 └── ramdocs/                 CSV만 — 눈으로 확인하는 용도 (검토 불필요)
 ```
 
@@ -73,9 +72,13 @@ python -m preprocessing.schema data/processed/*.jsonl   # 산출물 검증 + 게
 | `label` | 👈 **채우는 칸** (`correct` / `conflict` / `noise`). 규칙이 아는 것은 이미 채워져 있고, 빈칸은 LLM·사람이 메운다 |
 | `label_source` | 참고: 그 값을 누가 넣었나 (`rule` / `llm` / 빈칸=사람) |
 | `rule_hint` | `matched_older`(정답 문자열은 있으나 구버전) / `unmatched`(정답 문자열 없음) — **참고용, 확정 아님** |
-| `corrected_answer` | 👈 채우는 칸: 정답 오타 교정 (실측: `Boston Celtis`, `Bolovia`) |
+| `correct_answer` | 👈 채우는 칸: 정답. 오타면 **그 자리에서 직접 고친다** (실측: `Boston Celtis`, `Bolovia`) — 원본은 초안 CSV와 git 이력에 남는다 |
 | `verdict` · `conflict_type` | 👈 채우는 칸 (QACC 게이트 ①: sharp/soft, 충돌 유형) |
 | `text` | 판단 근거인 문서 본문 |
+| `note` | 검토 메모 (최종본의 `meta.review_notes`로 보존) |
+
+문서 길이 공변량·오답 목록 같은 부가 정보는 **별도 파일 없이 CSV에서 다시 계산**한다 —
+사람이 손댈 필요가 없는 값이라 CSV를 어지럽히지 않는다.
 
 ⚠️ **`rule_hint = unmatched`를 "무관 문서"로 읽으면 안 된다.** 정답과 **다른 답을 주장하는
 충돌 문서**가 여기 섞여 있다(예: 정답 `at least 1,759`에 `1,762`를 주장하는 문서).

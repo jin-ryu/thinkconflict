@@ -28,7 +28,8 @@ from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, assert_reviewed,
                                   passes_valid_conflict_gate, render_documents,
                                   validate_item)
-from preprocessing.tabular import label_provenance, read_csv, to_items, write_csv
+from preprocessing.tabular import (label_provenance, original_answers, read_csv,
+                                   to_items, write_csv)
 
 GOLD = "begins at sundown on Saturday, April 12."
 
@@ -448,16 +449,39 @@ def test_blank_label_becomes_unknown_and_blocks_scoring(tmp_path, item):
     assert any("unknown" in e for e in validate_item(built))   # 스키마가 막는다
 
 
-def test_corrected_answer_overrides_gold_and_is_preserved(tmp_path):
+def test_gold_typo_is_fixed_in_place_and_original_preserved(tmp_path):
+    """정답 오타는 `correct_answer` 칸을 직접 고친다. 원본은 초안 CSV와 대조해 보존한다."""
     it = Item("dragged-0090", "dragged", "q", "temporal", ["Boston Celtis"],
               chunks=[Chunk(0, "the Celtics won", "correct")])
+    draft = tmp_path / "draft.csv"
+    write_csv([it], draft)
+    originals = original_answers(draft)
+
+    rows = read_csv(draft)
+    rows[0]["correct_answer"] = "Boston Celtics"     # 사람이 그 자리에서 고침
+    built = to_items(rows, original_answers=originals)[0]
+    assert built.correct_answers == ["Boston Celtics"]
+    assert built.meta["answer_errata"] == "Boston Celtis"
+
+
+def test_covariates_are_derived_from_chunks_not_a_sidecar(tmp_path, item):
+    """문서 길이·개수는 별도 파일 없이 CSV의 본문에서 다시 계산한다 (RQ3 공변량)."""
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    meta = to_items(read_csv(path))[0].meta
+    assert meta["n_docs"] == 3
+    assert meta["doc_len_words"] == [len(c.text.split()) for c in item.chunks]
+
+
+def test_wrong_answers_are_derived_from_supported_answers(tmp_path):
+    """오답 목록은 문서별 supported_answer에서 파생한다 (사람이 채우는 칸이 아니다)."""
+    it = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+              chunks=[Chunk(0, "t1", "correct", supported_answer="A"),
+                      Chunk(1, "t2", "conflict", supported_answer="B"),
+                      Chunk(2, "t3", "noise")])
     path = tmp_path / "x.csv"
     write_csv([it], path)
-    rows = read_csv(path)
-    rows[0]["corrected_answer"] = "Boston Celtics"
-    built = to_items(rows)[0]
-    assert built.correct_answers == ["Boston Celtics"]
-    assert built.meta["answer_errata"] == "Boston Celtis"   # 원본 값 보존
+    assert to_items(read_csv(path))[0].wrong_answers == ["B"]
 
 
 def test_provenance_counts_who_filled_each_label():

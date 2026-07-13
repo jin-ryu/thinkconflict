@@ -93,7 +93,7 @@ def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool
         doc = " ".join((r.get("text") or "").split()[:MAX_DOC_WORDS])
         raw = ask(client, model, DRAGGED_PROMPT.format(
             question=r["question"],
-            answer=(r.get("corrected_answer") or r.get("correct_answer") or ""),
+            answer=(r.get("correct_answer") or ""),
             doc=doc))
         label = TO_LABEL.get(first_token(raw, tuple(TO_LABEL)) or "", "")
         if label:
@@ -141,11 +141,13 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int) -> in
         head = rs[0]
         docs = "\n".join(f"[{i + 1}] {' '.join((r.get('text') or '').split()[:60])}"
                          for i, r in enumerate(rs))
+        gold = (head.get("correct_answer") or "").strip()
+        # 상충 후보 답은 문서별 supported_answer에서 그대로 얻는다 (원본 귀속 주석)
+        wrong = sorted({(r.get("supported_answer") or "").strip() for r in rs}
+                       - {"", gold})
         raw = ask(client, model, QACC_PROMPT.format(
-            question=head["question"],
-            gold=(head.get("corrected_answer") or head.get("correct_answer")
-                  or "(재검증 필요)"),
-            wrong=head.get("wrong_answers", ""), docs=docs))
+            question=head["question"], gold=gold or "(재검증 필요)",
+            wrong=" | ".join(wrong), docs=docs))
         lines = [l for l in raw.splitlines() if l.strip()]
         verdict = first_token(lines[0] if lines else "", ("sharp", "soft")) or ""
         ctype = first_token(lines[1] if len(lines) > 1 else "",
