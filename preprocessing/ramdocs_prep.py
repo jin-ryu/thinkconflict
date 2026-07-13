@@ -23,7 +23,8 @@ within-item 쌍 구성 규칙 (실측 기반 설계 결정):
     m > n인 문항은 초과 misinfo(m − k)가 conflict 변형에서 빠지므로 meta에 기록한다.
     n = 0인 문항은 교체할 노이즈가 없어 쌍을 만들 수 없다 — 제외하고 건수를 보고한다.
 
-usage: python -m preprocessing.ramdocs_prep [--raw-dir data/raw/ramdocs] [--out-dir data/processed/ramdocs]
+usage: python -m preprocessing.ramdocs_prep
+       (CSV → data/interim/ramdocs/ · 최종 JSONL → data/processed/)
 """
 from __future__ import annotations
 
@@ -173,7 +174,8 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw-dir", default="data/raw/ramdocs", type=Path)
-    ap.add_argument("--out-dir", default="data/processed/ramdocs", type=Path)
+    ap.add_argument("--interim-dir", default="data/interim/ramdocs", type=Path)
+    ap.add_argument("--out-dir", default="data/processed", type=Path)
     args = ap.parse_args()
 
     rows = load_raw(args.raw_dir)
@@ -182,8 +184,8 @@ def main() -> None:
     pairs, p_stats = build_pairs(rows)
 
     for items, name in ((a, "ramdocs_a"), (b, "ramdocs_b"), (pairs, "ramdocs_pairs")):
-        write_jsonl(items, args.out_dir / f"{name}.jsonl")
-        write_csv(items, args.out_dir / f"{name}.csv")   # 눈으로 확인하는 용도 (LLM 불필요)
+        write_jsonl(items, args.out_dir / f"{name}.jsonl")        # 최종본 (검토 불필요)
+        write_csv(items, args.interim_dir / f"{name}.csv")        # 눈으로 확인하는 용도
 
     n_conf = sum(1 for it in a if it.conflict_type == "misinfo")
     print("CSV도 함께 생성 — 라벨이 원본에 내장돼 있어 LLM·사람 검토가 필요 없다")

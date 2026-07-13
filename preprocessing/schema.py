@@ -114,6 +114,20 @@ def validate_item(item: Item) -> list[str]:
     return errs
 
 
+def assert_reviewed(path: str | Path) -> None:
+    """실험 입력이 검토 완료본인지 확인한다.
+
+    `data/interim/`의 초안(CSV·draft)은 라벨이 미확정일 수 있으므로 실험에 쓰면 안 된다.
+    실험 스크립트는 반드시 `data/processed/`의 최종 JSONL만 읽는다 — 이 불변식을
+    코드로 강제해, 검토가 끝나기 전에 돌려 놓고 결과를 믿는 사고를 막는다."""
+    p = Path(path)
+    if "interim" in p.parts or ".draft." in p.name:
+        raise SystemExit(
+            f"검토 전 초안을 실험 입력으로 쓸 수 없다: {p}\n"
+            "  → data/processed/ 의 최종 JSONL을 쓸 것 "
+            "(`python -m preprocessing.<ds>_prep build`로 생성)")
+
+
 def passes_valid_conflict_gate(item: Item) -> bool:
     """유효 충돌 게이트 (사전등록 §3.1): 정답 지지 문서와 충돌 문서가 공존해야
     채점 트랙 투입 가능. 라벨 미확정(unknown) 문항은 통과할 수 없다."""
@@ -152,7 +166,7 @@ CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="공통 스키마 JSONL 검증 + 유효 충돌 게이트 통과율")
-    ap.add_argument("paths", nargs="+", help="data/processed/*/*.jsonl")
+    ap.add_argument("paths", nargs="+", help="data/processed/*.jsonl")
     args = ap.parse_args()
     for path in args.paths:
         items = list(read_jsonl(path))

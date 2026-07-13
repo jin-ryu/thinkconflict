@@ -250,19 +250,21 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "estimate-cost", "build"])
     ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
-    ap.add_argument("--out-dir", default="data/processed/qacc", type=Path)
+    ap.add_argument("--interim-dir", default="data/interim/qacc", type=Path)
+    ap.add_argument("--out-dir", default="data/processed", type=Path)
     ap.add_argument("--dragged-draft",
-                    default="data/processed/dragged/dragged.draft.csv", type=Path)
+                    default="data/interim/dragged/dragged.draft.csv", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     args = ap.parse_args()
-    draft_csv = args.out_dir / "qacc.draft.csv"
-    llm_csv = args.out_dir / "qacc.llm.csv"
+    draft_csv = args.interim_dir / "qacc.draft.csv"
+    llm_csv = args.interim_dir / "qacc.llm.csv"
+    meta_path = args.interim_dir / "qacc.meta.json"
 
     if args.stage == "draft":
         items, stats = build_items(load_raw(args.raw_dir))
         items, dropped = dedup_against_dragged(items, args.dragged_draft)
         write_csv(items, draft_csv)
-        write_meta(items, args.out_dir / "qacc.meta.json")
+        write_meta(items, meta_path)
         print(f"\n초안 CSV: {draft_csv} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건, "
               f"행 {sum(len(it.chunks) for it in items)})")
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
@@ -276,7 +278,7 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items_from_csv(rows, read_meta(args.out_dir / "qacc.meta.json"))
+        items, stats = build_items_from_csv(rows, read_meta(meta_path))
         if not items:
             raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
                              "final_verdict(또는 llm_verdict)를 채울 것 (게이트 ①)")

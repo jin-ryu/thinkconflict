@@ -21,7 +21,7 @@ from pathlib import Path
 from diagnosis.labeler import build_openai_judge, label_generation
 from diagnosis.metrics import print_report
 from diagnosis.trace_parser import parse_record
-from preprocessing.schema import read_jsonl
+from preprocessing.schema import assert_reviewed, read_jsonl
 
 # 판정자 자기선호 편향 통제: 트레이스 생성 모델과 같은 계열은 그 모델의 판정에서 제외
 SAME_FAMILY = {"qwen": {"qwen"}, "gemma": {"gemma"}, "gptoss": {"gptoss", "gpt"}}
@@ -48,6 +48,7 @@ def main() -> None:
     ap.add_argument("--judge-url")
     args = ap.parse_args()
 
+    assert_reviewed(args.data)
     items = {it.question_id: it for it in read_jsonl(args.data)}
     records, n_unparsed = [], 0
     judge = None

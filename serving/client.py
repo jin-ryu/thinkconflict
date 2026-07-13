@@ -19,7 +19,7 @@ from pathlib import Path
 from openai import OpenAI
 
 from experiments.exp1_mitigation.envs import build_messages, ENVS
-from preprocessing.schema import read_jsonl, render_documents
+from preprocessing.schema import assert_reviewed, read_jsonl, render_documents
 
 # 사전등록 디코딩 (계획서 §3.3.1(2)): 권장 디코딩 고정, 시드 최소 5회 반복
 DECODING = {"temperature": 0.6, "top_p": 0.95}
@@ -80,6 +80,7 @@ def generate_one(client: OpenAI, model_id: str, cfg: GenConfig,
 
 def run(cfg: GenConfig, data_path: Path, out_path: Path,
         seeds: tuple[int, ...] = SEEDS) -> None:
+    assert_reviewed(data_path)   # 검토 전 초안으로 생성하지 못하게 막는다
     client, model_id = make_client(cfg)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     done = set()

@@ -25,8 +25,9 @@ from preprocessing.dragged_prep import (anchor_tokens, build_draft, doc_text,
                                         resolve_by_recency)
 from preprocessing.qacc_prep import as_list, letters_to_indices
 from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
-from preprocessing.schema import (Chunk, Item, passes_valid_conflict_gate,
-                                  render_documents, validate_item)
+from preprocessing.schema import (Chunk, Item, assert_reviewed,
+                                  passes_valid_conflict_gate, render_documents,
+                                  validate_item)
 from preprocessing.tabular import label_provenance, read_csv, to_items, write_csv
 
 GOLD = "begins at sundown on Saturday, April 12."
@@ -378,6 +379,26 @@ def test_recency_tie_is_only_unresolvable_when_all_matched_share_the_date():
     all_same = [Chunk(0, "t", date="2025-01-01"), Chunk(1, "t", date="2025-01-01")]
     assert resolve_by_recency(all_same) == ([], "date_tie")
     assert resolve_by_recency([Chunk(0, "t"), Chunk(1, "t")]) == ([], "date_absent")
+
+
+# ── 검토 전 데이터로 실험하는 사고 방지 ──────────────────────────────────────
+
+@pytest.mark.parametrize("path", [
+    "data/interim/dragged/dragged.draft.csv",
+    "data/interim/dragged/dragged.llm.csv",
+    "data/processed/dragged.draft.jsonl",     # 이름에 draft가 있으면 경로 무관하게 차단
+])
+def test_unreviewed_input_is_refused(path):
+    with pytest.raises(SystemExit):
+        assert_reviewed(path)
+
+
+@pytest.mark.parametrize("path", [
+    "data/processed/dragged.jsonl",
+    "data/processed/ramdocs_a.jsonl",
+])
+def test_final_input_is_accepted(path):
+    assert_reviewed(path)   # 예외가 나지 않아야 한다
 
 
 # ── CSV 계층: 파이프라인의 중간 표현 (draft → llm → build) ───────────────────

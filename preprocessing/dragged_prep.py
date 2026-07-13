@@ -331,19 +331,20 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "build"])
     ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
-    ap.add_argument("--out-dir", default="data/processed/dragged", type=Path)
+    ap.add_argument("--interim-dir", default="data/interim/dragged", type=Path)
+    ap.add_argument("--out-dir", default="data/processed", type=Path)
     ap.add_argument("--csv", type=Path,
-                    help="build 입력 CSV (기본: <out-dir>/dragged.llm.csv 있으면 그것, "
-                         "없으면 dragged.draft.csv)")
+                    help="build 입력 CSV (기본: dragged.llm.csv 있으면 그것, 없으면 draft)")
     args = ap.parse_args()
-    draft_csv = args.out_dir / "dragged.draft.csv"
-    llm_csv = args.out_dir / "dragged.llm.csv"
+    draft_csv = args.interim_dir / "dragged.draft.csv"
+    llm_csv = args.interim_dir / "dragged.llm.csv"
+    meta_path = args.interim_dir / "dragged.meta.json"
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))
         hints = {it.question_id: (it.meta.get("rule_hint") or {}) for it in items}
         write_csv(items, draft_csv, hints=hints)
-        write_meta(items, args.out_dir / "dragged.meta.json")
+        write_meta(items, meta_path)
         n_open = sum(1 for it in items for c in it.chunks
                      if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
         print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
@@ -357,7 +358,7 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items(rows, read_meta(args.out_dir / "dragged.meta.json"))
+        items, stats = build_items(rows, read_meta(meta_path))
         write_jsonl(items, args.out_dir / "dragged.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
