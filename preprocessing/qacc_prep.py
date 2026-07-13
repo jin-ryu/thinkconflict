@@ -190,7 +190,7 @@ def dedup_against_dragged(items: list[Item], dragged_csv: Path) -> tuple[list[It
     if not dragged_csv.exists():
         print(f"경고: {dragged_csv} 없음 — 중복 제거 생략 (dragged draft 먼저 실행할 것)")
         return items, []
-    dragged = {norm_q(r["question"]): r["rule_conflict_type"]
+    dragged = {norm_q(r["question"]): r["conflict_type"]
                for r in read_csv(dragged_csv)}
     kept, dropped = [], []
     for it in items:
@@ -270,7 +270,7 @@ def main() -> None:
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
         print(f"플래그 {sum(flags.values())}건 (채점 트랙 진입 차단): {dict(flags)}")
         print("conflict_type(초벌):", dict(Counter(it.conflict_type for it in items)))
-        print("→ 다음: llm_assist qacc로 llm_verdict·llm_conflict_type·llm_label을 채운다")
+        print("→ 다음: llm_assist qacc로 `verdict`·`conflict_type` 빈칸을 채운다 (판정자 2종)")
     elif args.stage == "estimate-cost":
         estimate_cost_from_csv(read_csv(draft_csv))
     else:  # build
@@ -281,7 +281,7 @@ def main() -> None:
         items, stats = build_items_from_csv(rows, read_meta(meta_path))
         if not items:
             raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
-                             "final_verdict(또는 llm_verdict)를 채울 것 (게이트 ①)")
+                             "`verdict` 열을 채울 것 (게이트 ①)")
         write_jsonl(items, args.out_dir / "qacc.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'qacc.jsonl'} (게이트 통과 N={len(items)}, "

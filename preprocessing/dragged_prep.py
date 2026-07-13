@@ -27,12 +27,12 @@
 
 파이프라인 (중간 산출물은 CSV — 사람이 열어 보고 고친다):
 
-    draft  →  dragged.draft.csv   규칙이 correct만 확정. conflict/noise는 빈칸으로 남긴다.
+    draft  →  dragged.draft.csv   규칙이 아는 것(correct)만 채우고 나머지 `label`은 빈칸.
                                   (규칙은 '정답을 담았는가'만 알 뿐, '다른 답을 주장하는가'와
                                    '무관한가'를 가르지 못한다 — 사전등록 §7.6)
-    llm    →  dragged.llm.csv     llm_assist가 빈 llm_label을 채운다 (초벌)
-    사람    →  llm.csv의 final_label 확정 (빈칸이면 llm_label이 대신 쓰인다)
-    build  →  dragged.jsonl       라벨 우선순위 사람 > LLM > 규칙으로 최종본 생성
+    llm    →  dragged.llm.csv     llm_assist가 빈 `label` 칸을 채운다 (초벌)
+    사람    →  CSV를 열어 `label`을 확인·수정 (채우는 칸은 이것 하나뿐)
+    build  →  dragged.jsonl       CSV에 적힌 값을 그대로 읽어 최종본 생성
 
 규칙이 하는 일: 문자열·앵커 매칭으로 정답 문서를 찾고, 복수 매칭은 제외가 아니라
 `date` 최신성으로 해소한다(사전등록 §3.2). 해소 불가만 플래그한다. 오정보 충돌은
@@ -348,7 +348,7 @@ def main() -> None:
         n_open = sum(1 for it in items for c in it.chunks
                      if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
         print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
-        print(f"  확정 필요 문서(사실 충돌): {n_open}건 — final_label 열을 채우면 된다")
+        print(f"  확정 필요 문서(사실 충돌): {n_open}건 — `label` 열의 빈칸을 채우면 된다")
         print(f"  상대 날짜 기준점(코퍼스 최신 절대일): {ref}")
         print("  매칭 버킷(0=무매칭 1=유일 2=복수):",
               {k: v for k, v in sorted(stats.items()) if "_match_" in k})
@@ -362,10 +362,8 @@ def main() -> None:
         write_jsonl(items, args.out_dir / "dragged.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
-        print(f"라벨 출처: 사람 {stats['human']} · LLM {stats['llm']} · 규칙 {stats['rule']} "
+        print(f"라벨 출처: 규칙 {stats['rule']} · LLM {stats['llm']} · 사람 {stats['human']} "
               f"· 미확정 {stats['unresolved']}")
-        if stats["rule_llm_disagree"]:
-            print(f"  ⚠ 규칙↔LLM 불일치 {stats['rule_llm_disagree']}건 — 사람이 확인할 것")
         print(f"사실 충돌: behavior_track {stats['behavior_track']}건 / "
               f"제외 {stats['fact_excluded']}건 "
               f"(그중 라벨 미확정 {stats['items_with_unresolved_chunks']}건)")

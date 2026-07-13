@@ -2,16 +2,19 @@
 
 파이프라인은 세 단계이며, **중간 산출물은 전부 CSV**다. JSONL은 마지막에만 나온다:
 
-    1) draft   원본 → `<ds>.draft.csv`   규칙이 확정한 것만 채우고 나머지는 빈칸
-    2) llm     빈칸 채움 → `<ds>.llm.csv`  LLM 초벌 제안 (RAMDocs는 채울 빈칸이 없어 생략)
-    3) build   사람 확정 → `<ds>.jsonl`    최종본. CSV의 라벨을 그대로 읽어 만든다
+    1) draft   원본 → `<ds>.draft.csv`   규칙이 아는 것만 채우고 나머지는 빈칸
+    2) llm     빈칸 채움 → `<ds>.llm.csv`  LLM 초벌 (RAMDocs는 채울 빈칸이 없어 생략)
+    3) build   사람 확정 → `<ds>.jsonl`    최종본. CSV의 값을 그대로 읽어 만든다
+
+**채우는 칸은 하나뿐이다.** 문서 라벨은 `label`, QACC 판정은 `verdict`·`conflict_type`.
+규칙이 확정한 값은 미리 채워져 있고, LLM은 **빈칸만** 메우며, 사람은 아무 칸이나 고쳐 쓴다
+(맨 나중에 쓴 값이 그대로 최종본이 된다 — 우선순위 규칙 같은 건 없다).
+
+`*_source` 열은 그 값을 누가 넣었는지 기록하는 **참고용**이다(rule / llm / 빈칸=사람).
+파이프라인은 이 열을 읽어 판정에 쓰지 않고, build 리포트에만 쓴다.
 
 CSV는 **청크 1개 = 1행**이고, 문항 수준 필드(question, correct_answer 등)는 행마다 반복된다.
 Excel/Numbers로 열어 정렬·필터하며 검토할 수 있다.
-
-라벨 우선순위 (build 시 적용): **final_* (사람) > llm_* (초벌) > rule_* (규칙)**.
-사람이 빈칸으로 두면 LLM 제안이, LLM도 없으면 규칙 값이 쓰인다. 셋 다 없으면 `unknown`으로
-남고, `unknown`이 있는 문항은 채점 트랙에 들어가지 못한다(schema.validate_item이 막는다).
 """
 from __future__ import annotations
 
@@ -25,25 +28,23 @@ from preprocessing.schema import CHUNK_LABELS, Chunk, Item
 COLUMNS = [
     # ── 문항 수준 ────────────────────────────────────────────────────────────
     "question_id", "dataset", "question",
-    "rule_conflict_type",           # 규칙/원본이 준 유형
-    "llm_conflict_type",            # LLM 초벌 (QACC)
-    "final_conflict_type",          # 사람 확정 (빈칸이면 위 값 사용)
+    "conflict_type",                # 👈 채우는 칸 (규칙 초벌값이 들어 있음, 고쳐 써도 된다)
+    "conflict_type_source",         # 참고: rule / llm / 빈칸=사람
     "correct_answer",               # 원본 정답
-    "corrected_answer",             # 정오표: 원본 정답에 오타가 있을 때만 기입
+    "corrected_answer",             # 👈 채우는 칸: 정답 오타가 있을 때만 기입 (정오표)
     "wrong_answers",                # 문서에 실린 오답들 ('|'로 구분, 부가 관측용)
-    "llm_verdict",                  # QACC 게이트 ①: sharp / soft (LLM)
-    "final_verdict",                # QACC 게이트 ①: 사람 확정
-    "exclusion_flag",               # 규칙이 붙인 제외/보류 사유
+    "verdict",                      # 👈 채우는 칸: QACC 게이트 ① (sharp / soft)
+    "verdict_source",               # 참고: rule / llm / 빈칸=사람
+    "exclusion_flag",               # 규칙이 붙인 제외·보류 사유
     # ── 청크 수준 ────────────────────────────────────────────────────────────
     "doc_id", "date", "url", "supported_answer",
-    "rule_label",                   # 규칙이 확정한 라벨 (correct만 확정됨)
-    "rule_hint",                    # 참고 신호 (matched_older / unmatched) — 확정 아님
-    "llm_label",                    # LLM 초벌 제안
-    "final_label",                  # 👈 사람이 확정하는 값 (correct / conflict / noise)
+    "label",                        # 👈 채우는 칸 (correct / conflict / noise)
+    "label_source",                 # 참고: rule / llm / 빈칸=사람
+    "rule_hint",                    # 규칙의 참고 신호 (matched_older / unmatched) — 확정 아님
     "text",                         # 문서 본문 (판단 근거)
     "note",                         # 검토자 메모 (파이프라인은 읽지 않음)
 ]
-_FINAL_LABELS = tuple(l for l in CHUNK_LABELS if l != "unknown")
+VALID_LABELS = tuple(l for l in CHUNK_LABELS if l != "unknown")
 
 
 def _join(values: list[str] | None) -> str:
@@ -54,14 +55,13 @@ def _split(cell: str) -> list[str]:
     return [v.strip() for v in (cell or "").split("|") if v.strip()]
 
 
-def _pick(*values: str) -> str:
-    """우선순위대로 첫 번째 비어있지 않은 값 (final > llm > rule)."""
-    return next((v.strip() for v in values if v and v.strip()), "")
+def _cell(row: dict, key: str) -> str:
+    return (row.get(key) or "").strip()
 
 
 def write_csv(items: list[Item], path: str | Path, *,
               hints: dict[str, dict] | None = None) -> None:
-    """Item 목록을 검토용 CSV로 쓴다. hints는 {question_id: {doc_id: hint}}."""
+    """Item 목록을 검토용 CSV로 쓴다. 규칙이 확정한 값은 채워지고 나머지는 빈칸이다."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     hints = hints or {}
@@ -70,35 +70,34 @@ def write_csv(items: list[Item], path: str | Path, *,
         w.writeheader()
         for it in items:
             item_hints = hints.get(it.question_id, {})
+            verdict = it.meta.get("screen_verdict", "")
             for c in it.chunks:
+                known = c.label != "unknown"
                 w.writerow({
                     "question_id": it.question_id,
                     "dataset": it.dataset,
                     "question": it.question,
-                    "rule_conflict_type": it.conflict_type,
-                    "llm_conflict_type": "",
-                    "final_conflict_type": "",
+                    "conflict_type": it.conflict_type,
+                    "conflict_type_source": "rule",
                     "correct_answer": it.correct_answers[0] if it.correct_answers else "",
                     "corrected_answer": "",
                     "wrong_answers": _join(it.wrong_answers),
-                    "llm_verdict": "",
-                    "final_verdict": "",
+                    "verdict": verdict,
+                    "verdict_source": "rule" if verdict else "",
                     "exclusion_flag": it.exclusion_flag or "",
                     "doc_id": c.doc_id,
                     "date": c.date or "",
                     "url": c.url or "",
                     "supported_answer": c.supported_answer or "",
-                    "rule_label": "" if c.label == "unknown" else c.label,
+                    "label": c.label if known else "",       # 미확정은 빈칸
+                    "label_source": "rule" if known else "",
                     "rule_hint": item_hints.get(c.doc_id) or item_hints.get(str(c.doc_id)) or "",
-                    "llm_label": "",
-                    "final_label": "",
                     "text": c.text,
                     "note": "",
                 })
 
 
 def read_csv(path: str | Path) -> list[dict]:
-    """CSV를 행 목록으로 읽는다 (LLM 채움 단계가 그대로 다시 쓰기 위해)."""
     with open(path, encoding="utf-8-sig") as f:
         return list(csv.DictReader(f))
 
@@ -119,39 +118,35 @@ def write_rows(rows: list[dict], path: str | Path,
 
 
 def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) -> list[Item]:
-    """CSV 행 → Item 목록. 라벨 우선순위(final > llm > rule)를 여기서 적용한다.
+    """CSV 행 → Item 목록. CSV에 적힌 값을 그대로 읽는다 (우선순위 규칙 없음).
 
-    meta_by_qid를 주면 draft 단계가 기록해 둔 meta(문서 길이 공변량 등)를 되붙인다.
+    `label`이 빈칸이거나 알 수 없는 값이면 `unknown`으로 두고, `unknown`이 남은 문항은
+    채점 트랙에 들어가지 못한다(schema.validate_item이 막는다).
     """
     meta_by_qid = meta_by_qid or {}
     by_item: dict[str, dict] = {}
     for r in rows:
-        qid = r["question_id"]
-        it = by_item.setdefault(qid, {"rows": [], "first": r})
-        it["rows"].append(r)
+        by_item.setdefault(r["question_id"], {"rows": [], "first": r})["rows"].append(r)
 
     items = []
     for qid, entry in by_item.items():
         head = entry["first"]
-        answer = _pick(head.get("corrected_answer", ""), head.get("correct_answer", ""))
+        answer = _cell(head, "corrected_answer") or _cell(head, "correct_answer")
         chunks = []
         for r in sorted(entry["rows"], key=lambda x: int(x["doc_id"])):
-            label = _pick(r.get("final_label", ""), r.get("llm_label", ""),
-                          r.get("rule_label", ""))
-            if label not in _FINAL_LABELS:
-                label = "unknown"      # 미확정 — 채점 트랙 진입을 스키마가 막는다
+            label = _cell(r, "label")
             chunks.append(Chunk(
-                doc_id=int(r["doc_id"]), text=r.get("text", ""), label=label,
-                date=r.get("date") or None, url=r.get("url") or None,
-                supported_answer=r.get("supported_answer") or None,
+                doc_id=int(r["doc_id"]), text=r.get("text", ""),
+                label=label if label in VALID_LABELS else "unknown",
+                date=_cell(r, "date") or None, url=_cell(r, "url") or None,
+                supported_answer=_cell(r, "supported_answer") or None,
             ))
         meta = dict(meta_by_qid.get(qid, {}))
-        if _pick(head.get("corrected_answer", "")):
+        if _cell(head, "corrected_answer"):
             meta["answer_errata"] = head.get("correct_answer", "")
-        verdict = _pick(head.get("final_verdict", ""), head.get("llm_verdict", ""))
-        if verdict:
-            meta["screen_verdict"] = verdict
-        notes = [r["note"] for r in entry["rows"] if r.get("note", "").strip()]
+        if _cell(head, "verdict"):
+            meta["screen_verdict"] = _cell(head, "verdict")
+        notes = [_cell(r, "note") for r in entry["rows"] if _cell(r, "note")]
         if notes:
             meta["review_notes"] = notes
 
@@ -159,54 +154,42 @@ def to_items(rows: list[dict], *, meta_by_qid: dict[str, dict] | None = None) ->
             question_id=qid,
             dataset=head["dataset"],
             question=head["question"],
-            conflict_type=_pick(head.get("final_conflict_type", ""),
-                                head.get("llm_conflict_type", ""),
-                                head.get("rule_conflict_type", "")),
+            conflict_type=_cell(head, "conflict_type"),
             correct_answers=[answer] if answer else [],
             wrong_answers=_split(head.get("wrong_answers", "")),
             chunks=chunks,
-            exclusion_flag=(head.get("exclusion_flag") or None),
+            exclusion_flag=(_cell(head, "exclusion_flag") or None),
             meta=meta,
         ))
     return items
 
 
 def label_provenance(rows: list[dict]) -> dict[str, int]:
-    """라벨이 어디서 왔는지 집계 (사람/LLM/규칙/미확정) + 규칙↔LLM 불일치 — build 리포트용.
+    """label을 누가 채웠는지 집계 — build 리포트용.
 
-    불일치는 조용히 넘기지 않고 센다: LLM이 규칙의 골드 매핑을 뒤집은 경우이므로
-    사람이 반드시 봐야 한다(사람이 final_label을 채우면 그쪽이 이긴다)."""
-    counts = {"human": 0, "llm": 0, "rule": 0, "unresolved": 0, "rule_llm_disagree": 0}
+    사람이 빈칸을 채우면 label_source는 빈 채로 남으므로 'human'으로 센다.
+    (사람이 LLM 값을 덮어쓴 경우는 source가 llm으로 남아 구분되지 않는다 — 참고 지표다.)"""
+    counts = {"rule": 0, "llm": 0, "human": 0, "unresolved": 0}
     for r in rows:
-        human = _pick(r.get("final_label", ""))
-        llm = _pick(r.get("llm_label", ""))
-        rule = _pick(r.get("rule_label", ""))
-        if llm in _FINAL_LABELS and rule in _FINAL_LABELS and llm != rule:
-            counts["rule_llm_disagree"] += 1
-        if human in _FINAL_LABELS:
-            counts["human"] += 1
-        elif llm in _FINAL_LABELS:
-            counts["llm"] += 1
-        elif rule in _FINAL_LABELS:
-            counts["rule"] += 1
-        else:
+        if _cell(r, "label") not in VALID_LABELS:
             counts["unresolved"] += 1
+            continue
+        src = _cell(r, "label_source")
+        counts[src if src in ("rule", "llm") else "human"] += 1
     return counts
 
 
 def write_meta(items: list[Item], path: str | Path) -> None:
     """문항별 meta를 사이드카 JSON으로 저장한다 (본문 없음 — 수백 KB).
 
-    CSV에는 사람이 볼 열만 두고, 원본 출처·공변량 같은 부가 정보는 여기 둔다.
+    CSV에는 사람이 볼 열만 두고, 원본 출처·문서 길이 공변량 같은 부가 정보는 여기 둔다.
     build 단계가 이걸 읽어 최종 JSONL의 meta에 되붙인다."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {it.question_id: it.meta for it in items}
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+    path.write_text(json.dumps({it.question_id: it.meta for it in items},
+                               ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def read_meta(path: str | Path) -> dict[str, dict]:
     path = Path(path)
-    if not path.exists():
-        return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}

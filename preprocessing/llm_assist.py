@@ -1,18 +1,18 @@
 """전처리 LLM 초벌 (PPT 12·13p — Phase 1의 LLM 소요 전부).
 
-**입력도 CSV, 출력도 CSV다.** `<ds>.draft.csv`의 빈칸을 채워 `<ds>.llm.csv`로 쓴다.
-사람은 그 CSV를 열어 `final_*` 열만 확정하면 되고(빈칸이면 LLM 제안이 그대로 쓰인다),
-`<ds>_prep build`가 그걸 읽어 JSONL을 만든다.
+**입력도 CSV, 출력도 CSV다.** `<ds>.draft.csv`의 **빈칸만** 채워 `<ds>.llm.csv`로 쓴다.
+이미 값이 있는 칸(규칙이 확정한 것)은 건드리지 않는다. 사람은 그 CSV를 열어 아무 칸이나
+고쳐 쓰면 되고(맨 나중에 적힌 값이 그대로 최종본이 된다), `<ds>_prep build`가 JSONL을 만든다.
 
-    dragged  →  llm_label 열 (문서별 support / contradict / irrelevant)
+    dragged  →  빈 `label` 칸 (correct / conflict / noise)
                 규칙은 '정답을 담았는가'만 알 뿐 '다른 답을 주장하는가(conflict)'와
                 '무관한가(noise)'를 가르지 못한다 — 그 판정을 LLM이 초벌한다.
                 실측 반례: 정답 "at least 1,759"에 "1,762"를 주장하는 문서.
 
-    qacc     →  judge{N}_verdict(sharp/soft) + judge{N}_type 열 (게이트 ①)
-                두 판정자가 일치하면 llm_verdict·llm_conflict_type에 반영하고,
-                불일치는 빈칸으로 남겨 사람이 adjudication하게 한다(부록 A(b)).
-                문서 라벨은 원본 귀속 주석에 이미 있어 건드리지 않는다.
+    qacc     →  빈 `verdict`(sharp/soft)·`conflict_type` 칸 (게이트 ①)
+                판정자 2종의 원 판정은 judge{N}_* 열에 증거로 남기고, **둘이 일치할 때만**
+                verdict·conflict_type을 채운다. 불일치하면 빈칸으로 남겨 사람이
+                adjudication하게 한다(부록 A(b)). 문서 라벨은 원본 귀속 주석에 이미 있다.
 
     ramdocs  →  LLM 불필요. 문서 라벨·정답이 원본에 내장돼 있어 승계만 한다
                 (LLM을 태우면 원본 골드 라벨을 추측으로 덮어쓰는 셈이라 품질이 낮아진다).
@@ -61,7 +61,7 @@ def first_token(text: str, allowed: tuple[str, ...]) -> str | None:
     return None
 
 
-# ── DRAGged: 문서별 정답 지지 판정 → llm_label ────────────────────────────────
+# ── DRAGged: 문서별 정답 지지 판정 → 빈 `label` 칸 ───────────────────────────
 
 DRAGGED_PROMPT = """You are labeling retrieved web documents for a QA dataset.
 
@@ -82,14 +82,11 @@ TO_LABEL = {"support": "correct", "contradict": "conflict", "irrelevant": "noise
 
 
 def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool) -> int:
-    """LLM은 **빈칸만** 채운다. 규칙이 이미 확정한 rule_label(=correct, 골드 매핑)은
-    건드리지 않는다 — llm_label이 rule_label보다 우선순위가 높으므로, 여기서 덮어쓰면
-    애써 찾은 정답 문서를 LLM 추측으로 잃는다."""
+    """빈 `label` 칸만 채운다. 규칙이 이미 확정한 값(골드 매핑)은 덮어쓰지 않는다 —
+    덮어쓰면 애써 찾은 정답 문서를 LLM 추측으로 잃는다."""
     targets = [r for r in rows
-               if r.get("rule_conflict_type") in FACT_CONFLICT_TYPES
-               and not (r.get("rule_label") or "").strip()      # 빈칸만
-               and not (r.get("llm_label") or "").strip()
-               and not (r.get("final_label") or "").strip()]
+               if (r.get("conflict_type") or "").strip() in FACT_CONFLICT_TYPES
+               and not (r.get("label") or "").strip()]           # 빈칸만
     if only_flagged:
         targets = [r for r in targets if (r.get("exclusion_flag") or "").strip()]
     for r in tqdm(targets, desc=f"dragged/{model}", unit="doc"):
@@ -98,7 +95,9 @@ def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool
             question=r["question"],
             answer=(r.get("corrected_answer") or r.get("correct_answer") or ""),
             doc=doc))
-        r["llm_label"] = TO_LABEL.get(first_token(raw, tuple(TO_LABEL)) or "", "")
+        label = TO_LABEL.get(first_token(raw, tuple(TO_LABEL)) or "", "")
+        if label:
+            r["label"], r["label_source"] = label, "llm"
     return len(targets)
 
 
@@ -154,11 +153,11 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int) -> in
         ctype = "" if ctype == "na" else ctype
         for r in rs:
             r[vcol], r[tcol] = verdict, ctype
-            # 두 판정자가 일치할 때만 llm_* 로 승격한다. 불일치는 빈칸 → 사람이 확정(부록 A(b))
-            if (r.get(other_v) or "").strip() == verdict and verdict:
-                r["llm_verdict"] = verdict
-            if (r.get(other_t) or "").strip() == ctype and ctype:
-                r["llm_conflict_type"] = ctype
+            # 두 판정자가 일치할 때만 채운다. 불일치는 빈칸 → 사람이 확정(부록 A(b))
+            if verdict and (r.get(other_v) or "").strip() == verdict:
+                r["verdict"], r["verdict_source"] = verdict, "llm"
+            if ctype and (r.get(other_t) or "").strip() == ctype:
+                r["conflict_type"], r["conflict_type_source"] = ctype, "llm"
     return len(todo)
 
 
@@ -193,8 +192,7 @@ def main() -> None:
 
     write_rows(rows, llm_csv, extra_columns=extra)
     print(f"\n{n}건 판정 → {llm_csv}")
-    print(f"→ 이 CSV의 final_* 열을 확정한 뒤 "
-          f"`python -m preprocessing.{ds}_prep build` 실행 (빈칸이면 LLM 제안이 쓰인다)")
+    print(f"→ 이 CSV를 열어 확인·수정한 뒤 `python -m preprocessing.{ds}_prep build` 실행")
 
 
 if __name__ == "__main__":

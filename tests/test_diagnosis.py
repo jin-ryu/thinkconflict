@@ -414,25 +414,34 @@ def test_csv_round_trip_preserves_items(tmp_path, item):
     assert back.chunks[0].date == item.chunks[0].date
 
 
-def test_label_priority_is_human_then_llm_then_rule(tmp_path, item):
+def test_rule_prefills_label_and_leaves_unknown_blank(tmp_path, item):
+    """draft CSV: 규칙이 아는 값은 채워지고, 모르는 것은 빈칸으로 남는다."""
+    item.chunks[1].label = "unknown"          # 규칙이 판정하지 못한 문서
     path = tmp_path / "x.csv"
     write_csv([item], path)
     rows = read_csv(path)
-    rows[0]["rule_label"], rows[0]["llm_label"] = "correct", "noise"
-    rows[0]["final_label"] = "conflict"          # 사람이 이긴다
-    rows[1]["rule_label"], rows[1]["llm_label"] = "noise", "conflict"  # LLM이 규칙을 이긴다
-    rows[1]["final_label"] = ""
-    rows[2]["rule_label"], rows[2]["llm_label"], rows[2]["final_label"] = "noise", "", ""
+    assert rows[0]["label"] == "correct" and rows[0]["label_source"] == "rule"
+    assert rows[1]["label"] == "" and rows[1]["label_source"] == ""
+
+
+def test_single_label_column_last_value_wins(tmp_path, item):
+    """채우는 칸은 `label` 하나뿐 — 규칙·LLM·사람이 같은 칸에 쓰고, 적힌 값이 그대로 최종."""
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    rows = read_csv(path)
+    rows[0]["label"] = "conflict"                                # 사람이 규칙 값을 덮어씀
+    rows[1]["label"], rows[1]["label_source"] = "noise", "llm"   # LLM이 채움
+    rows[2]["label"] = ""                                        # 아무도 안 채움
     labels = [c.label for c in to_items(rows)[0].chunks]
-    assert labels == ["conflict", "conflict", "noise"]
+    assert labels == ["conflict", "noise", "unknown"]
 
 
-def test_blank_labels_become_unknown_and_block_scoring(tmp_path, item):
+def test_blank_label_becomes_unknown_and_blocks_scoring(tmp_path, item):
     path = tmp_path / "x.csv"
     write_csv([item], path)
     rows = read_csv(path)
     for r in rows:
-        r["rule_label"] = r["llm_label"] = r["final_label"] = ""
+        r["label"] = ""
     built = to_items(rows)[0]
     assert all(c.label == "unknown" for c in built.chunks)
     built.behavior_track = True
@@ -451,12 +460,13 @@ def test_corrected_answer_overrides_gold_and_is_preserved(tmp_path):
     assert built.meta["answer_errata"] == "Boston Celtis"   # 원본 값 보존
 
 
-def test_provenance_flags_rule_llm_disagreement():
-    rows = [{"rule_label": "correct", "llm_label": "noise", "final_label": ""},
-            {"rule_label": "correct", "llm_label": "correct", "final_label": ""},
-            {"rule_label": "", "llm_label": "", "final_label": ""}]
-    p = label_provenance(rows)
-    assert p["rule_llm_disagree"] == 1 and p["llm"] == 2 and p["unresolved"] == 1
+def test_provenance_counts_who_filled_each_label():
+    """label_source가 비어 있는데 label이 채워져 있으면 사람이 채운 것으로 센다."""
+    rows = [{"label": "correct", "label_source": "rule"},
+            {"label": "conflict", "label_source": "llm"},
+            {"label": "noise", "label_source": ""},       # 사람이 빈칸을 채움
+            {"label": "", "label_source": ""}]            # 미확정
+    assert label_provenance(rows) == {"rule": 1, "llm": 1, "human": 1, "unresolved": 1}
 
 
 # ── QACC 전처리: MTurk 플랫 포맷 파싱 계약 ───────────────────────────────────
