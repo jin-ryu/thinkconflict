@@ -43,7 +43,7 @@ from preprocessing.tabular import (PENDING_SCREEN, SOFT_CONFLICT, read_csv,
                                    write_rows)
 
 MAX_DOC_WORDS = 200        # 판정 프롬프트에 넣는 문서 발췌 상한
-FACT_CONFLICT_TYPES = ("temporal", "misinfo")
+FACT_CONFLICT_TYPES = ("outdated", "misinformation")
 
 
 def make_client(base_url: str, api_key: str) -> OpenAI:
@@ -137,13 +137,13 @@ Two judgments:
    or a SOFT pseudo-conflict (the same fact written at different granularity or
    notation, e.g. "September 1915" vs "25 September 1915", unit/spelling variants)?
 2. If sharp, what drives the conflict?
-   temporal — the answers differ because the sources are from different times
-   misinfo  — at least one source asserts a factually wrong claim
-   opinion  — the question admits multiple defensible views, no single fact
+   outdated             — the answers differ because the sources are from different times
+   misinformation       — at least one source asserts a factually wrong claim
+   conflicting_opinions — the question admits multiple defensible views, no single fact
 
 Fill the form with one word per line.
 verdict ∈ {{sharp, soft}} =
-type ∈ {{temporal, misinfo, opinion, na}} = """
+type ∈ {{outdated, misinformation, conflicting_opinions, na}} = """
 
 
 def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int,
@@ -173,7 +173,8 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int,
         lines = [l for l in raw.splitlines() if l.strip()]
         verdict = first_token(lines[0] if lines else "", ("sharp", "soft")) or ""
         ctype = first_token(lines[1] if len(lines) > 1 else "",
-                            ("temporal", "misinfo", "opinion", "na")) or ""
+                            ("outdated", "misinformation", "conflicting_opinions",
+                             "na")) or ""
         mine[qid] = {"question_id": qid, "verdict": verdict,
                      "conflict_type": "" if ctype == "na" else ctype, "model": model}
 

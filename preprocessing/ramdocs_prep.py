@@ -87,12 +87,13 @@ def build_b(rows: list[dict]) -> list[Item]:
     items = []
     for i, row in enumerate(rows):
         misinfo, _ = _by_type(row["documents"])
-        multi_gold = len(row.get("gold_answers", [])) > 1
         items.append(Item(
             question_id=f"ramdocs-{i:04d}",
             dataset="ramdocs_b",
             question=row["question"],
-            conflict_type="misinfo" if misinfo else ("ambiguous" if multi_gold else "none"),
+            # PPT 11p의 5개 라벨로 통일. '모호성'(복수 정답)은 5분류에 없고 문서들이 서로
+            # 싸우는 것도 아니므로 no_conflict로 두고, 모호성 자체는 meta.n_gold에 남긴다.
+            conflict_type=("misinformation" if misinfo else "no_conflict"),
             correct_answers=list(row.get("gold_answers", [])),
             wrong_answers=list(row.get("wrong_answers", [])),
             chunks=(ch := to_chunks(row["documents"])),
@@ -118,7 +119,7 @@ def build_a(rows: list[dict]) -> tuple[list[Item], dict]:
                 question_id=f"ramdocs-{i:04d}-a{j}",
                 dataset="ramdocs_a",
                 question=row["question"],
-                conflict_type="misinfo" if misinfo else "none",
+                conflict_type=("misinformation" if misinfo else "no_conflict"),
                 correct_answers=[gold],
                 wrong_answers=list(row.get("wrong_answers", [])),
                 chunks=(ch := to_chunks(support + misinfo + noise)),
@@ -159,7 +160,7 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
                       }
             # 충돌 변형: misinfo k개가 noise k개를 밀어낸다
             items.append(Item(
-                question_id=f"{pair_id}-conflict", conflict_type="misinfo",
+                question_id=f"{pair_id}-conflict", conflict_type="misinformation",
                 chunks=(ch := to_chunks(support + misinfo[:k] + noise[k:])),
                 meta={**_common_meta(row, ch, i),
                       "gold_index": j, "variant": "conflict",
@@ -167,7 +168,7 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
                       "misinfo_dropped": len(misinfo) - k}, **common))
             # 대조 변형: 같은 자리에 noise가 그대로 남는다 (문서 수 동일)
             items.append(Item(
-                question_id=f"{pair_id}-control", conflict_type="none",
+                question_id=f"{pair_id}-control", conflict_type="no_conflict",
                 chunks=(ch := to_chunks(support + noise)),
                 meta={**_common_meta(row, ch, i),
                       "gold_index": j, "variant": "control",
@@ -192,7 +193,7 @@ def main() -> None:
         write_jsonl(items, args.out_dir / "ramdocs" / f"{name}.jsonl")  # 최종본 (검토 불필요)
         write_csv(items, args.review_dir / f"{name}.csv")        # 눈으로 확인하는 용도
 
-    n_conf = sum(1 for it in a if it.conflict_type == "misinfo")
+    n_conf = sum(1 for it in a if it.conflict_type == "misinformation")
     print("CSV도 함께 생성 — 라벨이 원본에 내장돼 있어 LLM·사람 검토가 필요 없다")
     print(f"ramdocs_b (원본 결합형): N={len(b)}")
     print(f"ramdocs_a (분해형, 본 실험용): N={len(a)} "

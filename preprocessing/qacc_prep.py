@@ -104,7 +104,8 @@ def conflict_type_of(row: dict) -> str:
 
     확정 유형은 PPT 13p 설계대로 LLM 초벌(llm_assist qacc의 judge_type 열) +
     인간 검수를 거쳐 final 단계에서 덮어쓴다 — 여기 값은 그 전까지의 기본값이다."""
-    return "temporal" if RECENCY_CODE in as_list(row.get("reasons")) else "misinfo"
+    return ("outdated" if RECENCY_CODE in as_list(row.get("reasons"))
+            else "misinformation")
 
 
 def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
@@ -188,14 +189,20 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
     return items, stats
 
 
-def dedup_against_dragged(items: list[Item], dragged_csv: Path) -> tuple[list[Item], list[str]]:
+def dedup_against_dragged(items: list[Item], dragged_dir: Path) -> tuple[list[Item], list[str]]:
     """게이트 ②: DRAGged 질문 중복 제거. 두 벤치마크의 충돌 판정이 엇갈리는
-    문항은 라벨 신뢰의 경계 사례이므로 건수를 따로 보고한다."""
-    if not dragged_csv.exists():
-        print(f"경고: {dragged_csv} 없음 — 중복 제거 생략 (dragged draft 먼저 실행할 것)")
-        return items, []
+    문항은 라벨 신뢰의 경계 사례이므로 건수를 따로 보고한다.
+
+    DRAGged 초안 CSV는 유형별로 나뉘어 있으므로 전부 모아 읽는다 — 한 파일만 보면
+    중복이 조용히 새어든다(실측: 48건 → 0건으로 붕괴)."""
+    drafts = sorted(dragged_dir.glob("dragged_*.draft.csv"))
+    if not drafts:
+        raise SystemExit(
+            f"DRAGged 초안 CSV가 없다: {dragged_dir}/dragged_*.draft.csv\n"
+            "  → 게이트 ②(질문 중복 제거)를 건너뛸 수 없다. "
+            "`python -m preprocessing.dragged_prep draft` 먼저 실행할 것")
     dragged = {norm_q(r["question"]): r["conflict_type"]
-               for r in read_csv(dragged_csv)}
+               for p in drafts for r in read_csv(p)}
     kept, dropped = [], []
     for it in items:
         ct = dragged.get(norm_q(it.question))
@@ -207,7 +214,7 @@ def dedup_against_dragged(items: list[Item], dragged_csv: Path) -> tuple[list[It
     # QACC는 충돌로, DRAGged는 비충돌/상보로 본 문항이 경계 사례다 (§3.1.3(4) ②)
     print(f"게이트 ②: DRAGged 중복 {len(dropped)}건 제거 (계획서 실측 47) — "
           f"DRAGged 판정 내역 {dict(by_type)}")
-    print(f"   충돌 판정 불일치(DRAGged=none): {by_type['none']}건, "
+    print(f"   충돌 판정 불일치(DRAGged=no_conflict): {by_type['no_conflict']}건, "
           f"(DRAGged=complementary): {by_type['complementary']}건 — 라벨 신뢰의 경계 사례로 보고")
     return kept, dropped
 
@@ -239,7 +246,7 @@ def build_items_from_csv(rows: list[dict], originals: dict[str, str] | None = No
         if it.exclusion_flag is not None:
             continue          # soft·미판정·유효충돌 미통과는 드롭 (게이트 ①)
         # opinion으로 확정되면 단일 정답이 없다 → 채점 파일이 아니라 opinion 파일로 간다
-        if it.conflict_type == "opinion":
+        if it.conflict_type == "conflicting_opinions":
             it.correct_answers = []
         stats["scorable" if is_scorable(it) else "excluded"] += 1
         items.append(it)
@@ -252,8 +259,7 @@ def main() -> None:
     ap.add_argument("--raw-dir", default="data/1_raw/qacc", type=Path)
     ap.add_argument("--review-dir", default="data/2_review/qacc", type=Path)
     ap.add_argument("--out-dir", default="data/3_processed", type=Path)
-    ap.add_argument("--dragged-draft",
-                    default="data/2_review/dragged/dragged.draft.csv", type=Path)
+    ap.add_argument("--dragged-review-dir", default="data/2_review/dragged", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
     ap.add_argument("--allow-unresolved", action="store_true",
                     help="게이트 ① 미완료 상태로 최종본 생성 (테스트용)")
@@ -263,7 +269,7 @@ def main() -> None:
 
     if args.stage == "draft":
         items, stats = build_items(load_raw(args.raw_dir))
-        items, dropped = dedup_against_dragged(items, args.dragged_draft)
+        items, dropped = dedup_against_dragged(items, args.dragged_review_dir)
         write_csv(items, draft_csv)
         print(f"\n초안 CSV: {draft_csv} (충돌 {stats['conflict']}건 → 중복 제거 후 {len(items)}건, "
               f"행 {sum(len(it.chunks) for it in items)})")

@@ -12,13 +12,15 @@
 
 유형별 역할 분담 (연구보고 PPT 10·12·22p 확정 — 쓰는 유형과 안 쓰는 유형):
 
-    | 유형              | 건수 | 채점(행동) 트랙        | 자기일관성 트랙       |
-    |-------------------|-----|------------------------|-----------------------|
-    | temporal (시간)   |  62 | ⓐ 충돌 조건 (전수 검증) | 충돌측 (182의 일부)   |
-    | misinfo (오정보)  |   5 | ⓐ 충돌 조건 (전수 검증) | 충돌측 (182의 일부)   |
-    | opinion (의견)    | 115 | **미사용** (정답 없음)  | 충돌측 (182의 일부)   |
-    | complementary     | 115 | **미사용** (정답 108건 부재) | 비상충측 (276의 일부) + ⓒ 기준선 |
-    | none (비충돌)     | 161 | ⓒ 행동 대조군 (RQ3)     | 비상충측 (276의 일부) |
+    conflict_type은 **PPT 11p의 5개 라벨**로 통일 부여한다 (원본이 무엇이든 이 값으로 정규화):
+
+    | 표준 라벨              | 건수 | 채점(행동)              | 자기일관성            |
+    |------------------------|-----|-------------------------|-----------------------|
+    | `outdated`             |  62 | ⓐ 충돌 조건 (전수 검증)  | 충돌측 (182의 일부)   |
+    | `misinformation`       |   5 | ⓐ 충돌 조건 (전수 검증)  | 충돌측 (182의 일부)   |
+    | `conflicting_opinions` | 115 | **미사용** (정답 없음)   | 충돌측 (182의 일부)   |
+    | `complementary`        | 115 | **미사용** (정답 108건 부재) | 비상충측 (276의 일부) |
+    | `no_conflict`          | 161 | ⓒ 대조군 (RQ3)          | 비상충측 (276의 일부) |
 
 정답 가용성(실측): 사실 충돌 67건과 비충돌 161건은 전건 정답이 있으나,
 상보 115건 중 108건·의견 115건 중 113건은 `correct_answer`가 비어 있다.
@@ -63,14 +65,15 @@ from preprocessing.tabular import (label_provenance, read_csv, read_csv_by_type,
                                    to_items, write_by_type, write_csv_by_type)
 
 # 원본 conflict_type 문구 → 공통 스키마 (실측 5종 전부 커버)
+# 원본 문구 → PPT 11p의 5개 표준 라벨 (실측 5종 전부 커버)
 CONFLICT_TYPE_MAP = {
-    "outdated": "temporal",             # Conflict due to outdated information (62)
-    "misinformation": "misinfo",        # Conflict due to misinformation (5)
-    "opinion": "opinion",               # Conflicting opinions and research outcomes (115)
-    "complementary": "complementary",   # Complementary information (115)
-    "no conflict": "none",              # No conflict (161)
+    "outdated": "outdated",                       # Conflict due to outdated information (62)
+    "misinformation": "misinformation",           # Conflict due to misinformation (5)
+    "opinion": "conflicting_opinions",            # Conflicting opinions and research outcomes (115)
+    "complementary": "complementary",             # Complementary information (115)
+    "no conflict": "no_conflict",                 # No conflict (161)
 }
-FACT_CONFLICT_TYPES = ("temporal", "misinfo")  # 행동 트랙 대상 (명목 67건)
+FACT_CONFLICT_TYPES = ("outdated", "misinformation")  # 채점 대상 (명목 67건)
 CHUNK_LABELS_FINAL = ("correct", "conflict", "noise")  # 시트에서 허용되는 확정 라벨
 TEXT_FIELDS = ("short_text", "snippet", "response_str")  # 폴백 순서 (실측 기반)
 MAX_DOC_WORDS = 420   # response_str 폴백이 컨텍스트를 삼키지 않도록 상한 (short_text 최대 412)
@@ -229,7 +232,7 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
                 flag = "no_match"
             elif len(matched) == 1:
                 matched[0].label = "correct"
-            elif ctype == "misinfo":
+            elif ctype == "misinformation":
                 # 오정보 충돌은 최신성이 아니라 출처 권위로 갈린다 — 자동 해소하지 않는다
                 flag = "multi_match_needs_authority"
             else:
@@ -245,7 +248,7 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
             if flag:
                 stats[f"flag_{flag}"] += 1
 
-        elif ctype == "none" and answer:
+        elif ctype == "no_conflict" and answer:
             # 비충돌: 모든 문서가 같은 사실을 가리켜 매핑이 자명하다 (§3.1.1).
             # 충돌 문서가 존재하지 않는 조건이므로 noise 부여가 안전하다.
             for c in chunks:
@@ -313,13 +316,14 @@ def report(items: list[Item]) -> None:
     print(f"  → 자동 해소: {n_auto}건 / 인간 검증 대기(회수 가능): {pending}건 "
           f"/ 해소 불가(날짜): {flags['date_tie'] + flags['date_absent']}건")
     print(f"  → 인간 검증 후 채점 가능 상한 {n_auto + pending}건 (계획서 사전 점검 예상 56~61)")
-    ctrl = [it for it in items if it.conflict_type == "none"]
+    ctrl = [it for it in items if it.conflict_type == "no_conflict"]
     print(f"비충돌 대조군(ⓒ): {len(ctrl)}건, 그중 채점 가능 "
           f"{sum(1 for it in ctrl if is_scorable(it))}건")
     sc_conflict = sum(1 for it in items
-                      if it.conflict_type in ("temporal", "misinfo", "opinion"))
+                      if it.conflict_type in ("outdated", "misinformation",
+                                             "conflicting_opinions"))
     sc_control = sum(1 for it in items
-                     if it.conflict_type in ("complementary", "none"))
+                     if it.conflict_type in ("complementary", "no_conflict"))
     print(f"자기일관성 비교: 충돌측 {sc_conflict}건(목표 182) vs 비상충측 {sc_control}건(목표 276)")
     print("채점 미사용 유형: opinion(정답 없음) · complementary(정답 108/115 부재) — PPT 10·22p")
 

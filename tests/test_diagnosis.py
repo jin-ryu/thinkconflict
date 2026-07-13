@@ -43,7 +43,7 @@ GOLD = "begins at sundown on Saturday, April 12."
 def item() -> Item:
     return Item(
         question_id="dragged-0001", dataset="dragged",
-        question="When does this year's Passover start?", conflict_type="temporal",
+        question="When does this year's Passover start?", conflict_type="outdated",
         correct_answers=[GOLD],
         chunks=[
             Chunk(0, "Pesach 2025 begins before sundown on Saturday April 12, 2025.",
@@ -64,17 +64,17 @@ def test_valid_item_passes_conflict_gate(item):
 
 def test_scorability_is_derived_not_flagged():
     """트랙 플래그를 들고 다니지 않는다 — 정답·제외사유·라벨 확정 여부로 파생한다."""
-    ok = Item("dragged-0001", "dragged", "q", "temporal", ["A"],
+    ok = Item("dragged-0001", "dragged", "q", "outdated", ["A"],
               chunks=[Chunk(0, "t", "correct"), Chunk(1, "t", "conflict")])
     assert is_scorable(ok)
     # 정답이 없는 문항(의견 충돌)은 채점 대상이 아니다
-    assert not is_scorable(Item("dragged-0002", "dragged", "q", "opinion", [],
+    assert not is_scorable(Item("dragged-0002", "dragged", "q", "conflicting_opinions", [],
                                 chunks=[Chunk(0, "t", "noise")]))
     # 라벨이 미확정이면 채점할 수 없다
-    assert not is_scorable(Item("dragged-0003", "dragged", "q", "temporal", ["A"],
+    assert not is_scorable(Item("dragged-0003", "dragged", "q", "outdated", ["A"],
                                 chunks=[Chunk(0, "t", "unknown")]))
     # 제외 사유가 붙으면 빠진다
-    assert not is_scorable(Item("dragged-0004", "dragged", "q", "temporal", ["A"],
+    assert not is_scorable(Item("dragged-0004", "dragged", "q", "outdated", ["A"],
                                 chunks=[Chunk(0, "t", "correct")],
                                 exclusion_flag="date_tie"))
 
@@ -87,7 +87,8 @@ def test_opinion_items_are_not_graded():
 
 def test_hedge_is_counted_separately_not_as_inconsistency():
     """양쪽 병기(hedge)는 불일치가 아니다 — 의견 질의에서 정당한 행동일 수 있다 (§1.8)."""
-    op = Item("dragged-0002", "dragged", "Can humans live past 150?", "opinion", [],
+    op = Item("dragged-0002", "dragged", "Can humans live past 150?",
+              "conflicting_opinions", [],
               chunks=[Chunk(0, "Experts say yes.", "noise")])
     lab = label_generation(parse_think(
         "<think>Experts lean yes.</think>\nExperts disagree; both views exist."), op, [0])
@@ -297,7 +298,8 @@ def test_ramdocs_within_item_pair_holds_document_count_fixed():
     assert stats["pairs"] == 1 and len(pairs) == 2
     conflict, control = pairs
     assert len(conflict.chunks) == len(control.chunks)      # 문서 수 고정
-    assert conflict.conflict_type == "misinfo" and control.conflict_type == "none"
+    assert conflict.conflict_type == "misinformation"
+    assert control.conflict_type == "no_conflict"
     assert any(c.label == "conflict" for c in conflict.chunks)
     assert not any(c.label == "conflict" for c in control.chunks)
     assert conflict.meta["pair_id"] == control.meta["pair_id"]
@@ -319,7 +321,7 @@ def test_ramdocs_noise_only_item_is_control_condition():
         {"text": "n", "type": "noise", "answer": None}],
         "gold_answers": ["A"], "wrong_answers": []}]
     a, _ = build_a(rows)
-    assert a[0].conflict_type == "none"  # between-item 대조의 비충돌 조건
+    assert a[0].conflict_type == "no_conflict"  # between-item 대조의 비충돌 조건
 
 
 # ── 흐름 행렬 · 이득 분해 (§3.2.2(3)) ────────────────────────────────────────
@@ -354,7 +356,8 @@ def test_dragged_conflict_type_map_covers_all_five_raw_labels():
            "Conflicting opinions and research outcomes",
            "Conflict due to outdated information", "Conflict due to misinformation"]
     assert [map_conflict_type(r) for r in raw] == [
-        "none", "complementary", "opinion", "temporal", "misinfo"]
+        "no_conflict", "complementary", "conflicting_opinions",
+        "outdated", "misinformation"]
 
 
 def test_dragged_unknown_conflict_type_raises_rather_than_silently_passing():
@@ -436,7 +439,7 @@ def test_build_refuses_to_emit_final_output_before_review(tmp_path, monkeypatch)
     assert subprocess.run(base + ["draft"] + args, env=env,
                           capture_output=True).returncode == 0
     # 초안 CSV는 유형별로 나뉜다 — 검토할 파일만 열 수 있게
-    assert (review / "dragged_temporal.draft.csv").exists()
+    assert (review / "dragged_outdated.draft.csv").exists()
 
     done = subprocess.run(base + ["build"] + args, env=env, capture_output=True, text=True)
     assert done.returncode != 0                       # 검토 전이므로 거부
@@ -486,14 +489,14 @@ def test_dates_are_normalized_to_iso():
 
 
 def test_schema_rejects_non_iso_dates():
-    bad = Item("dragged-0001", "dragged", "q", "temporal", ["x"],
+    bad = Item("dragged-0001", "dragged", "q", "outdated", ["x"],
                chunks=[Chunk(0, "t", "correct", date="Nov 2, 2024")])
     assert any("ISO-8601" in e for e in validate_item(bad))
 
 
 def test_noise_chunk_carries_no_supported_answer():
     """supported_answer = '이 문서가 주장하는 답' — noise는 질문에 답하지 않으므로 비운다."""
-    bad = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+    bad = Item("qacc-0001", "qacc", "q", "misinformation", ["A"],
                chunks=[Chunk(0, "t", "noise", supported_answer="A")])
     assert any("noise chunk must not carry" in e for e in validate_item(bad))
 
@@ -542,7 +545,7 @@ def test_blank_label_becomes_unknown_and_blocks_scoring(tmp_path, item):
 
 def test_gold_typo_is_fixed_in_place_and_original_preserved(tmp_path):
     """정답 오타는 `correct_answer` 칸을 직접 고친다. 원본은 초안 CSV와 대조해 보존한다."""
-    it = Item("dragged-0090", "dragged", "q", "temporal", ["Boston Celtis"],
+    it = Item("dragged-0090", "dragged", "q", "outdated", ["Boston Celtis"],
               chunks=[Chunk(0, "the Celtics won", "correct")])
     draft = tmp_path / "draft.csv"
     write_csv([it], draft)
@@ -566,7 +569,7 @@ def test_covariates_are_derived_from_chunks_not_a_sidecar(tmp_path, item):
 
 def test_wrong_answers_are_derived_from_supported_answers(tmp_path):
     """오답 목록은 문서별 supported_answer에서 파생한다 (사람이 채우는 칸이 아니다)."""
-    it = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+    it = Item("qacc-0001", "qacc", "q", "misinformation", ["A"],
               chunks=[Chunk(0, "t1", "correct", supported_answer="A"),
                       Chunk(1, "t2", "conflict", supported_answer="B"),
                       Chunk(2, "t3", "noise")])
@@ -577,7 +580,7 @@ def test_wrong_answers_are_derived_from_supported_answers(tmp_path):
 
 def test_qacc_gate_is_expressed_as_exclusion_flag(tmp_path):
     """sharp/soft 판정은 별도 열이 아니라 스키마의 exclusion_flag로 표현한다."""
-    it = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+    it = Item("qacc-0001", "qacc", "q", "misinformation", ["A"],
               chunks=[Chunk(0, "t", "correct")], exclusion_flag=PENDING_SCREEN)
     path = tmp_path / "x.csv"
     write_csv([it], path)

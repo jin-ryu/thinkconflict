@@ -32,13 +32,16 @@ CSV에 적힌 값이 그대로 최종본이 된다(우선순위 규칙 같은 �
 ```
 data/2_review/
 ├── dragged/                          **유형별로 나뉜다** — 검토할 파일만 열면 된다
-│   ├── dragged_temporal.draft.csv      578행 · 빈칸 518  👈 검토 대상
-│   ├── dragged_misinfo.draft.csv        45행 · 빈칸  45  👈 검토 대상
-│   ├── dragged_temporal.llm.csv        LLM이 빈칸을 채운 것 (사람이 여기서 확인·수정)
-│   ├── dragged_misinfo.llm.csv         〃
-│   ├── dragged_opinion.draft.csv     1123행 — 정답이 없어 라벨이 채점에 쓰이지 않는다
-│   ├── dragged_complementary.draft.csv 1067행 — 〃
-│   └── dragged_none.draft.csv        1399행 — 규칙이 전부 채움 (대조군)
+│   ├── dragged_outdated.draft.csv               578행 · 빈칸 518  👈 검토 대상
+│   ├── dragged_misinformation.draft.csv          45행 · 빈칸  45  👈 검토 대상
+│   ├── dragged_outdated.llm.csv                 LLM이 빈칸을 채운 것 (여기서 확인·수정)
+│   ├── dragged_misinformation.llm.csv           〃
+│   ├── dragged_conflicting_opinions.draft.csv  1123행 — 정답이 없어 라벨이 채점에 안 쓰인다
+│   ├── dragged_complementary.draft.csv         1067행 — 〃
+│   └── dragged_no_conflict.draft.csv           1399행 — 규칙이 전부 채움 (ⓒ 대조군)
+
+`conflict_type`은 **PPT 11p의 5개 라벨**로 통일한다 (원본이 무엇이든 이 값으로 정규화):
+`outdated` · `misinformation` · `conflicting_opinions` · `complementary` · `no_conflict`
 ├── qacc/                             draft.csv · llm.csv · judges/
 └── ramdocs/                          CSV만 — 눈으로 확인하는 용도 (검토 불필요)
 

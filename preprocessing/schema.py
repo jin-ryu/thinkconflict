@@ -30,7 +30,9 @@ ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")   # 공통 날짜 형식
 RAW_DIR = "1_raw"              # 원본 (git 미포함 — download.sh로 재현)
 REVIEW_DIR = "2_review"        # 작업용 CSV (사람이 검토·수정)
 PROCESSED_DIR = "3_processed"  # 최종 JSONL (검토 완료본만 — 실험이 읽는 유일한 입력)
-CONFLICT_TYPES = ("temporal", "misinfo", "opinion", "complementary", "none", "ambiguous")
+# 충돌 유형 — PPT 11p가 정한 5개 라벨로 통일 부여한다 (원본이 무엇이든 이 값으로 정규화)
+CONFLICT_TYPES = ("outdated", "misinformation", "conflicting_opinions",
+                  "complementary", "no_conflict")
 CHUNK_LABELS = ("correct", "conflict", "noise", "unknown")
 
 
@@ -190,7 +192,7 @@ def render_documents(item: Item, *, shuffle_seed: int) -> tuple[str, list[int]]:
 
 # ── CLI: 산출물 검증 + 게이트 통과율 보고 (Phase 1-4) ─────────────────────────
 
-CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 대상
+CONFLICT_CONDITIONS = ("outdated", "misinformation")  # 유효 충돌 게이트 적용 대상
 
 
 def main() -> None:

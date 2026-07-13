@@ -30,11 +30,12 @@ CONFLICT_CUES = [  # L1 탐지 표지 (언어화된 충돌 인지)
     r"\bdiscrepanc",
 ]
 TYPE_CUES = {  # 유형 인지 (부가 축): 원인 유형까지 짚었는가
-    "temporal": [r"\boutdated", r"\bmore recent", r"\bnewer", r"\bolder (?:article|source|document)",
+    "outdated": [r"\boutdated", r"\bmore recent", r"\bnewer", r"\bolder (?:article|source|document)",
                  r"\b(?:19|20)\d{2}\b.{0,40}\b(?:19|20)\d{2}\b", r"\bfresher", r"\blatest"],
-    "misinfo": [r"\bmisinformation", r"\bunreliable", r"\bcredib", r"\btrustworth",
+    "misinformation": [r"\bmisinformation", r"\bunreliable", r"\bcredib", r"\btrustworth",
                 r"\bauthorit", r"\bofficial (?:source|site|website)", r"\breputable"],
-    "opinion": [r"\bopinion", r"\bsubjective", r"\bperspective", r"\bviewpoint", r"\bdebat"],
+    "conflicting_opinions": [r"\bopinion", r"\bsubjective", r"\bperspective",
+                             r"\bviewpoint", r"\bdebat"],
 }
 # "[Document 3]", "document 3", "doc 3" 인용 + 지지/기각 동사 문맥
 DOC_REF_RE = re.compile(r"\[?doc(?:ument)?s?\s*(\d{1,2})\]?", re.IGNORECASE)

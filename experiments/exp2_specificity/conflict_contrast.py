@@ -33,8 +33,8 @@ from statsmodels.genmod.bayes_mixed_glm import BinomialBayesMixedGLM
 from diagnosis.metrics import MIN_COMPARABLE_N, stage_metrics
 from preprocessing.schema import read_jsonl
 
-CONFLICT_TYPES = {"temporal", "misinfo"}      # 충돌 조건 (사실 충돌 — 채점 가능)
-CONTROL_TYPES = {"complementary", "none"}     # 비충돌 대조 조건
+CONFLICT_TYPES = {"outdated", "misinformation"}   # 충돌 조건 (사실 충돌 — 채점 가능)
+CONTROL_TYPES = {"complementary", "no_conflict"}  # 비충돌 대조 조건
 
 
 def load_labels(path: Path) -> list[dict]:
