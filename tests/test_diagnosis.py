@@ -28,7 +28,8 @@ from preprocessing.ramdocs_prep import build_a, build_b, build_pairs
 from preprocessing.schema import (Chunk, Item, assert_reviewed,
                                   passes_valid_conflict_gate, render_documents,
                                   validate_item)
-from preprocessing.tabular import (label_provenance, original_answers, read_csv,
+from preprocessing.tabular import (COLUMNS, PENDING_SCREEN, SOFT_CONFLICT,
+                                   label_provenance, original_answers, read_csv,
                                    to_items, write_csv)
 
 GOLD = "begins at sundown on Saturday, April 12."
@@ -415,14 +416,23 @@ def test_csv_round_trip_preserves_items(tmp_path, item):
     assert back.chunks[0].date == item.chunks[0].date
 
 
+def test_csv_columns_are_schema_fields_only(tmp_path, item):
+    """CSV 열은 전부 공통 스키마(Item/Chunk) 필드다 — 보조 열을 만들지 않는다."""
+    path = tmp_path / "x.csv"
+    write_csv([item], path)
+    assert set(read_csv(path)[0]) == set(COLUMNS)
+    assert not any(c.endswith("_source") or c in ("rule_hint", "note", "verdict")
+                   for c in COLUMNS)
+
+
 def test_rule_prefills_label_and_leaves_unknown_blank(tmp_path, item):
     """draft CSV: 규칙이 아는 값은 채워지고, 모르는 것은 빈칸으로 남는다."""
     item.chunks[1].label = "unknown"          # 규칙이 판정하지 못한 문서
     path = tmp_path / "x.csv"
     write_csv([item], path)
     rows = read_csv(path)
-    assert rows[0]["label"] == "correct" and rows[0]["label_source"] == "rule"
-    assert rows[1]["label"] == "" and rows[1]["label_source"] == ""
+    assert rows[0]["label"] == "correct"
+    assert rows[1]["label"] == ""
 
 
 def test_single_label_column_last_value_wins(tmp_path, item):
@@ -430,9 +440,9 @@ def test_single_label_column_last_value_wins(tmp_path, item):
     path = tmp_path / "x.csv"
     write_csv([item], path)
     rows = read_csv(path)
-    rows[0]["label"] = "conflict"                                # 사람이 규칙 값을 덮어씀
-    rows[1]["label"], rows[1]["label_source"] = "noise", "llm"   # LLM이 채움
-    rows[2]["label"] = ""                                        # 아무도 안 채움
+    rows[0]["label"] = "conflict"     # 사람이 규칙 값을 덮어씀
+    rows[1]["label"] = "noise"        # LLM이 채움
+    rows[2]["label"] = ""             # 아무도 안 채움
     labels = [c.label for c in to_items(rows)[0].chunks]
     assert labels == ["conflict", "noise", "unknown"]
 
@@ -484,20 +494,36 @@ def test_wrong_answers_are_derived_from_supported_answers(tmp_path):
     assert to_items(read_csv(path))[0].wrong_answers == ["B"]
 
 
-def test_provenance_counts_who_filled_each_label():
-    """label_source가 비어 있는데 label이 채워져 있으면 사람이 채운 것으로 센다."""
-    rows = [{"label": "correct", "label_source": "rule"},
-            {"label": "conflict", "label_source": "llm"},
-            {"label": "noise", "label_source": ""},       # 사람이 빈칸을 채움
-            {"label": "", "label_source": ""}]            # 미확정
-    assert label_provenance(rows) == {"rule": 1, "llm": 1, "human": 1, "unresolved": 1}
+def test_qacc_gate_is_expressed_as_exclusion_flag(tmp_path):
+    """sharp/soft 판정은 별도 열이 아니라 스키마의 exclusion_flag로 표현한다."""
+    it = Item("qacc-0001", "qacc", "q", "misinfo", ["A"],
+              chunks=[Chunk(0, "t", "correct")], exclusion_flag=PENDING_SCREEN)
+    path = tmp_path / "x.csv"
+    write_csv([it], path)
+    rows = read_csv(path)
+    assert rows[0]["exclusion_flag"] == PENDING_SCREEN      # 판정 전엔 채점 트랙 진입 불가
+    rows[0]["exclusion_flag"] = ""                          # sharp 판정 → 비운다
+    assert to_items(rows)[0].exclusion_flag is None
+    rows[0]["exclusion_flag"] = SOFT_CONFLICT               # soft 판정 → 드롭
+    assert to_items(rows)[0].exclusion_flag == SOFT_CONFLICT
+
+
+def test_provenance_is_derived_by_diffing_against_the_draft():
+    """출처 열을 두지 않는다 — 초안 CSV와 대조해 '규칙이 채운 값'과 '이후 채운 값'을 가른다."""
+    draft = [{"question_id": "q1", "doc_id": "0", "label": "correct"},
+             {"question_id": "q1", "doc_id": "1", "label": ""},
+             {"question_id": "q1", "doc_id": "2", "label": ""}]
+    final = [{"question_id": "q1", "doc_id": "0", "label": "correct"},   # 규칙 값 그대로
+             {"question_id": "q1", "doc_id": "1", "label": "conflict"},  # 이후 채움
+             {"question_id": "q1", "doc_id": "2", "label": ""}]          # 미확정
+    assert label_provenance(final, draft) == {"rule": 1, "filled": 1, "unresolved": 1}
 
 
 # ── QACC 전처리: MTurk 플랫 포맷 파싱 계약 ───────────────────────────────────
 
-def test_draft_leaves_conflicting_vs_noise_unresolved_for_fact_conflicts():
-    """규칙은 '정답을 담았는가'만 안다 — 다른 답을 주장하는 문서(conflicting)와
-    무관한 문서(noise)를 가르지 못하므로 unknown으로 남기고 LLM+사람에게 넘긴다.
+def test_draft_leaves_conflict_vs_noise_unresolved_for_fact_conflicts():
+    """규칙은 '정답을 담았는가'만 안다 — 다른 답을 주장하는 문서(conflict)와
+    무관한 문서(noise)를 가르지 못하므로 빈칸으로 남기고 LLM+사람에게 넘긴다.
     실측 반례: 정답 'at least 1,759'에 '1,762'를 주장하는 문서는 매칭에 실패한다."""
     rows = [{
         "question": "How many tornadoes so far?",
@@ -512,8 +538,6 @@ def test_draft_leaves_conflicting_vs_noise_unresolved_for_fact_conflicts():
     labels = [c.label for c in items[0].chunks]
     assert labels[0] == "correct"
     assert labels[1] == labels[2] == "unknown"   # 충돌/무관을 규칙이 단정하지 않는다
-    hints = items[0].meta["rule_hint"]
-    assert hints[1] == "unmatched" and hints[2] == "unmatched"
 
 
 def test_draft_control_items_get_noise_since_no_conflicting_doc_exists():

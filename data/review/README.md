@@ -65,28 +65,38 @@ python -m preprocessing.qacc_prep   build     # → data/processed/qacc.jsonl
 python -m preprocessing.schema data/processed/*.jsonl   # 산출물 검증 + 게이트 통과율
 ```
 
-## CSV 열 읽는 법
+## CSV 열 — 전부 공통 스키마 필드다
 
-| 열 | 뜻 |
+보조 열(`rule_hint`, `note`, `*_source`, `verdict`)은 두지 않는다. 검토자가 보는 모든 칸이
+최종 JSONL의 필드에 그대로 대응한다.
+
+| 열 | 스키마 | 채우나 |
+|---|---|---|
+| `label` | `Chunk.label` | 👈 **`correct` / `conflict` / `noise`** — 빈칸을 채운다 |
+| `correct_answer` | `Item.correct_answers` | 👈 정답. 오타면 그 자리에서 고친다 (실측: `Boston Celtis`, `Bolovia`) |
+| `conflict_type` | `Item.conflict_type` | 👈 규칙 초벌값이 들어 있다. 틀렸으면 고친다 |
+| `exclusion_flag` | `Item.exclusion_flag` | 👈 **비우면 채점 트랙에 들어간다.** 사유가 있으면 적는다 |
+| `question_id` · `dataset` · `question` · `doc_id` · `date` · `url` · `supported_answer` · `text` | 그대로 | 읽기용 |
+
+### QACC 게이트 ①은 `exclusion_flag`로 표현한다
+
+sharp/soft를 위한 별도 열을 만들지 않는다 — 스키마에 이미 있는 칸을 쓴다.
+
+| `exclusion_flag` 값 | 뜻 |
 |---|---|
-| `label` | 👈 **채우는 칸** (`correct` / `conflict` / `noise`). 규칙이 아는 것은 이미 채워져 있고, 빈칸은 LLM·사람이 메운다 |
-| `label_source` | 참고: 그 값을 누가 넣었나 (`rule` / `llm` / 빈칸=사람) |
-| `rule_hint` | `matched_older`(정답 문자열은 있으나 구버전) / `unmatched`(정답 문자열 없음) — **참고용, 확정 아님** |
-| `correct_answer` | 👈 채우는 칸: 정답. 오타면 **그 자리에서 직접 고친다** (실측: `Boston Celtis`, `Bolovia`) — 원본은 초안 CSV와 git 이력에 남는다 |
-| `verdict` · `conflict_type` | 👈 채우는 칸 (QACC 게이트 ①: sharp/soft, 충돌 유형) |
-| `text` | 판단 근거인 문서 본문 |
-| `note` | 검토 메모 (최종본의 `meta.review_notes`로 보존) |
+| `pending_screen` | 아직 판정 안 됨 (기본값) → **채점 트랙 진입 불가** |
+| `soft_conflict` | 사이비 충돌(표기 차이) → 드롭 |
+| (빈칸) | **sharp = 진짜 사실 모순 → 채점 트랙 진입** |
+| `no_valid_conflict_pair` 등 | 규칙이 붙인 다른 제외 사유 |
 
-문서 길이 공변량·오답 목록 같은 부가 정보는 **별도 파일 없이 CSV에서 다시 계산**한다 —
-사람이 손댈 필요가 없는 값이라 CSV를 어지럽히지 않는다.
+판정자 2종의 원 판정은 검토 CSV를 어지럽히지 않도록 `qacc/judges/judge{1,2}.csv`에 따로
+남는다. **둘이 일치할 때만** 검토 CSV에 반영되고, 불일치하면 `pending_screen`으로 남아
+사람이 adjudication한다(부록 A(b)).
 
-⚠️ **`rule_hint = unmatched`를 "무관 문서"로 읽으면 안 된다.** 정답과 **다른 답을 주장하는
-충돌 문서**가 여기 섞여 있다(예: 정답 `at least 1,759`에 `1,762`를 주장하는 문서).
-이 구분이 유효 충돌 게이트를 좌우한다 (사전등록 §7.6).
-
-`build`는 라벨을 **누가 채웠는지**(규칙/LLM/사람) 집계해 출력한다.
-QACC 판정자 2종이 불일치한 문항은 `verdict`가 빈칸으로 남는다 → 사람이 adjudication한다(부록 A(b)).
-판정자별 원 판정은 `judge1_*`·`judge2_*` 열에 증거로 남는다.
+⚠️ **`label`이 빈칸인 563개 문서 중에는 "다른 답을 주장하는 충돌 문서"가 섞여 있다**
+(예: 정답 `at least 1,759`인데 `1,762`를 주장). 규칙은 "정답 문자열이 없다"는 것만 알 뿐
+그게 딴소리인지 무관한지 모른다 — `text`를 보고 판단해야 하며, 이 구분이 유효 충돌 게이트를
+좌우한다 (사전등록 §7.6).
 
 ## 현재 상태 (2026-07-13)
 

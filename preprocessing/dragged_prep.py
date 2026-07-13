@@ -208,7 +208,6 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
                                 url=d.get("url"), title=d.get("title")))
         answer = str(row.get("correct_answer") or "").strip()
         flag = None
-        hints: dict[int, str] = {}
 
         if ctype in FACT_CONFLICT_TYPES:
             matched = [c for c in chunks if match_answer(answer, c.text)]
@@ -225,16 +224,11 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
                 for c in matched:
                     if c.doc_id in winners:
                         c.label = "correct"
-            # 나머지 문서는 unknown으로 남긴다. 규칙은 '정답을 담았는가'만 볼 수 있을 뿐
+            # 나머지 문서는 unknown(빈칸)으로 남긴다. 규칙은 '정답을 담았는가'만 볼 수 있을 뿐
             # '다른 답을 주장하는가(conflict)'와 '무관한가(noise)'를 가를 수 없다 —
             # 실측 반례: 정답 "at least 1,759"에 "1,762"를 주장하는 문서는 정답 문자열이
             # 없어 매칭에 실패하지만 명백한 충돌 문서다. 이 구분은 LLM 초벌 + 사람
-            # 전수 검토가 확정한다 (PPT 12p ①, 사전등록 §7.7).
-            matched_ids = {c.doc_id for c in matched}
-            for c in chunks:
-                if c.label == "unknown":
-                    hints[c.doc_id] = ("matched_older" if c.doc_id in matched_ids
-                                       else "unmatched")
+            # 전수 검토가 확정한다 (PPT 12p ①, 사전등록 §7.6).
             if flag:
                 stats[f"flag_{flag}"] += 1
 
@@ -266,19 +260,17 @@ def build_draft(rows: list[dict]) -> tuple[list[Item], Counter, datetime | None]
             meta={"source_row": i, "source": row.get("source"),
                   "raw_conflict_type": row["conflict_type"],
                   "mapping": "draft-string-fuzz",
-                  "rule_hint": hints,   # unknown 문서에 대한 규칙 힌트 (확정 아님)
                   "n_docs": len(chunks),
                   "doc_len_words": [len(c.text.split()) for c in chunks]},
         ))
     return items, stats, ref
 
 
-def build_items(rows: list[dict],
-                originals: dict[str, str] | None = None) -> tuple[list[Item], Counter]:
-    """CSV 행 → 최종 Item. 라벨 우선순위(사람 > LLM > 규칙)는 tabular.to_items가 적용한다.
-    여기서는 DRAGged 고유의 트랙 판정만 한다."""
+def build_items(rows: list[dict], originals: dict[str, str] | None = None,
+                draft_rows: list[dict] | None = None) -> tuple[list[Item], Counter]:
+    """CSV 행 → 최종 Item. CSV에 적힌 값을 그대로 읽고, DRAGged 고유의 트랙 판정만 한다."""
     items = to_items(rows, original_answers=originals)
-    stats: Counter = Counter(label_provenance(rows))
+    stats: Counter = Counter(label_provenance(rows, draft_rows))
     for it in items:
         it.self_consistency_track = True    # 다섯 유형 전부 (§3.2 이중 트랙)
         if it.meta.get("answer_errata"):
@@ -343,8 +335,7 @@ def main() -> None:
 
     if args.stage == "draft":
         items, stats, ref = build_draft(load_raw(args.raw_dir))
-        hints = {it.question_id: (it.meta.get("rule_hint") or {}) for it in items}
-        write_csv(items, draft_csv, hints=hints)
+        write_csv(items, draft_csv)
         n_open = sum(1 for it in items for c in it.chunks
                      if c.label == "unknown" and it.conflict_type in FACT_CONFLICT_TYPES)
         print(f"초안 CSV: {draft_csv} (문항 {len(items)} · 행 {sum(len(it.chunks) for it in items)})")
@@ -358,11 +349,12 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items(rows, original_answers(draft_csv))
+        items, stats = build_items(rows, original_answers(draft_csv),
+                                   read_csv(draft_csv))
         write_jsonl(items, args.out_dir / "dragged.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'dragged.jsonl'} (N={len(items)})")
-        print(f"라벨 출처: 규칙 {stats['rule']} · LLM {stats['llm']} · 사람 {stats['human']} "
+        print(f"라벨: 규칙 그대로 {stats['rule']} · 이후 채움(LLM·사람) {stats['filled']} "
               f"· 미확정 {stats['unresolved']}")
         print(f"사실 충돌: behavior_track {stats['behavior_track']}건 / "
               f"제외 {stats['fact_excluded']}건 "

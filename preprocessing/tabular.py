@@ -6,12 +6,11 @@
     2) llm     빈칸 채움 → `<ds>.llm.csv`  LLM 초벌 (RAMDocs는 채울 빈칸이 없어 생략)
     3) build   사람 확정 → `<ds>.jsonl`    최종본. CSV의 값을 그대로 읽어 만든다
 
-**채우는 칸은 하나뿐이다.** 문서 라벨은 `label`, QACC 판정은 `verdict`·`conflict_type`.
-규칙이 확정한 값은 미리 채워져 있고, LLM은 **빈칸만** 메우며, 사람은 아무 칸이나 고쳐 쓴다
-(맨 나중에 쓴 값이 그대로 최종본이 된다 — 우선순위 규칙 같은 건 없다).
+**CSV의 모든 열은 공통 스키마(schema.Item/Chunk)에 그대로 대응한다.** 보조 열은 두지 않는다 —
+파이프라인 사정으로 만든 칸이 검토자의 시야를 어지럽히지 않게 하기 위함이다.
 
-`*_source` 열은 그 값을 누가 넣었는지 기록하는 **참고용**이다(rule / llm / 빈칸=사람).
-파이프라인은 이 열을 읽어 판정에 쓰지 않고, build 리포트에만 쓴다.
+규칙이 아는 값은 미리 채워져 있고, LLM은 **빈칸만** 메우며, 사람은 아무 칸이나 고쳐 쓴다.
+CSV에 적힌 값이 그대로 최종본이 된다 (우선순위 규칙 같은 건 없다).
 
 CSV는 **청크 1개 = 1행**이고, 문항 수준 필드(question, correct_answer 등)는 행마다 반복된다.
 Excel/Numbers로 열어 정렬·필터하며 검토할 수 있다.
@@ -24,64 +23,54 @@ from pathlib import Path
 
 from preprocessing.schema import CHUNK_LABELS, Chunk, Item
 
-# 청크 1개 = 1행. 앞쪽은 문항 수준(행마다 반복), 뒤쪽은 청크 수준.
+# 청크 1개 = 1행. 열은 전부 공통 스키마 필드다 (Item.* 또는 Chunk.*).
 COLUMNS = [
-    # ── 문항 수준 ────────────────────────────────────────────────────────────
+    # ── 문항 수준 (Item) ─────────────────────────────────────────────────────
     "question_id", "dataset", "question",
-    "conflict_type",                # 👈 채우는 칸 (규칙 초벌값이 들어 있음, 고쳐 써도 된다)
-    "conflict_type_source",         # 참고: rule / llm / 빈칸=사람
-    "correct_answer",               # 👈 채우는 칸: 원본 정답. 오타면 여기서 직접 고친다
-    "verdict",                      # 👈 채우는 칸: QACC 게이트 ① (sharp / soft)
-    "verdict_source",               # 참고: rule / llm / 빈칸=사람
-    "exclusion_flag",               # 규칙이 붙인 제외·보류 사유
-    # ── 청크 수준 ────────────────────────────────────────────────────────────
+    "conflict_type",     # 👈 채우는 칸: temporal / misinfo / opinion / complementary / none
+    "correct_answer",    # 👈 채우는 칸: 정답. 오타면 여기서 직접 고친다 (Item.correct_answers)
+    "exclusion_flag",    # 👈 채우는 칸: 채점 트랙 제외 사유. 비우면 트랙에 들어간다
+    # ── 청크 수준 (Chunk) ────────────────────────────────────────────────────
     "doc_id", "date", "url", "supported_answer",
-    "label",                        # 👈 채우는 칸 (correct / conflict / noise)
-    "label_source",                 # 참고: rule / llm / 빈칸=사람
-    "rule_hint",                    # 규칙의 참고 신호 (matched_older / unmatched) — 확정 아님
-    "text",                         # 문서 본문 (판단 근거)
-    "note",                         # 검토자 메모 (파이프라인은 읽지 않음)
+    "label",             # 👈 채우는 칸: correct / conflict / noise
+    "text",              # 문서 본문 (판단 근거)
 ]
 VALID_LABELS = tuple(l for l in CHUNK_LABELS if l != "unknown")
+
+# QACC 게이트 ①(sharp/soft)은 별도 열이 아니라 exclusion_flag로 표현한다:
+#   pending_screen — 아직 판정 안 됨 (기본값 → 채점 트랙 진입 불가)
+#   soft_conflict  — 사이비 충돌(표기 차이)로 판정 → 드롭
+#   (빈칸)         — sharp = 진짜 사실 모순 → 채점 트랙 진입
+PENDING_SCREEN = "pending_screen"
+SOFT_CONFLICT = "soft_conflict"
 
 
 def _cell(row: dict, key: str) -> str:
     return (row.get(key) or "").strip()
 
 
-def write_csv(items: list[Item], path: str | Path, *,
-              hints: dict[str, dict] | None = None) -> None:
+def write_csv(items: list[Item], path: str | Path) -> None:
     """Item 목록을 검토용 CSV로 쓴다. 규칙이 확정한 값은 채워지고 나머지는 빈칸이다."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    hints = hints or {}
     with open(path, "w", newline="", encoding="utf-8-sig") as f:  # BOM: Excel 한글 대응
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         for it in items:
-            item_hints = hints.get(it.question_id, {})
-            verdict = it.meta.get("screen_verdict", "")
             for c in it.chunks:
-                known = c.label != "unknown"
                 w.writerow({
                     "question_id": it.question_id,
                     "dataset": it.dataset,
                     "question": it.question,
                     "conflict_type": it.conflict_type,
-                    "conflict_type_source": "rule",
                     "correct_answer": it.correct_answers[0] if it.correct_answers else "",
-                    "verdict": verdict,
-                    "verdict_source": "rule" if verdict else "",
                     "exclusion_flag": it.exclusion_flag or "",
                     "doc_id": c.doc_id,
                     "date": c.date or "",
                     "url": c.url or "",
                     "supported_answer": c.supported_answer or "",
-                    "label": c.label if known else "",       # 미확정은 빈칸
-                    "label_source": "rule" if known else "",
-                    "rule_hint": item_hints.get(c.doc_id) or item_hints.get(str(c.doc_id)) or "",
+                    "label": "" if c.label == "unknown" else c.label,   # 미확정은 빈칸
                     "text": c.text,
-                    "note": "",
                 })
 
 
@@ -90,19 +79,15 @@ def read_csv(path: str | Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 
-def write_rows(rows: list[dict], path: str | Path,
-               extra_columns: list[str] | None = None) -> None:
-    """행을 그대로 다시 쓴다. extra_columns로 판정자별 열(judge1_verdict 등)을 덧붙인다."""
+def write_rows(rows: list[dict], path: str | Path) -> None:
+    """행을 그대로 다시 쓴다 (열 구성은 COLUMNS 고정 — 스키마 밖 열은 만들지 않는다)."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    seen = {k for r in rows for k in r}                       # 이미 있는 열 보존(재개 시)
-    cols = COLUMNS + [c for c in (extra_columns or []) if c not in COLUMNS]
-    cols += [c for c in sorted(seen) if c not in cols]
     with open(path, "w", newline="", encoding="utf-8-sig") as f:
-        w = csv.DictWriter(f, fieldnames=cols)
+        w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         for r in rows:
-            w.writerow({k: r.get(k, "") for k in cols})
+            w.writerow({k: r.get(k, "") for k in COLUMNS})
 
 
 def to_items(rows: list[dict], *,
@@ -143,11 +128,6 @@ def to_items(rows: list[dict], *,
         original = original_answers.get(qid)
         if original is not None and answer != original:
             meta["answer_errata"] = original      # 사람이 정답 오타를 고쳤다 (원본 보존)
-        if _cell(head, "verdict"):
-            meta["screen_verdict"] = _cell(head, "verdict")
-        notes = [_cell(r, "note") for r in entry["rows"] if _cell(r, "note")]
-        if notes:
-            meta["review_notes"] = notes
 
         items.append(Item(
             question_id=qid,
@@ -173,16 +153,20 @@ def original_answers(path: str | Path) -> dict[str, str]:
             for r in read_csv(p)}
 
 
-def label_provenance(rows: list[dict]) -> dict[str, int]:
-    """label을 누가 채웠는지 집계 — build 리포트용.
+def label_provenance(rows: list[dict], draft_rows: list[dict] | None = None) -> dict[str, int]:
+    """라벨이 채워졌는지 집계 — build 리포트용.
 
-    사람이 빈칸을 채우면 label_source는 빈 채로 남으므로 'human'으로 센다.
-    (사람이 LLM 값을 덮어쓴 경우는 source가 llm으로 남아 구분되지 않는다 — 참고 지표다.)"""
-    counts = {"rule": 0, "llm": 0, "human": 0, "unresolved": 0}
+    출처 열을 따로 두지 않으므로, 초안 CSV(draft_rows)와 대조해 '규칙이 채운 것'과
+    '나중에 채워진 것(LLM·사람)'을 가른다. 누가 채웠는지의 정확한 이력은 git diff가 갖는다."""
+    by_key = {(r["question_id"], r["doc_id"]): _cell(r, "label")
+              for r in (draft_rows or [])}
+    counts = {"rule": 0, "filled": 0, "unresolved": 0}
     for r in rows:
-        if _cell(r, "label") not in VALID_LABELS:
+        label = _cell(r, "label")
+        if label not in VALID_LABELS:
             counts["unresolved"] += 1
-            continue
-        src = _cell(r, "label_source")
-        counts[src if src in ("rule", "llm") else "human"] += 1
+        elif by_key.get((r["question_id"], r["doc_id"])) == label:
+            counts["rule"] += 1          # 초안과 같다 = 규칙이 채운 값 그대로
+        else:
+            counts["filled"] += 1        # LLM·사람이 채우거나 고친 값
     return counts

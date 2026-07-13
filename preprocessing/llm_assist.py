@@ -9,10 +9,11 @@
                 '무관한가(noise)'를 가르지 못한다 — 그 판정을 LLM이 초벌한다.
                 실측 반례: 정답 "at least 1,759"에 "1,762"를 주장하는 문서.
 
-    qacc     →  빈 `verdict`(sharp/soft)·`conflict_type` 칸 (게이트 ①)
-                판정자 2종의 원 판정은 judge{N}_* 열에 증거로 남기고, **둘이 일치할 때만**
-                verdict·conflict_type을 채운다. 불일치하면 빈칸으로 남겨 사람이
-                adjudication하게 한다(부록 A(b)). 문서 라벨은 원본 귀속 주석에 이미 있다.
+    qacc     →  게이트 ①(sharp/soft). 판정자 2종의 **원 판정은 judges/judge{N}.csv에 따로**
+                남기고(검토 CSV는 공통 스키마 열만 유지), **둘이 일치할 때만** 검토 CSV에
+                반영한다 — sharp면 `exclusion_flag`를 비우고, soft면 `soft_conflict`로 바꾼다.
+                불일치하면 `pending_screen` 그대로 두어 사람이 adjudication한다(부록 A(b)).
+                문서 라벨은 원본 귀속 주석에 이미 있어 건드리지 않는다.
 
     ramdocs  →  LLM 불필요. 문서 라벨·정답이 원본에 내장돼 있어 승계만 한다
                 (LLM을 태우면 원본 골드 라벨을 추측으로 덮어쓰는 셈이라 품질이 낮아진다).
@@ -29,13 +30,15 @@ usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import re
 from pathlib import Path
 
 from openai import OpenAI
 from tqdm import tqdm
 
-from preprocessing.tabular import read_csv, write_rows
+from preprocessing.tabular import (PENDING_SCREEN, SOFT_CONFLICT, read_csv,
+                                   write_rows)
 
 MAX_DOC_WORDS = 200        # 판정 프롬프트에 넣는 문서 발췌 상한
 FACT_CONFLICT_TYPES = ("temporal", "misinfo")
@@ -126,23 +129,25 @@ verdict ∈ {{sharp, soft}} =
 type ∈ {{temporal, misinfo, opinion, na}} = """
 
 
-def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int) -> int:
-    """QACC 판정은 문항 수준이다 — 같은 question_id의 행들을 한 번에 판정해 함께 채운다."""
+def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int,
+             judge_dir: Path) -> int:
+    """QACC 판정은 문항 수준이다 — 같은 question_id의 행들을 한 번에 판정한다.
+
+    판정자의 원 판정은 judges/judge{N}.csv에 증거로 남기고(검토 CSV는 스키마 열만 유지),
+    두 판정자가 **일치할 때만** 검토 CSV의 exclusion_flag·conflict_type에 반영한다."""
     by_item: dict[str, list[dict]] = {}
     for r in rows:
         by_item.setdefault(r["question_id"], []).append(r)
 
-    vcol, tcol = f"judge{judge_idx}_verdict", f"judge{judge_idx}_type"
-    other_v, other_t = (f"judge{2 if judge_idx == 1 else 1}_verdict",
-                        f"judge{2 if judge_idx == 1 else 1}_type")
-    todo = [(qid, rs) for qid, rs in by_item.items() if not (rs[0].get(vcol) or "").strip()]
+    mine = _read_judge(judge_dir / f"judge{judge_idx}.csv")
+    other = _read_judge(judge_dir / f"judge{2 if judge_idx == 1 else 1}.csv")
+    todo = [(qid, rs) for qid, rs in by_item.items() if qid not in mine]
 
-    for _qid, rs in tqdm(todo, desc=f"qacc/judge{judge_idx}/{model}", unit="item"):
+    for qid, rs in tqdm(todo, desc=f"qacc/judge{judge_idx}/{model}", unit="item"):
         head = rs[0]
         docs = "\n".join(f"[{i + 1}] {' '.join((r.get('text') or '').split()[:60])}"
-                         for i, r in enumerate(rs))
+                          for i, r in enumerate(rs))
         gold = (head.get("correct_answer") or "").strip()
-        # 상충 후보 답은 문서별 supported_answer에서 그대로 얻는다 (원본 귀속 주석)
         wrong = sorted({(r.get("supported_answer") or "").strip() for r in rs}
                        - {"", gold})
         raw = ask(client, model, QACC_PROMPT.format(
@@ -152,15 +157,45 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int) -> in
         verdict = first_token(lines[0] if lines else "", ("sharp", "soft")) or ""
         ctype = first_token(lines[1] if len(lines) > 1 else "",
                             ("temporal", "misinfo", "opinion", "na")) or ""
-        ctype = "" if ctype == "na" else ctype
-        for r in rs:
-            r[vcol], r[tcol] = verdict, ctype
-            # 두 판정자가 일치할 때만 채운다. 불일치는 빈칸 → 사람이 확정(부록 A(b))
-            if verdict and (r.get(other_v) or "").strip() == verdict:
-                r["verdict"], r["verdict_source"] = verdict, "llm"
-            if ctype and (r.get(other_t) or "").strip() == ctype:
-                r["conflict_type"], r["conflict_type_source"] = ctype, "llm"
+        mine[qid] = {"question_id": qid, "verdict": verdict,
+                     "conflict_type": "" if ctype == "na" else ctype, "model": model}
+
+    _write_judge(mine, judge_dir / f"judge{judge_idx}.csv")
+
+    # 두 판정자가 모두 판정한 문항만, 그리고 일치할 때만 검토 CSV에 반영한다
+    n_applied = 0
+    for qid, rs in by_item.items():
+        a, b = mine.get(qid), other.get(qid)
+        if not a or not b:
+            continue
+        if a["verdict"] and a["verdict"] == b["verdict"]:
+            for r in rs:
+                if (r.get("exclusion_flag") or "").strip() != PENDING_SCREEN:
+                    continue      # 다른 사유로 이미 제외된 문항은 건드리지 않는다
+                r["exclusion_flag"] = "" if a["verdict"] == "sharp" else SOFT_CONFLICT
+            n_applied += 1
+        if a["conflict_type"] and a["conflict_type"] == b["conflict_type"]:
+            for r in rs:
+                r["conflict_type"] = a["conflict_type"]
+    if other:
+        print(f"판정자 2종 일치로 반영된 문항: {n_applied} "
+              f"(불일치는 '{PENDING_SCREEN}'로 남아 사람이 adjudication)")
     return len(todo)
+
+
+def _read_judge(path: Path) -> dict[str, dict]:
+    if not path.exists():
+        return {}
+    with open(path, encoding="utf-8-sig") as f:
+        return {r["question_id"]: r for r in csv.DictReader(f)}
+
+
+def _write_judge(records: dict[str, dict], path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", newline="", encoding="utf-8-sig") as f:
+        w = csv.DictWriter(f, fieldnames=["question_id", "verdict", "conflict_type", "model"])
+        w.writeheader()
+        w.writerows(records.values())
 
 
 def main() -> None:
@@ -187,12 +222,11 @@ def main() -> None:
     client = make_client(args.base_url, args.api_key)
     if ds == "dragged":
         n = run_dragged(client, args.model, rows, args.only_flagged)
-        extra: list[str] = []
     else:
-        n = run_qacc(client, args.model, rows, args.judge)
-        extra = [f"judge{args.judge}_verdict", f"judge{args.judge}_type"]
+        n = run_qacc(client, args.model, rows, args.judge,
+                     args.data_dir / ds / "judges")
 
-    write_rows(rows, llm_csv, extra_columns=extra)
+    write_rows(rows, llm_csv)
     print(f"\n{n}건 판정 → {llm_csv}")
     print(f"→ 이 CSV를 열어 확인·수정한 뒤 `python -m preprocessing.{ds}_prep build` 실행")
 

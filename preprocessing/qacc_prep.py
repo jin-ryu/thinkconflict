@@ -38,8 +38,8 @@ from collections import Counter
 from pathlib import Path
 
 from preprocessing.schema import Chunk, Item, write_jsonl
-from preprocessing.tabular import (label_provenance, original_answers, read_csv,
-                                   to_items, write_csv)
+from preprocessing.tabular import (PENDING_SCREEN, SOFT_CONFLICT, label_provenance,
+                                   original_answers, read_csv, to_items, write_csv)
 
 CONFLICT_FLAG = "A"          # secondAnswerExist == "A" 이면 충돌 (실측 381건)
 RECENCY_CODE = "A"           # reasons 코드 A = 최신성 (48건, 계획서와 일치)
@@ -156,6 +156,10 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
         if not has_pair and flag is None:
             flag = "no_valid_conflict_pair"   # 유효 충돌 게이트 (사전등록 §3.1) 미통과
             stats["flag_no_valid_conflict_pair"] += 1
+        if flag is None:
+            # 게이트 ①(sharp/soft)은 별도 열이 아니라 exclusion_flag로 표현한다.
+            # 판정 전에는 pending_screen → 채점 트랙 진입 불가 (미판정이 새어들지 않는다)
+            flag = PENDING_SCREEN
 
         items.append(Item(
             question_id=f"qacc-{i:04d}",
@@ -225,19 +229,18 @@ def estimate_cost_from_csv(rows: list[dict]) -> None:
           "상용 판정자를 쓸 경우에만 단가를 곱해 승인 요청 후 집행 (사전등록 §3.3)")
 
 
-def build_items_from_csv(rows: list[dict],
-                         originals: dict[str, str] | None = None) -> tuple[list[Item], Counter]:
-    """CSV 행 → 최종 Item. 게이트 ①(sharp만 투입)과 유형 확정을 여기서 적용한다."""
-    items, stats = [], Counter(label_provenance(rows))
+def build_items_from_csv(rows: list[dict], originals: dict[str, str] | None = None,
+                         draft_rows: list[dict] | None = None) -> tuple[list[Item], Counter]:
+    """CSV 행 → 최종 Item. 게이트 ①은 exclusion_flag가 비어 있는지로 판정한다:
+    빈칸 = sharp(투입), soft_conflict/pending_screen/기타 = 드롭."""
+    items, stats = [], Counter(label_provenance(rows, draft_rows))
     for it in to_items(rows, original_answers=originals):
-        verdict = it.meta.get("screen_verdict", "")
-        stats[f"verdict_{verdict or 'unjudged'}"] += 1
-        if verdict != "sharp":
-            continue          # soft(사이비 충돌)·미판정은 채점 트랙에서 드롭 (게이트 ①)
+        stats[f"flag_{it.exclusion_flag or 'sharp(빈칸)'}"] += 1
+        if it.exclusion_flag is not None:
+            continue          # soft·미판정·유효충돌 미통과는 채점 트랙에서 드롭
         it.self_consistency_track = True
         # opinion으로 확정되면 단일 정답이 없어 채점 대상이 아니다 (§3.2 이중 트랙)
-        it.behavior_track = (it.exclusion_flag is None
-                             and bool(it.correct_answers)
+        it.behavior_track = (bool(it.correct_answers)
                              and it.conflict_type != "opinion"
                              and any(c.label == "correct" for c in it.chunks)
                              and any(c.label == "conflict" for c in it.chunks))
@@ -268,7 +271,8 @@ def main() -> None:
         flags = Counter(it.exclusion_flag for it in items if it.exclusion_flag)
         print(f"플래그 {sum(flags.values())}건 (채점 트랙 진입 차단): {dict(flags)}")
         print("conflict_type(초벌):", dict(Counter(it.conflict_type for it in items)))
-        print("→ 다음: llm_assist qacc로 `verdict`·`conflict_type` 빈칸을 채운다 (판정자 2종)")
+        print(f"→ 다음: llm_assist qacc(판정자 2종). sharp면 exclusion_flag('{PENDING_SCREEN}')를 "
+              f"비우고, soft면 '{SOFT_CONFLICT}'로 바꾼다")
     elif args.stage == "estimate-cost":
         estimate_cost_from_csv(read_csv(draft_csv))
     else:  # build
@@ -276,16 +280,18 @@ def main() -> None:
         if not src.exists():
             raise SystemExit(f"입력 CSV 없음: {src} — `draft` 단계 먼저 실행")
         rows = read_csv(src)
-        items, stats = build_items_from_csv(rows, original_answers(draft_csv))
+        items, stats = build_items_from_csv(rows, original_answers(draft_csv),
+                                            read_csv(draft_csv))
         if not items:
-            raise SystemExit("sharp 판정 문항이 없다 — llm_assist qacc 실행 후 "
-                             "`verdict` 열을 채울 것 (게이트 ①)")
+            raise SystemExit(
+                "sharp 판정 문항이 없다 — llm_assist qacc(판정자 2종)를 돌리거나, "
+                f"CSV에서 sharp 문항의 exclusion_flag('{PENDING_SCREEN}')를 비울 것 (게이트 ①)")
         write_jsonl(items, args.out_dir / "qacc.jsonl")
         print(f"입력: {src}")
         print(f"확정: {args.out_dir / 'qacc.jsonl'} (게이트 통과 N={len(items)}, "
               f"behavior_track {stats['behavior_track']}건)")
-        print("판정 내역:", {k.replace("verdict_", ""): v for k, v in stats.items()
-                             if k.startswith("verdict_")})
+        print("게이트 ① 내역:", {k.replace("flag_", ""): v for k, v in stats.items()
+                                if k.startswith("flag_")})
 
 
 if __name__ == "__main__":
