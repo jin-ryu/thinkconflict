@@ -148,7 +148,7 @@ CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="공통 스키마 JSONL 검증 + 유효 충돌 게이트 통과율")
-    ap.add_argument("paths", nargs="+", help="data/processed/*.jsonl")
+    ap.add_argument("paths", nargs="+", help="data/processed/*/*.jsonl")
     args = ap.parse_args()
     for path in args.paths:
         items = list(read_jsonl(path))

@@ -16,7 +16,7 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 ```
 docs/            정본 계획서 · 구축 계획 · 사전등록 규약
 data/raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
-data/processed/  공통 스키마 JSONL (전처리 산출물)
+data/processed/  공통 스키마 JSONL — 데이터셋별 폴더 (전처리 산출물, git 미포함)
 preprocessing/   공통 스키마 정의 + 데이터셋별 전처리 (+ review/ 인간 검증 시트)
 serving/         3모델 vLLM 서빙 스크립트 + 공통 생성 클라이언트
 diagnosis/       트레이스 파서 · L1/L2/FA 라벨러 · 채점기 · 지표 산출기
@@ -40,11 +40,11 @@ Phase 2 이후 (GPU 필요):
 
 ```bash
 bash serving/launch_qwen.sh &                                       # 모델 서빙
-python -m serving.client --data data/processed/dragged.jsonl \
+python -m serving.client --data data/processed/dragged/dragged.jsonl \
     --model qwen --env standard --out results/raw/qwen_standard_dragged.jsonl
 python -m diagnosis.trace_parser results/raw/*.jsonl                # 파싱 실패율 점검
 python -m diagnosis.run_labeling --generations results/raw/qwen_standard_dragged.jsonl \
-    --data data/processed/dragged.jsonl --out results/labels/qwen_standard_dragged.jsonl
+    --data data/processed/dragged/dragged.jsonl --out results/labels/qwen_standard_dragged.jsonl
 python -m experiments.exp2_specificity.regime_control --gate \
     --thinking ... --masked ...                                     # go/no-go 게이트
 python -m analysis.aggregate                                        # 집계 → 즉시 커밋

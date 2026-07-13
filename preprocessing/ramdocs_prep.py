@@ -23,7 +23,7 @@ within-item 쌍 구성 규칙 (실측 기반 설계 결정):
     m > n인 문항은 초과 misinfo(m − k)가 conflict 변형에서 빠지므로 meta에 기록한다.
     n = 0인 문항은 교체할 노이즈가 없어 쌍을 만들 수 없다 — 제외하고 건수를 보고한다.
 
-usage: python -m preprocessing.ramdocs_prep [--raw-dir data/raw/ramdocs] [--out-dir data/processed]
+usage: python -m preprocessing.ramdocs_prep [--raw-dir data/raw/ramdocs] [--out-dir data/processed/ramdocs]
 """
 from __future__ import annotations
 
@@ -159,7 +159,7 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--raw-dir", default="data/raw/ramdocs", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
+    ap.add_argument("--out-dir", default="data/processed/ramdocs", type=Path)
     args = ap.parse_args()
 
     rows = load_raw(args.raw_dir)

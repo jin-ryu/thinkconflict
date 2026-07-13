@@ -238,8 +238,9 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["convert", "estimate-cost", "screen", "final"])
     ap.add_argument("--raw-dir", default="data/raw/qacc", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
-    ap.add_argument("--dragged-draft", default="data/processed/dragged.draft.jsonl", type=Path)
+    ap.add_argument("--out-dir", default="data/processed/qacc", type=Path)
+    ap.add_argument("--dragged-draft",
+                    default="data/processed/dragged/dragged.draft.jsonl", type=Path)
     args = ap.parse_args()
     draft_path = args.out_dir / "qacc.draft.jsonl"
 

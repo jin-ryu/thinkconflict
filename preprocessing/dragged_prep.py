@@ -32,7 +32,7 @@
               않고 사람에게 넘긴다(5건뿐이라 전수 검증이 가능).
     sheet   — 사실 충돌(시간+오정보) 전수 인간 검토 시트(CSV). 정답 오탈자 교정 컬럼 포함
               (실측 확인: "Boston Celtis", "Bolovia").
-    final   — 검토 완료 시트를 반영해 data/processed/dragged.jsonl 확정.
+    final   — 검토 완료 시트를 반영해 data/processed/dragged/dragged.jsonl 확정.
 
 usage: python -m preprocessing.dragged_prep {draft|sheet|final}
 """
@@ -390,7 +390,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["draft", "sheet", "final"])
     ap.add_argument("--raw-dir", default="data/raw/dragged", type=Path)
-    ap.add_argument("--out-dir", default="data/processed", type=Path)
+    ap.add_argument("--out-dir", default="data/processed/dragged", type=Path)
     ap.add_argument("--review-dir", default="preprocessing/review", type=Path)
     args = ap.parse_args()
     draft_path = args.out_dir / "dragged.draft.jsonl"
