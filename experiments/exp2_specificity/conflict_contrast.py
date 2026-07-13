@@ -16,7 +16,7 @@
 usage:
     python -m experiments.exp2_specificity.conflict_contrast \
         --labels results/labels/qwen_standard_dragged.jsonl \
-        --data data/processed/dragged.jsonl --design between
+        --data data/processed/dragged/dragged_temporal.jsonl --design between
 """
 from __future__ import annotations
 

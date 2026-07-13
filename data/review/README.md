@@ -53,16 +53,16 @@ python -m preprocessing.ramdocs_prep
 python -m preprocessing.dragged_prep draft
 python -m preprocessing.llm_assist  dragged --base-url http://HOST:PORT/v1 --model MODEL
 #   ↳ review/dragged/dragged.llm.csv 를 열어 `label` 확인·수정
-python -m preprocessing.dragged_prep build    # → data/processed/dragged.jsonl
+python -m preprocessing.dragged_prep build    # → data/processed/dragged/*.jsonl (유형별)
 
 # QACC — 스키마 변환 → 판정자 2종 → 사람 확정 → 최종본
 python -m preprocessing.qacc_prep   draft
 python -m preprocessing.llm_assist  qacc --judge 1 --base-url ... --model MODEL_A
 python -m preprocessing.llm_assist  qacc --judge 2 --base-url ... --model MODEL_B  # 다른 계열
 #   ↳ review/qacc/qacc.llm.csv 를 열어 `verdict`·`conflict_type` 확인·수정
-python -m preprocessing.qacc_prep   build     # → data/processed/qacc.jsonl
+python -m preprocessing.qacc_prep   build     # → data/processed/qacc/*.jsonl (유형별)
 
-python -m preprocessing.schema data/processed/*.jsonl   # 산출물 검증 + 게이트 통과율
+python -m preprocessing.schema data/processed/*/*.jsonl   # 산출물 검증 + 게이트 통과율
 ```
 
 ## CSV 열 — 전부 공통 스키마 필드다

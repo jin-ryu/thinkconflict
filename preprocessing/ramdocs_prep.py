@@ -24,7 +24,7 @@ within-item 쌍 구성 규칙 (실측 기반 설계 결정):
     n = 0인 문항은 교체할 노이즈가 없어 쌍을 만들 수 없다 — 제외하고 건수를 보고한다.
 
 usage: python -m preprocessing.ramdocs_prep
-       (CSV → data/review/ramdocs/ · 최종 JSONL → data/processed/)
+       (CSV → data/review/ramdocs/ · 최종 JSONL → data/processed/ramdocs/)
 """
 from __future__ import annotations
 
@@ -189,7 +189,7 @@ def main() -> None:
     pairs, p_stats = build_pairs(rows)
 
     for items, name in ((a, "ramdocs_a"), (b, "ramdocs_b"), (pairs, "ramdocs_pairs")):
-        write_jsonl(items, args.out_dir / f"{name}.jsonl")        # 최종본 (검토 불필요)
+        write_jsonl(items, args.out_dir / "ramdocs" / f"{name}.jsonl")  # 최종본 (검토 불필요)
         write_csv(items, args.review_dir / f"{name}.csv")        # 눈으로 확인하는 용도
 
     n_conf = sum(1 for it in a if it.conflict_type == "misinfo")

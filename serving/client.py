@@ -5,7 +5,7 @@ vLLM OpenAI 호환 엔드포인트에 대해 디코딩을 고정(t=0.6, top-p 0.
 기록해 라벨링(diagnosis/)이 재현 가능하게 한다. raw 생성물은 git 미포함.
 
 usage:
-    python -m serving.client --data data/processed/ramdocs_a.jsonl \
+    python -m serving.client --data data/processed/ramdocs/ramdocs_a.jsonl \
         --model qwen --env standard --out results/raw/qwen_standard_ramdocs_a.jsonl
 """
 from __future__ import annotations

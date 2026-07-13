@@ -45,4 +45,4 @@ RQ3 매칭 대조              : ramdocs_pairs (단일 파일)
 > 만들 때 QACC 파생물은 **CC BY-SA 3.0**(저작자 표시 + 동일조건변경허락) 대상임을 확인할 것.
 > 라이선스 사본: `data/raw/LICENSES/`.
 
-검증: `python -m preprocessing.schema data/processed/*.jsonl`
+검증: `python -m preprocessing.schema data/processed/*/*.jsonl`

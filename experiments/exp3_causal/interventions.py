@@ -19,7 +19,7 @@ usage:
     python -m experiments.exp3_causal.interventions run \
         --generations results/raw/qwen_standard_dragged.jsonl \
         --labels results/labels/qwen_standard_dragged.jsonl \
-        --data data/processed/dragged.jsonl --model qwen \
+        --data data/processed/dragged/dragged_temporal.jsonl --model qwen \
         --mode truncation --out results/raw/qwen_dragged_trunc.jsonl
     python -m experiments.exp3_causal.interventions analyze --dir results/raw/
 """

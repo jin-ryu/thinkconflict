@@ -154,7 +154,7 @@ def write_by_type(items: list[Item], out_dir: str | Path,
     실수로 채점 파이프라인에 넣을 수 없다.
     """
     from preprocessing.schema import write_jsonl
-    out_dir = Path(out_dir)
+    out_dir = Path(out_dir) / dataset      # data/processed/<ds>/ — stage 안에서 데이터셋별 폴더
     by_type: dict[str, list[Item]] = {}
     for it in items:
         by_type.setdefault(it.conflict_type, []).append(it)
@@ -162,7 +162,7 @@ def write_by_type(items: list[Item], out_dir: str | Path,
     for ctype, group in sorted(by_type.items()):
         name = f"{dataset}_{ctype}.jsonl"
         write_jsonl(group, out_dir / name)
-        written.append((name, len(group)))
+        written.append((f"{dataset}/{name}", len(group)))
     return written
 
 

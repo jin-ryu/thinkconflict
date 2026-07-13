@@ -9,20 +9,19 @@
     noise       — 질문과 무관하거나 어느 답도 지지하지 않는 문서
     unknown     — 미확정 (골드 매핑 전 초안 상태에서만 허용)
 
-트랙(사전등록 §1.8 이중 트랙):
-    behavior         — 정답 채점(정확도·AIR) 트랙 투입 가능 (scorable)
-    self_consistency — 트레이스 입장↔답변 자기일관성 트랙 (정답 불요)
+트랙은 플래그가 아니라 **파일**로 가른다 (사전등록 §7.2):
+    data/processed/<ds>/<ds>_<유형>.jsonl — 충돌 유형별로 파일이 분리돼 있고,
+    분석이 필요한 파일만 골라 합친다. 채점 가능 여부는 is_scorable()로 파생한다.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import random
+import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Iterator
-
-import re
 
 DATASETS = ("dragged", "qacc", "ramdocs_a", "ramdocs_b")
 ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")   # 공통 날짜 형식
@@ -188,7 +187,7 @@ CONFLICT_CONDITIONS = ("temporal", "misinfo")  # 유효 충돌 게이트 적용 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="공통 스키마 JSONL 검증 + 유효 충돌 게이트 통과율")
-    ap.add_argument("paths", nargs="+", help="data/processed/*.jsonl")
+    ap.add_argument("paths", nargs="+", help="data/processed/*/*.jsonl")
     args = ap.parse_args()
     for path in args.paths:
         items = list(read_jsonl(path))
