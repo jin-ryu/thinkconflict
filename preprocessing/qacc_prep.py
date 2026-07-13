@@ -173,8 +173,12 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
                   "n_answers": 1 + sum(1 for f in ("secondAnswerExist", "thirdAnswerExist",
                                                    "fourthAnswerExist")
                                        if row.get(f) == CONFLICT_FLAG),
+                  "n_docs": len(chunks),
                   "doc_len_words": [len(c.text.split()) for c in chunks],  # 게이트 ④ 공변량
-                  "annotation_task_id": row.get("annotation_task_id")},
+                  "annotation_task_id": row.get("annotation_task_id"),
+                  # 스키마에 자리가 없는 원본 필드는 meta에 보존한다 (PPT 11p 규약)
+                  "explanation": (None if is_nan(row.get("explanation"))
+                                  else row.get("explanation"))},
         ))
     return items, stats
 

@@ -62,6 +62,15 @@ def _supporting(docs: list[dict], gold: str) -> list[dict]:
     return [d for d in docs if d["type"] == "correct" and d.get("answer") == gold]
 
 
+def _common_meta(row: dict, chunks: list[Chunk], i: int) -> dict:
+    """세 데이터셋 공통 규약 (PPT 11p): 문서 길이를 회귀 보정용 공변량으로 기록하고,
+    스키마에 자리가 없는 원본 필드(`disambig_entity`)는 meta에 보존한다."""
+    return {"source_row": i,
+            "n_docs": len(chunks),
+            "doc_len_words": [len(c.text.split()) for c in chunks],
+            "disambig_entity": row.get("disambig_entity")}
+
+
 def build_b(rows: list[dict]) -> list[Item]:
     """원본 결합형: 문항 구조 그대로, any-gold 정답 집합 승계."""
     items = []
@@ -75,10 +84,11 @@ def build_b(rows: list[dict]) -> list[Item]:
             conflict_type="misinfo" if misinfo else ("ambiguous" if multi_gold else "none"),
             correct_answers=list(row.get("gold_answers", [])),
             wrong_answers=list(row.get("wrong_answers", [])),
-            chunks=to_chunks(row["documents"]),
+            chunks=(ch := to_chunks(row["documents"])),
             behavior_track=bool(row.get("gold_answers")),
             self_consistency_track=True,
-            meta={"source_row": i, "n_gold": len(row.get("gold_answers", []))},
+            meta={**_common_meta(row, ch, i),
+                  "n_gold": len(row.get("gold_answers", []))},
         ))
     return items
 
@@ -102,10 +112,11 @@ def build_a(rows: list[dict]) -> tuple[list[Item], dict]:
                 conflict_type="misinfo" if misinfo else "none",
                 correct_answers=[gold],
                 wrong_answers=list(row.get("wrong_answers", [])),
-                chunks=to_chunks(support + misinfo + noise),
+                chunks=(ch := to_chunks(support + misinfo + noise)),
                 behavior_track=True,
                 self_consistency_track=True,
-                meta={"source_row": i, "gold_index": j, "variant": "full",
+                meta={**_common_meta(row, ch, i),
+                      "gold_index": j, "variant": "full",
                       "original_gold_answers": golds,
                       "n_misinfo": len(misinfo), "n_noise": len(noise)},
             ))
@@ -142,15 +153,17 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
             # 충돌 변형: misinfo k개가 noise k개를 밀어낸다
             items.append(Item(
                 question_id=f"{pair_id}-conflict", conflict_type="misinfo",
-                chunks=to_chunks(support + misinfo[:k] + noise[k:]),
-                meta={"source_row": i, "gold_index": j, "variant": "conflict",
+                chunks=(ch := to_chunks(support + misinfo[:k] + noise[k:])),
+                meta={**_common_meta(row, ch, i),
+                      "gold_index": j, "variant": "conflict",
                       "pair_id": pair_id, "n_swapped": k,
                       "misinfo_dropped": len(misinfo) - k}, **common))
             # 대조 변형: 같은 자리에 noise가 그대로 남는다 (문서 수 동일)
             items.append(Item(
                 question_id=f"{pair_id}-control", conflict_type="none",
-                chunks=to_chunks(support + noise),
-                meta={"source_row": i, "gold_index": j, "variant": "control",
+                chunks=(ch := to_chunks(support + noise)),
+                meta={**_common_meta(row, ch, i),
+                      "gold_index": j, "variant": "control",
                       "pair_id": pair_id, "n_swapped": k}, **common))
             stats["pairs"] += 1
     return items, stats
