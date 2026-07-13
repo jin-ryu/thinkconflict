@@ -75,6 +75,40 @@ def test_equivalence_is_not_string_em():
     assert equivalent("April 12, 2025", "2025-04-12")  # 날짜 동치
 
 
+# 아래 gold 문자열은 DRAGged 원본 실측값이다. 표기 차이를 오답으로 세면 AIR이
+# 부풀려지므로(사전등록 §1.4), 실제 gold로 채점기를 고정한다.
+@pytest.mark.parametrize("pred,gold", [
+    ("El Capitan", "EL-Capitan"),                                   # 하이픈
+    ("Jannik Sinner", "Jannik Sinner ( ITA )"),                     # 괄호 부가정보
+    ("November 27, 2025", "For 2025 it is November 27th"),          # 서술형 gold + 서수
+    ("Monday, May 26, 2025", "Memorial Day, on Monday, May 26, 2025."),
+    ("Operation Market Garden", "Operation Market Garden during World War II."),
+    ("The answer is 3,559 people.", "3,559 people"),                # 모델이 문장으로 답함
+    ("It begins at sundown on Saturday, April 12.",
+     "begins at sundown on Saturday, April 12."),
+])
+def test_real_dragged_gold_strings_are_graded_correct(pred, gold):
+    assert grade(pred, [gold]) == "correct"
+
+
+@pytest.mark.parametrize("pred,gold", [
+    ("November 20, 2025", "For 2025 it is November 27th"),  # 수치 앵커 불일치
+    ("1,762 tornadoes", "at least 1,759"),                  # 실제 충돌 문서의 답
+    ("10,000 people", "3,559 people"),
+    ("The Boy", "The Boy and the Heron"),                   # 부분만 답함
+    ("people", "3,559 people"),                             # 수치 누락
+    ("April 22", "begins at sundown on Saturday, April 12."),
+])
+def test_grading_does_not_over_accept_different_answers(pred, gold):
+    assert grade(pred, [gold]) == "wrong"
+
+
+def test_gold_typos_stay_wrong_until_errata_correction():
+    """gold 오타는 규칙이 넘겨짚지 않는다 — 정오표(사람)가 고쳐야 correct가 된다."""
+    assert grade("The Boston Celtics", ["Boston Celtis"]) == "wrong"
+    assert grade("The Boston Celtics", ["Boston Celtics"]) == "correct"
+
+
 def test_any_gold():
     assert grade("B", ["A", "B"]) == "correct"
 
