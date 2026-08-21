@@ -767,3 +767,15 @@ def test_export_cell_nulls_ratios_below_min_n():
     cell = cell_summary("ramdocs_a", "standard", recs)
     assert cell["metrics"]["AIR"] is None and cell["air_denominator"] == 5
     assert cell["paths"]["legitimate"] == 5
+
+
+def test_dragged_llm_form_parsing_is_field_anchored():
+    """llm_assist dragged 폼 파싱 — 줄 위치가 아니라 필드 기준 (QACC에서 실측한 것과 같은
+    gpt-oss 응답 모양 2종: 값이 같은 줄 / 다음 줄)."""
+    from preprocessing.llm_assist import TO_LABEL, _asserted, form_field
+    same = "label ∈ {support, contradict, irrelevant} = contradict\nanswer = April 22, 2024"
+    nxt = "label\ncontradict\nanswer\nApril 22, 2024"
+    for raw in (same, nxt):
+        assert TO_LABEL[form_field(raw, "label", tuple(TO_LABEL))] == "conflict"
+        assert _asserted(raw) == "April 22, 2024"
+    assert _asserted("label = irrelevant\nanswer = NONE") == ""

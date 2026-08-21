@@ -1,0 +1,17 @@
+{
+ "n": 143,
+ "agreement": 0.9300699300699301,
+ "kappa": 0.8851036477583162,
+ "kappa_conflict_binary": 0.8735632183908046,
+ "confusion": {
+  "correct->correct": 27,
+  "noise->noise": 72,
+  "noise->correct": 2,
+  "conflict->noise": 3,
+  "noise->conflict": 1,
+  "conflict->conflict": 34,
+  "correct->noise": 1,
+  "correct->conflict": 1,
+  "conflict->correct": 2
+ }
+}

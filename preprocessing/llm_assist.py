@@ -154,24 +154,27 @@ def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool
     for r in tqdm(targets, desc=f"dragged/{model}", unit="doc"):
         doc = " ".join((r.get("text") or "").split()[:MAX_DOC_WORDS])
         raw = ask(client, model, DRAGGED_PROMPT.format(
-            question=r["question"], answer=(r.get("correct_answer") or ""), doc=doc),
-            max_tokens=60)
-        lines = [l for l in raw.splitlines() if l.strip()]
-        label = TO_LABEL.get(first_token(lines[0] if lines else "", tuple(TO_LABEL)) or "", "")
+            question=r["question"], answer=(r.get("correct_answer") or ""), doc=doc))
+        # 줄 위치가 아니라 폼 필드 기준으로 읽는다 — QACC에서 실측한 것과 같은 이유
+        # (사고형 판정자의 빈 응답·선택지 되받아쓰기). 예산도 ask()의 기본값(256)을 쓴다.
+        label = TO_LABEL.get(form_field(raw, "label", tuple(TO_LABEL)) or "", "")
         if not label:
             continue
         r["label"] = label
         # noise 문서는 질문에 답하지 않으므로 supported_answer가 없다 (스키마 규약)
-        r["supported_answer"] = "" if label == "noise" else _asserted(lines)
+        r["supported_answer"] = "" if label == "noise" else _asserted(raw)
     return len(targets)
 
 
-def _asserted(lines: list[str]) -> str:
-    """폼 응답 2번째 줄에서 '이 문서가 주장하는 답'을 뽑는다."""
-    if len(lines) < 2:
-        return ""
-    val = lines[1].split("=", 1)[-1].strip().strip('"\'')
-    return "" if val.lower() in ("none", "n/a", "") else val
+def _asserted(raw: str) -> str:
+    """폼 응답의 `answer =` 필드에서 '이 문서가 주장하는 답'을 뽑는다 (줄 위치 무관)."""
+    lines = [l for l in raw.splitlines() if l.strip()]
+    for i, line in enumerate(lines):
+        if re.match(r"\s*answer\b", line, re.IGNORECASE):
+            val = line.split("=", 1)[1] if "=" in line else (lines[i + 1] if i + 1 < len(lines) else "")
+            val = val.strip().strip('"\'')
+            return "" if val.lower() in ("none", "n/a", "") else val
+    return ""
 
 
 # ── QACC: sharp/soft + conflict_type 초벌 (게이트 ①) ──────────────────────────
