@@ -25,7 +25,9 @@ from serving.client import DECODING, MODELS
 
 COLUMNS = ["item_id", "dataset", "env", "seed", "L1", "L2", "FA", "path",
            "is_correct", "n_docs", "conflict_type",
-           "l2_source"]   # 규격 외 추가 1열: L2가 규칙/판정자 중 어느 쪽 판정인지 (민감도 분석용)
+           "l2_source",          # 규격 외 추가: L2가 규칙/판정자 중 어느 쪽 판정인지 (민감도 분석용)
+           "type_recognition"]   # 규격 외 추가: 유형 인지 (PPT 15·17p 'RQ1 유형 인지율'의 원자료)
+                                 #   correct_type | surface_only | '' (L1 미탐지 또는 유형 단서 정의 없음)
 
 
 def env_name(rec: dict) -> str:
@@ -44,6 +46,7 @@ def to_row(rec: dict, item: Item) -> dict:
         "is_correct": int(rec.get("fa") == "correct"),
         "n_docs": len(item.chunks), "conflict_type": item.conflict_type,
         "l2_source": (rec.get("provenance") or {}).get("l2", "") if rec.get("l2") else "",
+        "type_recognition": rec.get("type_recognition") or "",
     }
 
 
@@ -52,6 +55,9 @@ def _val(metric) -> float | None:
     if metric.value is None or not metric.comparable:
         return None
     return round(metric.value, 4)
+
+
+items_ct: dict[str, str] = {}   # question_id → conflict_type (main()에서 채움)
 
 
 def cell_summary(dataset: str, env: str, recs: list[dict]) -> dict:
@@ -72,7 +78,24 @@ def cell_summary(dataset: str, env: str, recs: list[dict]) -> dict:
         "denominators": {"loss_l2": m["Loss_L2"].n_denom,
                          "paths": p["legitimate"].n_denom} if m else {},
         "ci95": {"AIR": list(m["AIR"].ci95) if m and m["AIR"].ci95 else None},
+        # PPT 17p RQ1 지표: 유형 인지율 = 유형 적중 충돌문항 / 전체 충돌문항 (L1 미탐지는 미적중)
+        "type_recognition": dict(Counter(r.get("type_recognition") or "none" for r in behav)),
+        "type_recognition_rate": (round(sum(1 for r in behav if r.get("type_recognition") == "correct_type")
+                                        / len(behav), 4) if len(behav) >= MIN_COMPARABLE_N else None),
+        # 충돌 유형별 분해 (PPT 11p 5유형 축) — 개수는 항상, 비율은 N≥20일 때만
+        "by_conflict_type": {ct: _type_cell([r for r in behav if items_ct.get(r["question_id"]) == ct])
+                             for ct in sorted({items_ct.get(r["question_id"]) for r in behav})},
     }
+
+
+def _type_cell(recs: list[dict]) -> dict:
+    if not recs:
+        return {}
+    m = stage_metrics(recs)
+    return {"n": len(recs), "FA": dict(Counter(r["fa"] for r in recs)),
+            "L1_detected": sum(1 for r in recs if r["l1"] == "detected"),
+            "paths": {k: sum(1 for r in recs if r.get("path") == k) for k in PATHS},
+            "accuracy": _val(m["accuracy"]), "AIR": _val(m["AIR"]), "air_denominator": m["AIR"].n_denom}
 
 
 def transition_summary(dataset: str, before: list[dict], after: list[dict],
@@ -99,6 +122,7 @@ def main() -> None:
     args = ap.parse_args()
 
     items = {it.question_id: it for p in args.data for it in read_jsonl(p)}
+    items_ct.update({q: it.conflict_type for q, it in items.items()})
     recs: list[dict] = []
     for p in args.labels:
         with open(p, encoding="utf-8") as f:

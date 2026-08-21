@@ -750,9 +750,10 @@ def test_export_rows_follow_handoff_spec(item):
     from diagnosis.export_records import COLUMNS, env_name, to_row
     rec = {"question_id": item.question_id, "dataset": "dragged", "env": "standard",
            "seed": 13, "thinking": False, "l1": "unrecognized", "l2": None, "fa": "wrong",
-           "path": None, "provenance": {"l2": "rule"}}
+           "path": None, "provenance": {"l2": "rule"}, "type_recognition": None}
     row = to_row(rec, item)
     assert list(row) == COLUMNS
+    assert row["type_recognition"] == ""     # L1 미탐지 → 유형 인지 없음
     assert env_name(rec) == "standard_nothink"
     assert row["L2"] == "" and row["path"] == "" and row["is_correct"] == 0
     assert row["n_docs"] == 3 and row["conflict_type"] == "outdated"

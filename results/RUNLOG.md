@@ -27,6 +27,14 @@
 L1·AIR 분모가 절반으로 준다. 표본은 시드로 고정돼 있고 두 환경이 같은 파일을 쓰므로 짝짓기에는 영향이 없다.
 `records.csv`에 `conflict_type`이 있어 층화는 논문 쪽에서 가능하다.
 
+### QACC 충돌 유형(conflict_type) 부여 — 연구보고 11·13p "assign(LLM+인간)"
+
+- 사전값: `qacc_prep`의 규칙 prior — 원본 `reasons`에 최신성 코드(A)가 있으면 `outdated`, 아니면 `misinformation` (draft: 292/41)
+- 게이트① 판정자 2종(Qwen 사고 off · gpt-oss effort low)이 sharp/soft와 함께 **유형(outdated/misinformation/conflicting_opinions/na)** 을 판정. **두 판정자 유형이 일치할 때만** 덮어씀 — 채점 트랙 140문항 중 **128은 판정자 일치 유형**, **12는 사전값 유지**(유형 불일치 조합: outdated↔misinformation 8, opinions↔misinformation 2, 빈칸 2). 판정자 일치로 사전값에서 바뀐 문항 23
+- 최종 pilot 표본: `misinformation` 120 · `outdated` 18 (`conflicting_opinions` 2는 정답 없음으로 제외)
+- ⚠️ **사람 검수 미실시** — 연구보고 13p "LLM이 먼저 나누고 사람이 검수" 중 앞 단계만. 유형 축 분석(유형별 층화·유형 인지율)은 이 한계를 안고 읽는다. `records.csv`에 `conflict_type`·`type_recognition` 열이 있어 재분류 후 재집계 가능.
+- **유형 인지율(RQ1 두 번째 지표)** 은 `summary_air.json` 셀의 `type_recognition_rate`·`by_conflict_type`, 노트북 표 5에 있다. 값은 `labeler.TYPE_CUES`의 **규칙 단서**(outdated: 'more recent/newer/연도 쌍…', misinformation: 'misinformation/unreliable/credib…')로만 잰 것이라 단서 목록의 민감도에 좌우된다 — 실측: outdated(DRAGged) 0.34→0.77(standard→reflection)인데 misinformation(RAMDocs 0.01–0.03 · QACC 0.04–0.09)은 매우 낮다. 모델이 오정보를 '틀린 문서'로 다루면서 해당 어휘를 안 쓰는 경우가 많아 **과소 추정**일 가능성이 크며, 판정자 기반 유형 인지 판정은 본실험 과제다.
+
 ### QACC 게이트① 스크리닝 (§5.2)
 
 - 판정자 1: `Qwen/Qwen3.6-27B` (사고 off) · 판정자 2: `openai/gpt-oss-20b` (effort=low) — 교차 계열

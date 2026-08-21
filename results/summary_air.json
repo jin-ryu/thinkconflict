@@ -54,6 +54,48 @@
           0.10526315789473684,
           0.3684210526315789
         ]
+      },
+      "type_recognition": {
+        "correct_type": 34,
+        "surface_only": 7,
+        "none": 3
+      },
+      "type_recognition_rate": 0.7727,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 3,
+          "FA": {
+            "correct": 2,
+            "wrong": 1
+          },
+          "L1_detected": 2,
+          "paths": {
+            "legitimate": 1,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 1
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 2
+        },
+        "outdated": {
+          "n": 41,
+          "FA": {
+            "wrong": 8,
+            "correct": 33
+          },
+          "L1_detected": 39,
+          "paths": {
+            "legitimate": 28,
+            "shortcut": 1,
+            "discordant_hit": 2,
+            "blind_hit": 2
+          },
+          "accuracy": 0.8049,
+          "AIR": 0.2222,
+          "air_denominator": 36
+        }
       }
     },
     {
@@ -96,6 +138,47 @@
           0.05555555555555555,
           0.4444444444444444
         ]
+      },
+      "type_recognition": {
+        "none": 23,
+        "surface_only": 6,
+        "correct_type": 15
+      },
+      "type_recognition_rate": 0.3409,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 3,
+          "FA": {
+            "correct": 3
+          },
+          "L1_detected": 2,
+          "paths": {
+            "legitimate": 2,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 1
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 2
+        },
+        "outdated": {
+          "n": 41,
+          "FA": {
+            "wrong": 10,
+            "correct": 31
+          },
+          "L1_detected": 19,
+          "paths": {
+            "legitimate": 12,
+            "shortcut": 0,
+            "discordant_hit": 2,
+            "blind_hit": 17
+          },
+          "accuracy": 0.7561,
+          "AIR": null,
+          "air_denominator": 16
+        }
       }
     },
     {
@@ -131,6 +214,45 @@
       },
       "ci95": {
         "AIR": null
+      },
+      "type_recognition": {
+        "none": 44
+      },
+      "type_recognition_rate": 0.0,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 3,
+          "FA": {
+            "correct": 3
+          },
+          "L1_detected": 0,
+          "paths": {
+            "legitimate": 0,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 3
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 0
+        },
+        "outdated": {
+          "n": 41,
+          "FA": {
+            "correct": 34,
+            "wrong": 7
+          },
+          "L1_detected": 0,
+          "paths": {
+            "legitimate": 0,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 34
+          },
+          "accuracy": 0.8293,
+          "AIR": null,
+          "air_denominator": 0
+        }
       }
     },
     {
@@ -174,6 +296,48 @@
           0.1891891891891892,
           0.35135135135135137
         ]
+      },
+      "type_recognition": {
+        "surface_only": 121,
+        "none": 5,
+        "correct_type": 12
+      },
+      "type_recognition_rate": 0.087,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 120,
+          "FA": {
+            "correct": 89,
+            "wrong": 31
+          },
+          "L1_detected": 118,
+          "paths": {
+            "legitimate": 74,
+            "shortcut": 5,
+            "discordant_hit": 9,
+            "blind_hit": 1
+          },
+          "accuracy": 0.7417,
+          "AIR": 0.2745,
+          "air_denominator": 102
+        },
+        "outdated": {
+          "n": 18,
+          "FA": {
+            "wrong": 6,
+            "correct": 12
+          },
+          "L1_detected": 15,
+          "paths": {
+            "legitimate": 7,
+            "shortcut": 0,
+            "discordant_hit": 2,
+            "blind_hit": 3
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 9
+        }
       }
     },
     {
@@ -216,6 +380,48 @@
           0.1,
           0.4
         ]
+      },
+      "type_recognition": {
+        "none": 105,
+        "surface_only": 27,
+        "correct_type": 6
+      },
+      "type_recognition_rate": 0.0435,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 120,
+          "FA": {
+            "wrong": 33,
+            "correct": 87
+          },
+          "L1_detected": 29,
+          "paths": {
+            "legitimate": 21,
+            "shortcut": 0,
+            "discordant_hit": 3,
+            "blind_hit": 63
+          },
+          "accuracy": 0.725,
+          "AIR": 0.1923,
+          "air_denominator": 26
+        },
+        "outdated": {
+          "n": 18,
+          "FA": {
+            "wrong": 8,
+            "correct": 10
+          },
+          "L1_detected": 4,
+          "paths": {
+            "legitimate": 2,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 8
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 4
+        }
       }
     },
     {
@@ -251,6 +457,46 @@
       },
       "ci95": {
         "AIR": null
+      },
+      "type_recognition": {
+        "none": 138
+      },
+      "type_recognition_rate": 0.0,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 120,
+          "FA": {
+            "wrong": 26,
+            "correct": 94
+          },
+          "L1_detected": 0,
+          "paths": {
+            "legitimate": 0,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 94
+          },
+          "accuracy": 0.7833,
+          "AIR": null,
+          "air_denominator": 0
+        },
+        "outdated": {
+          "n": 18,
+          "FA": {
+            "correct": 15,
+            "wrong": 3
+          },
+          "L1_detected": 0,
+          "paths": {
+            "legitimate": 0,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 15
+          },
+          "accuracy": null,
+          "AIR": null,
+          "air_denominator": 0
+        }
       }
     },
     {
@@ -294,6 +540,31 @@
           0.0425531914893617,
           0.14184397163120568
         ]
+      },
+      "type_recognition": {
+        "surface_only": 181,
+        "none": 14,
+        "correct_type": 5
+      },
+      "type_recognition_rate": 0.025,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 200,
+          "FA": {
+            "correct": 176,
+            "wrong": 24
+          },
+          "L1_detected": 186,
+          "paths": {
+            "legitimate": 128,
+            "shortcut": 14,
+            "discordant_hit": 24,
+            "blind_hit": 10
+          },
+          "accuracy": 0.88,
+          "AIR": 0.0922,
+          "air_denominator": 141
+        }
       }
     },
     {
@@ -337,6 +608,31 @@
           0.012048192771084338,
           0.12048192771084337
         ]
+      },
+      "type_recognition": {
+        "none": 89,
+        "surface_only": 109,
+        "correct_type": 2
+      },
+      "type_recognition_rate": 0.01,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 200,
+          "FA": {
+            "correct": 168,
+            "wrong": 32
+          },
+          "L1_detected": 111,
+          "paths": {
+            "legitimate": 78,
+            "shortcut": 5,
+            "discordant_hit": 14,
+            "blind_hit": 71
+          },
+          "accuracy": 0.84,
+          "AIR": 0.0602,
+          "air_denominator": 83
+        }
       }
     },
     {
@@ -372,6 +668,29 @@
       },
       "ci95": {
         "AIR": null
+      },
+      "type_recognition": {
+        "none": 200
+      },
+      "type_recognition_rate": 0.0,
+      "by_conflict_type": {
+        "misinformation": {
+          "n": 200,
+          "FA": {
+            "correct": 188,
+            "wrong": 12
+          },
+          "L1_detected": 0,
+          "paths": {
+            "legitimate": 0,
+            "shortcut": 0,
+            "discordant_hit": 0,
+            "blind_hit": 188
+          },
+          "accuracy": 0.94,
+          "AIR": null,
+          "air_denominator": 0
+        }
       }
     }
   ],
