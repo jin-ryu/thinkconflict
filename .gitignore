@@ -30,3 +30,4 @@ data/1_raw/ramdocs/
 results/raw/
 results/**/generations/
 *.log
+references/
