@@ -20,14 +20,31 @@
 
 ---
 
-## 1. 목표 — 단 하나의 수치
+## 1. 목표 — 두 가지
+
+### ① 완화 이득 분해 (주 목표)
+
+> **완화 기법이 올린 정답률은 진짜 대조 추론에서 온 것인가, 우연에서 온 것인가?**
+
+같은 문항을 **완화 전(`standard`) / 후(`reflection`)** 로 돌려 전환 행렬을 만들고 다음을 계산한다.
+
+| 지표 | 정의 |
+|---|---|
+| **LGR** | 새로 맞은 정답 중 정상 경로로 맞힌 비율 |
+| **HR** | 원래 정상 정답이던 문항이 무너진 비율 |
+| **Flip** | 정답↔오답 역전 비율 |
+
+**이것이 이번 파일럿의 헤드라인이다.** 환경이 하나뿐이면 계산 자체가 불가능하므로
+**반드시 2개 환경을 돌려야 한다** (§5.4).
+
+### ② AIR (부 목표)
 
 > **AIR** = P(FA = wrong | L1 = detected, L2 = correct)
-> 추론에서 충돌을 인지하고 올바로 해소했는데, 최종 답변에서 뒤집힌 비율
+> 추론에서 올바로 해소하고도 최종 답변에서 뒤집힌 비율
 
-논문 1(ThinkConflict)의 RQ1 축소판이다. 다른 RQ는 이번 범위가 아니다.
+정답 4경로(Legitimate·Shortcut·Discordant Hit·Blind Hit)와 단계별 손실(Loss_L1, Loss_L2)도 함께 산출한다.
 
-부수 산출: 단계별 손실(Loss_L1, Loss_L2)과 정답 4경로 분포.
+> ℹ️ ①은 AIR 값이 작아도 성립한다. 그래서 ①을 주 목표로 둔다.
 
 ---
 
@@ -152,12 +169,61 @@ python -m diagnosis.run_labeling \
 `results/`는 지금까지 비어 있었다 = 이 파이프라인은 **한 번도 완주하지 않았다.**
 파서·프롬프트 버그가 나올 확률이 높다.
 
-### 5.4 본실행
+### 5.4 본실행 — 환경 2개를 같은 문항에 돌린다
 
-- 규모: **데이터셋별 100건** (RAMDocs + QACC)
-- 시드: `SEEDS`(13, 42, 71, 108, 2026) 중 **1–2개만**
-- 환경: `standard`만. CAD·CD2는 범위 밖
-- 디코딩: `t=0.6, top_p=0.95` 고정 — 건드리지 말 것
+**같은 문항 집합**에 환경만 바꿔 돌려야 전환 행렬이 만들어진다. 문항이 다르면 짝지을 수 없다.
+
+> ⚠️ **파일명을 먼저 확정할 것.** `qacc_prep build`는 `write_by_type()`으로 저장하므로
+> 출력이 `data/3_processed/qacc/qacc_<유형>.jsonl` 처럼 **유형별로 쪼개진다.** `qacc.jsonl` 단일 파일이 아니다.
+> RAMDocs는 `ramdocs_a.jsonl` · `ramdocs_b.jsonl` · `ramdocs_pairs.jsonl` 형태다.
+
+```bash
+# 0) 실제 파일명 확인
+ls data/3_processed/ramdocs/ data/3_processed/qacc/
+
+# 1) 100건 표본을 먼저 고정 — 두 환경이 같은 문항을 써야 짝지어진다
+mkdir -p data/pilot
+head -100 data/3_processed/ramdocs/ramdocs_a.jsonl  > data/pilot/ramdocs_a.jsonl
+cat  data/3_processed/qacc/qacc_*.jsonl | head -100 > data/pilot/qacc.jsonl
+
+# 2) 고정한 표본에 환경만 바꿔 돌린다
+for ENV in standard reflection; do
+  for DS in ramdocs_a qacc; do
+    python -m serving.client \
+      --data data/pilot/${DS}.jsonl \
+      --model qwen --env $ENV --seeds 13 \
+      --out results/raw/qwen_${ENV}_${DS}.jsonl
+  done
+done
+
+# 3) 라벨링 — --data 는 2)에서 쓴 것과 반드시 같은 파일
+for ENV in standard reflection; do
+  for DS in ramdocs_a qacc; do
+    python -m diagnosis.run_labeling \
+      --generations results/raw/qwen_${ENV}_${DS}.jsonl \
+      --data data/pilot/${DS}.jsonl \
+      --out results/labels/qwen_${ENV}_${DS}.jsonl
+  done
+done
+```
+
+- 규모: **데이터셋별 100건** — 1)에서 고정한 동일 문항을 두 환경에 재사용
+- 시드: **`--seeds 13` 명시 필수** — 생략하면 기본값 5개(13·42·71·108·2026)가 전부 돌아 5배가 된다
+- 디코딩: `t=0.6, top_p=0.95` — `serving/client.py`의 `DECODING` 고정값. 건드리지 말 것
+- `--env` 유효값: `standard` · `cad` · `cd2` · `recency_authority` · `reflection`
+
+**우선순위 — 시간이 부족하면 위에서부터 확보한다.**
+
+| 순위 | 조건 | 얻는 것 |
+|---|---|---|
+| 1 | `standard` × 2 데이터셋 | AIR·4경로·단계별 손실 |
+| **2** | **`reflection` × 2 데이터셋** | **LGR·HR·Flip (주 목표)** |
+| 3 | `thinking off` × `standard` | 추론 채널 인과 대조 (보너스) |
+
+`reflection`은 프롬프트만 바꾸는 환경이라 추가 서빙·다운로드가 없다.
+CAD·CD2는 디코딩 개입이 필요해 이번 범위 밖이다.
+
+3순위는 `serving/client.py --no-thinking`으로 같은 가중치에서 토글된다. 여유가 있을 때만.
 
 ---
 
@@ -167,51 +233,73 @@ python -m diagnosis.run_labeling \
 
 ```
 results/
-├── raw/     qwen_standard_<ds>.jsonl      생성 원문 (git 미포함)
-├── labels/  qwen_standard_<ds>.jsonl      3단계 라벨
-├── summary_air.json                       ★ 논문에 들어갈 집계
+├── raw/     qwen_<env>_<ds>.jsonl         생성 원문 (git 미포함)
+├── labels/  qwen_<env>_<ds>.jsonl         3단계 라벨
+├── records.csv                            ★★ 가장 중요 — 문항 단위 평면 표
+├── summary_air.json                       집계 (교차 확인용)
 └── RUNLOG.md                              ★ 실제 실행 설정·이슈
 ```
 
-### 6.1 `results/summary_air.json`
+### 6.1 `results/records.csv` ★★ 최우선
 
-**데이터셋별로 분리해서 담는다. 절대 합치지 않는다.**
+**문항 × 환경 조합마다 한 행.** 지표는 맥 세션에서 계산하므로,
+여기서는 **집계하지 말고 원자료를 그대로 내보내면 된다.**
+
+| 컬럼 | 값 |
+|---|---|
+| `item_id` | 문항 ID — **환경 간 짝짓기의 키. 반드시 동일해야 한다** |
+| `dataset` | `ramdocs_a` \| `qacc` |
+| `env` | `standard` \| `reflection` \| `standard_nothink` |
+| `seed` | 정수 |
+| `L1` | `detected` \| `unrecognized` |
+| `L2` | `correct` \| `wrong` \| `unresolved` |
+| `FA` | `correct` \| `wrong` \| `abstain` |
+| `path` | `legitimate` \| `shortcut` \| `discordant_hit` \| `blind_hit` \| `` (오답 시 공란) |
+| `is_correct` | 0 \| 1 |
+| `n_docs` | 문항의 문서 수 |
+| `conflict_type` | 5유형 라벨 |
+
+이 표 하나면 AIR·4경로·전환 행렬·LGR·HR·Flip을 전부 여기서 계산할 수 있다.
+**집계된 비율만 오면 계산을 다시 못 하므로 반드시 평면 표로 낼 것.**
+
+> ⚠️ `item_id`가 환경 간에 일치하지 않으면 **주 목표(이득 분해)를 계산할 수 없다.**
+> 내보내기 전에 `standard`와 `reflection`의 `item_id` 집합이 같은지 확인할 것.
+
+**이 CSV를 만드는 스크립트는 아직 없다. 직접 작성해야 한다.**
+`results/labels/*.jsonl`을 읽어 위 컬럼으로 펼치는 짧은 스크립트면 된다
+(예: `diagnosis/export_records.py`). 라벨 필드명은 `diagnosis/labeler.py`와
+`diagnosis/metrics.py`의 `stage_metrics()` · `path_decomposition()`이 쓰는 키를 그대로 따르면 된다.
+
+라벨 정의(3단계·4경로)의 근거는 `ThinkConflict_연구보고.pptx` 15–16페이지와
+`diagnosis/labeler.py` 구현에 있다. **정의를 새로 만들지 말고 기존 구현을 따를 것.**
+
+### 6.2 `results/summary_air.json`
+
+교차 확인용. 데이터셋 × 환경별로 분리해 담는다. **절대 합치지 않는다.**
 
 ```json
 {
-  "run": {
-    "model": "Qwen/Qwen3.6-27B",
-    "env": "standard",
-    "thinking": true,
-    "seeds": [13],
-    "temperature": 0.6,
-    "top_p": 0.95,
-    "judge": "rule_based | gptoss | none",
-    "date": "2026-08-21"
-  },
-  "datasets": {
-    "ramdocs_a": {
-      "n_items": 100,
-      "n_records": 100,
-      "L1": {"detected": 0, "unrecognized": 0},
-      "L2": {"correct": 0, "wrong": 0, "unresolved": 0},
-      "FA": {"correct": 0, "wrong": 0, "abstain": 0},
-      "paths": {"legitimate": 0, "shortcut": 0,
-                "discordant_hit": 0, "blind_hit": 0},
-      "metrics": {"loss_l1": 0.0, "loss_l2": 0.0, "AIR": 0.0},
-      "air_denominator": 0
-    },
-    "qacc": { "...동일 구조..." }
-  }
+  "run": {"model": "Qwen/Qwen3.6-27B", "thinking": true, "seeds": [13],
+          "temperature": 0.6, "top_p": 0.95,
+          "judge": "rule_based | gptoss | none", "date": "2026-08-21"},
+  "cells": [
+    {"dataset": "ramdocs_a", "env": "standard",
+     "n_items": 100,
+     "L1": {"detected": 0, "unrecognized": 0},
+     "L2": {"correct": 0, "wrong": 0, "unresolved": 0},
+     "FA": {"correct": 0, "wrong": 0, "abstain": 0},
+     "paths": {"legitimate": 0, "shortcut": 0, "discordant_hit": 0, "blind_hit": 0},
+     "metrics": {"loss_l1": 0.0, "loss_l2": 0.0, "AIR": 0.0},
+     "air_denominator": 0}
+  ]
 }
 ```
 
-- **`air_denominator` 필수** — AIR의 분모(L1=detected ∧ L2=correct 인 문항 수).
-  분모 없이 비율만 오면 논문에 쓸 수 없다.
+- **`air_denominator` 필수** — AIR의 분모(L1=detected ∧ L2=correct 문항 수).
 - 기권(abstain)은 판정에서 제외하되 **개수는 반드시 기록**한다.
-- 어떤 셀이든 **N < 20이면 비율을 내지 말고 `null`** 로 두고 개수만 남긴다 (사전등록 조건).
+- **N < 20인 셀은 비율을 `null`** 로 두고 개수만 남긴다 (사전등록 조건).
 
-### 6.2 `results/RUNLOG.md`
+### 6.3 `results/RUNLOG.md`
 
 논문 방법 절에 그대로 옮길 내용이다. 짧아도 되니 사실만 정확히:
 
@@ -221,11 +309,11 @@ results/
 - 실패·제외한 문항 수와 사유
 - 총 소요 시간
 
-### 6.3 커밋
+### 6.4 커밋
 
 ```bash
-git add results/labels results/summary_air.json results/RUNLOG.md
-git commit -m "feat(results): AIR pilot on RAMDocs + QACC"
+git add results/labels results/records.csv results/summary_air.json results/RUNLOG.md
+git commit -m "feat(results): mitigation-gain pilot on RAMDocs + QACC"
 git push origin main
 ```
 
@@ -235,12 +323,22 @@ git push origin main
 
 ## 7. ⏰ 마감
 
+**2026-08-21 18:00 (KST)** 이 마지노선이다. 논문 마감이 같은 날 23:59다.
+
 | 시각 | 할 일 |
 |---|---|
-| **18:00** | **결과 유무를 맥 세션에 알린다.** 이 시각까지 `summary_air.json`이 없으면 논문은 AIR 없이 확정된다 |
+| **18:00** | 여기까지 나온 것을 **커밋·푸시하고, 사용자에게 상태를 보고**한다 |
 | 이후 | 늦게 끝나도 커밋은 해둔다 — 다음 주 논문 1에 그대로 쓰인다 |
 
-18:00을 넘겨도 **실패가 아니다.** 파이프라인 첫 완주 자체가 논문 1의 필수 선행 작업이다.
+**보고 방법**: 이 세션은 맥 세션과 직접 통신할 수 없다.
+`git push` 한 뒤 **사용자에게 다음 세 가지를 한 줄씩 알린다.**
+
+1. `results/records.csv`가 생성되었는가 (예/아니오, 행 수)
+2. 어느 환경까지 돌았는가 (`standard`만 / `standard`+`reflection`)
+3. 막힌 지점이 있으면 무엇인가
+
+18:00까지 아무것도 없어도 **실패가 아니다.** 논문은 이 결과 없이 완결되도록 설계돼 있고,
+파이프라인 첫 완주 자체가 논문 1의 필수 선행 작업이다. **사전등록을 깨서 숫자를 만들지 말 것.**
 
 ---
 
