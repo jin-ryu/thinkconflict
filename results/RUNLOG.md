@@ -104,6 +104,42 @@ L1·AIR 분모가 절반으로 준다. 표본은 시드로 고정돼 있고 두 
 규칙이 `unresolved`로 기권한 115건(detected의 55%)을 판정자가 대부분 `correct`로 해소 → AIR 분모 2배. L1·blind_hit은 판정자 무관.
 본 산출물(`records.csv`)은 **판정자 포함** 라벨이며 `l2_source` 열로 구분 가능.
 
+## 6b. 추가 실험 — DRAGged 사실충돌 44문항 (2026-08-21 오후 추가)
+
+커밋 `f7ef15c`(과제3 문서 라벨 부트스트랩)를 받아 DRAGged를 채점 트랙에 넣었다. 같은 설계(시드 13, standard·reflection·standard_nothink, 판정자 gpt-oss)로 돌렸다.
+
+**문서 라벨 확정 절차** (`data/2_review/dragged/`):
+1. 과제3 `supports_gold_a3 == 1` → `label=correct` 104행 (`a3_stringmatch`), 규칙 확정 60행 유지
+2. 남은 빈칸 459행(outdated 429 + misinformation 30)을 gpt-oss-20b(effort low)로 초벌 — `llm_assist dragged`는 QACC에서 고친 것과 같은 버그(`max_tokens=60`, 줄 위치 파싱)가 있어 먼저 수정
+3. 층화 표본 **145행**(유형 × a3값 × LLM 라벨, 시드 13; 층 상한 때문에 150 미만)을 **이 세션의 Claude가 본문을 읽고 직접 판정** — `review_sheet_150.csv`의 `label_reviewed`·`note`
+4. gpt-oss ↔ 검토 일치율 0.930, **Cohen's κ = 0.885** (N=143, 빈칸 2 제외; conflict-이분 κ 0.874; outdated 0.945 / misinformation 0.800) → 부트스트랩 문서 §6 규칙(κ ≥ 0.7)대로 LLM 라벨 채택, 검토 145행은 검토 판정이 덮어씀(12행 변경). `review_kappa.json`
+5. `dragged_prep build` (`--allow-unresolved` 없이) → 사실충돌 67 중 **채점 가능 44** (outdated 41 · misinformation 3). 제외 23 = 유효충돌쌍 없음 15 · no_match 3 · date_tie 3 · date_absent 2
+6. 출처는 `label_sources.csv` (`rule_draft` 60 · `a3_stringmatch` 104 · `llm_gptoss` 314 · `reviewed_claude_session` 145)
+
+⚠️ **한계 — 반드시 명시**: 사전등록의 "사람 전수/κ 검토"에서 검토자가 **사람이 아니라 이 세션의 Claude**다. κ는 교차 계열 LLM 2종(gpt-oss ↔ Claude) 간 일치이지 사람-LLM 일치가 아니다. 논문 1 본실험 전에 사람이 `review_sheet_150.csv` 145행(불일치 사유는 `note`)을 재검토해야 하며, 그 전까지 DRAGged 셀은 **예비 결과**로만 읽는다. 표본이 44라 AIR 분모는 20 미만 → `summary_air.json`에서 `null`(개수만).
+
+`conflicting_opinions` 115문항은 채점 트랙에서 제외했다(정답 없음). 방침 제안: any-gold 확장(B)이 아니라 사전등록된 자기일관성 트랙(§1.8·§3.2, `label_stance`)으로 보내는 것 — 정답·문서 라벨이 필요 없다. 단 현재 `label_stance`의 판정 프롬프트가 L2용이라 stance가 항상 None이 되는 미수정 버그(§5 말미)를 먼저 고쳐야 한다.
+
+### 6c. DRAGged 실행 기록 (서버 시각)
+
+| 시각 | 단계 |
+|---|---|
+| 06:5x–07:1x | llm_assist 수정 · gpt-oss 초벌 459행 · 검토 145행 · κ · build |
+| 07:19–07:23 | GPU → Qwen |
+| 07:23–07:30 | 생성 `standard`(3분) · `reflection`(3분) · `standard_nothink`(1분), 44문항 × 시드 13, 12 동시요청 |
+| 07:30–07:32 | GPU → gpt-oss |
+| 07:32–07:34 | 라벨링 3파일(규칙+판정자), 파싱 실패 0 |
+| 07:36 | `export_records` 재실행 → `records.csv` **1,146행**(9셀) · `summary_air.json` 9셀·전환 6 · `air_analysis.ipynb` 재실행(그림 4, 에러 0) |
+
+| 데이터셋 | 환경 | 문항 | FA correct/wrong/abstain | L1 detected | AIR 분모 | 파싱 실패 |
+|---|---|---|---|---|---|---|
+| dragged | standard | 44 | 34/10/0 | 21 | 18 (<20 → AIR null) | 0 |
+| dragged | reflection | 44 | 35/9/0 | 41 | 38 | 0 |
+| dragged | standard_nothink | 44 | 37/7/0 | 0 | 0 | 0 |
+
+- 환경 간 `item_id` 집합 동일(44). `records.csv`의 `dataset=dragged`, `conflict_type ∈ {outdated 41, misinformation 3}`.
+- **AIR 분모 18(standard)은 20 미만이라 비율을 보고하지 않는다**(개수만). 이는 표본 44의 구조적 한계이지 결과가 아니다.
+
 ## 7. 한계
 
 - DRAGged(주력) 제외 · QACC 불일치 66문항 사람 adjudication 미실시(제외)
