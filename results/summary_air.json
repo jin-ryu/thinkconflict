@@ -1,0 +1,399 @@
+{
+  "run": {
+    "model": "Qwen/Qwen3.6-27B",
+    "thinking": true,
+    "note": "env 'standard_nothink' = thinking off (같은 가중치, 하드 토글)",
+    "seeds": [
+      13
+    ],
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "judge": "gptoss",
+    "date": "2026-08-21",
+    "min_comparable_n": 20
+  },
+  "cells": [
+    {
+      "dataset": "qacc",
+      "env": "reflection",
+      "n_items": 138,
+      "n_records": 138,
+      "L1": {
+        "detected": 133,
+        "unrecognized": 5
+      },
+      "L2": {
+        "correct": 111,
+        "unresolved": 5,
+        "wrong": 17
+      },
+      "FA": {
+        "correct": 101,
+        "wrong": 37
+      },
+      "paths": {
+        "legitimate": 81,
+        "shortcut": 5,
+        "discordant_hit": 11,
+        "blind_hit": 4
+      },
+      "metrics": {
+        "loss_l1": 0.0362,
+        "loss_l2": 0.1654,
+        "AIR": 0.2703,
+        "accuracy": 0.7319,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 111,
+      "denominators": {
+        "loss_l2": 133,
+        "paths": 101
+      },
+      "ci95": {
+        "AIR": [
+          0.1891891891891892,
+          0.35135135135135137
+        ]
+      }
+    },
+    {
+      "dataset": "qacc",
+      "env": "standard",
+      "n_items": 138,
+      "n_records": 138,
+      "L1": {
+        "unrecognized": 105,
+        "detected": 33
+      },
+      "L2": {
+        "correct": 30,
+        "wrong": 3
+      },
+      "FA": {
+        "wrong": 41,
+        "correct": 97
+      },
+      "paths": {
+        "legitimate": 23,
+        "shortcut": 0,
+        "discordant_hit": 3,
+        "blind_hit": 71
+      },
+      "metrics": {
+        "loss_l1": 0.7609,
+        "loss_l2": 0.0909,
+        "AIR": 0.2333,
+        "accuracy": 0.7029,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 30,
+      "denominators": {
+        "loss_l2": 33,
+        "paths": 97
+      },
+      "ci95": {
+        "AIR": [
+          0.1,
+          0.4
+        ]
+      }
+    },
+    {
+      "dataset": "qacc",
+      "env": "standard_nothink",
+      "n_items": 138,
+      "n_records": 138,
+      "L1": {
+        "unrecognized": 138
+      },
+      "L2": {},
+      "FA": {
+        "wrong": 29,
+        "correct": 109
+      },
+      "paths": {
+        "legitimate": 0,
+        "shortcut": 0,
+        "discordant_hit": 0,
+        "blind_hit": 109
+      },
+      "metrics": {
+        "loss_l1": 1.0,
+        "loss_l2": null,
+        "AIR": null,
+        "accuracy": 0.7899,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 0,
+      "denominators": {
+        "loss_l2": 0,
+        "paths": 109
+      },
+      "ci95": {
+        "AIR": null
+      }
+    },
+    {
+      "dataset": "ramdocs_a",
+      "env": "reflection",
+      "n_items": 200,
+      "n_records": 200,
+      "L1": {
+        "detected": 186,
+        "unrecognized": 14
+      },
+      "L2": {
+        "correct": 141,
+        "wrong": 28,
+        "unresolved": 17
+      },
+      "FA": {
+        "correct": 176,
+        "wrong": 24
+      },
+      "paths": {
+        "legitimate": 128,
+        "shortcut": 14,
+        "discordant_hit": 24,
+        "blind_hit": 10
+      },
+      "metrics": {
+        "loss_l1": 0.07,
+        "loss_l2": 0.2419,
+        "AIR": 0.0922,
+        "accuracy": 0.88,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 141,
+      "denominators": {
+        "loss_l2": 186,
+        "paths": 176
+      },
+      "ci95": {
+        "AIR": [
+          0.0425531914893617,
+          0.14184397163120568
+        ]
+      }
+    },
+    {
+      "dataset": "ramdocs_a",
+      "env": "standard",
+      "n_items": 200,
+      "n_records": 200,
+      "L1": {
+        "unrecognized": 89,
+        "detected": 111
+      },
+      "L2": {
+        "correct": 83,
+        "wrong": 19,
+        "unresolved": 9
+      },
+      "FA": {
+        "correct": 168,
+        "wrong": 32
+      },
+      "paths": {
+        "legitimate": 78,
+        "shortcut": 5,
+        "discordant_hit": 14,
+        "blind_hit": 71
+      },
+      "metrics": {
+        "loss_l1": 0.445,
+        "loss_l2": 0.2523,
+        "AIR": 0.0602,
+        "accuracy": 0.84,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 83,
+      "denominators": {
+        "loss_l2": 111,
+        "paths": 168
+      },
+      "ci95": {
+        "AIR": [
+          0.012048192771084338,
+          0.12048192771084337
+        ]
+      }
+    },
+    {
+      "dataset": "ramdocs_a",
+      "env": "standard_nothink",
+      "n_items": 200,
+      "n_records": 200,
+      "L1": {
+        "unrecognized": 200
+      },
+      "L2": {},
+      "FA": {
+        "correct": 188,
+        "wrong": 12
+      },
+      "paths": {
+        "legitimate": 0,
+        "shortcut": 0,
+        "discordant_hit": 0,
+        "blind_hit": 188
+      },
+      "metrics": {
+        "loss_l1": 1.0,
+        "loss_l2": null,
+        "AIR": null,
+        "accuracy": 0.94,
+        "abstain_rate": 0.0
+      },
+      "air_denominator": 0,
+      "denominators": {
+        "loss_l2": 0,
+        "paths": 188
+      },
+      "ci95": {
+        "AIR": null
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "dataset": "qacc",
+      "before": "standard",
+      "after": "reflection",
+      "n_paired": 138,
+      "n_unstable": 0,
+      "flows": {
+        "blind_hit->blind_hit": 4,
+        "blind_hit->discordant_hit": 4,
+        "blind_hit->legitimate": 59,
+        "blind_hit->shortcut": 2,
+        "blind_hit->wrong": 2,
+        "discordant_hit->legitimate": 2,
+        "discordant_hit->shortcut": 1,
+        "legitimate->discordant_hit": 4,
+        "legitimate->legitimate": 17,
+        "legitimate->shortcut": 1,
+        "legitimate->wrong": 1,
+        "wrong->discordant_hit": 3,
+        "wrong->legitimate": 3,
+        "wrong->shortcut": 1,
+        "wrong->wrong": 34
+      },
+      "LGR": {
+        "value": null,
+        "n_denom": 7,
+        "pooled_required": true
+      },
+      "hidden_regression": {
+        "value": 0.043478260869565216,
+        "n_denom": 23,
+        "to_abstain": 0
+      },
+      "flip_rate": {
+        "value": 0.07246376811594203,
+        "n_denom": 138
+      }
+    },
+    {
+      "dataset": "qacc",
+      "before": "standard",
+      "after": "standard_nothink",
+      "n_paired": 138,
+      "n_unstable": 0,
+      "flows": {
+        "blind_hit->blind_hit": 70,
+        "blind_hit->wrong": 1,
+        "discordant_hit->blind_hit": 3,
+        "legitimate->blind_hit": 23,
+        "wrong->blind_hit": 13,
+        "wrong->wrong": 28
+      },
+      "LGR": {
+        "value": null,
+        "n_denom": 13,
+        "pooled_required": true
+      },
+      "hidden_regression": {
+        "value": 0.0,
+        "n_denom": 23,
+        "to_abstain": 0
+      },
+      "flip_rate": {
+        "value": 0.10144927536231885,
+        "n_denom": 138
+      }
+    },
+    {
+      "dataset": "ramdocs_a",
+      "before": "standard",
+      "after": "reflection",
+      "n_paired": 200,
+      "n_unstable": 0,
+      "flows": {
+        "blind_hit->blind_hit": 7,
+        "blind_hit->discordant_hit": 10,
+        "blind_hit->legitimate": 50,
+        "blind_hit->shortcut": 2,
+        "blind_hit->wrong": 2,
+        "discordant_hit->discordant_hit": 6,
+        "discordant_hit->legitimate": 6,
+        "discordant_hit->shortcut": 2,
+        "legitimate->blind_hit": 3,
+        "legitimate->discordant_hit": 7,
+        "legitimate->legitimate": 63,
+        "legitimate->shortcut": 4,
+        "legitimate->wrong": 1,
+        "shortcut->legitimate": 1,
+        "shortcut->shortcut": 4,
+        "wrong->discordant_hit": 1,
+        "wrong->legitimate": 8,
+        "wrong->shortcut": 2,
+        "wrong->wrong": 21
+      },
+      "LGR": {
+        "value": null,
+        "n_denom": 11,
+        "pooled_required": true
+      },
+      "hidden_regression": {
+        "value": 0.01282051282051282,
+        "n_denom": 78,
+        "to_abstain": 0
+      },
+      "flip_rate": {
+        "value": 0.07,
+        "n_denom": 200
+      }
+    },
+    {
+      "dataset": "ramdocs_a",
+      "before": "standard",
+      "after": "standard_nothink",
+      "n_paired": 200,
+      "n_unstable": 0,
+      "flows": {
+        "blind_hit->blind_hit": 71,
+        "discordant_hit->blind_hit": 14,
+        "legitimate->blind_hit": 77,
+        "legitimate->wrong": 1,
+        "shortcut->blind_hit": 5,
+        "wrong->blind_hit": 21,
+        "wrong->wrong": 11
+      },
+      "LGR": {
+        "value": 0.0,
+        "n_denom": 21,
+        "pooled_required": false
+      },
+      "hidden_regression": {
+        "value": 0.01282051282051282,
+        "n_denom": 78,
+        "to_abstain": 0
+      },
+      "flip_rate": {
+        "value": 0.11,
+        "n_denom": 200
+      }
+    }
+  ]
+}
