@@ -1,13 +1,40 @@
 # AIR 파일럿 인수인계 (2026-08-20)
 
 > H100 서버에서 새 Claude Code 세션을 열었다면 **이 파일부터 읽고 이어서 진행**한다.
-> 브랜치: `pilot/air-ramdocs`
+> 이 문서는 `main`에 있다. 실험 작업은 `main`에서 브랜치를 따서 한다 (§0).
+
+---
+
+## 0. 브랜치
+
+이 문서는 조정용이라 **`main`에 둔다** — 어느 머신에서 clone해도 브랜치 이름을 몰라도 보이게 하기 위해서다.
+실험 산출물·코드 수정은 브랜치에서 한다.
+
+```bash
+git checkout main && git pull origin main
+git checkout -b pilot/air        # 데이터셋이 늘었으므로 ramdocs 한정 이름은 쓰지 않는다
+```
+
+이미 `pilot/air-ramdocs`를 만들어 두었고 **커밋한 것이 없다면** 지우고 다시 만든다:
+
+```bash
+git branch -D pilot/air-ramdocs
+git checkout -b pilot/air
+```
+
+**이미 커밋한 것이 있다면** 지우지 말고 옮겨 붙인다:
+
+```bash
+git checkout pilot/air-ramdocs
+git rebase main
+git branch -m pilot/air
+```
 
 ---
 
 ## 1. 지금 무엇을 하려는가
 
-**논문 1(ThinkConflict)의 RQ1 축소판 — RAMDocs 한정 AIR 실측.**
+**논문 1(ThinkConflict)의 RQ1 축소판 — AIR 실측.**
 
 논문 1 전체가 아니다. 측정하려는 것은 단 하나:
 
@@ -26,75 +53,103 @@
 
 ---
 
-## 2. 왜 RAMDocs만인가
+## 2. 어느 데이터셋을 쓰는가 — RAMDocs + QACC
 
-| 데이터셋 | `data/3_processed/` | 이유 |
-|---|---|---|
-| **RAMDocs** | ✅ `ramdocs_a.jsonl` (1,016) · `ramdocs_b.jsonl` (500) · `ramdocs_pairs.jsonl` (676) | 문서별 `correct/misinfo/noise` 라벨이 **원본 내장** → 사람 검토 불필요 |
-| DRAGged | ❌ 비어 있음 | `data/2_review/dragged/*.draft.csv`에서 사람 전수 검토 미완 |
-| QACC | ❌ 비어 있음 | 동일 |
+**2개를 쓴다.** 한 데이터셋만으로는 AIR이 그 데이터셋의 구성 방식에서 온 것인지 구분할 수 없다.
 
-`preprocessing/schema.py`의 `assert_reviewed`가 검토 미완 데이터의 빌드를 거부한다.
-DRAGged 458건 검토는 마감 내 불가능하므로 **파일럿은 RAMDocs로 한정**한다.
+| 데이터셋 | 라벨 상태 | 남은 작업 | 판단 |
+|---|---|---|---|
+| **RAMDocs** | ✅ `data/3_processed/ramdocs/` 완비 — `a` 1,016 · `b` 500 · `pairs` 676 | **없음** | ✅ 즉시 사용 |
+| **QACC** | ✅ 라벨 **공백 0건** (3,049행 / 333문항, `noise` 1638 · `correct` 934 · `conflict` 477). **268문항이 유효 충돌 게이트 통과** | 게이트① 스크리닝 (`pending_screen`) — **LLM 자동화 가능** | ✅ 사용 (§4.2) |
+| DRAGged | ❌ `label` 대부분 공백 — `outdated` 578행 중 **518행 공백** | LLM 초벌 + **사람 전수 검토** | ❌ 이번 파일럿 제외 |
 
-이 제약은 논문에 한계로 명시한다 — RAMDocs는 위키 문단 합성 배치라 생태학적 타당도가 낮고,
-충돌 문항 비율이 91.2%로 편중돼 있다.
+### RAMDocs만으로는 안 되는 이유
+
+과제5에서 이미 내린 결론이다:
+
+> *RAMDocs 내부 CV AUC 0.872 — 높지만 신호가 아니다. 오정보 문서를 **추가하는** 방식으로 충돌을 만들었으므로
+> 모델은 `n_docs`를 세고 있을 뿐이다. **구성 방식의 흔적이지 충돌의 성질이 아니다.***
+
+RAMDocs는 위키 문단 합성 배치이고 충돌 문항 비율이 91.2%로 편중돼 있다.
+여기서만 AIR을 재면 "합성 데이터에서의 AIR"이 된다.
+**QACC는 실제 구글 검색 스니펫**이라 생태학적 타당도가 높고, 두 데이터셋에서 방향이 일치하면 주장이 훨씬 강해진다.
+
+### DRAGged를 빼는 이유
+
+`preprocessing/dragged_prep.py`의 build는 채점 트랙 문항에 `unknown` 청크가 있으면 거부한다.
+`llm_assist`로 초벌 라벨은 뽑을 수 있으나 **사람 전수 검토**가 남고, 검토 없이 쓰면 사전등록 규약을 깬다.
+62문항짜리 `outdated`를 급하게 태우는 것보다 **논문 1 본실험에서 제대로 검토해 주력으로 쓰는 것**이 맞다.
+
+→ 파일럿 한계에 **"주력 데이터셋 DRAGged는 라벨 검토 미완으로 제외"** 를 명시한다.
 
 ---
 
-## 3. ⚠️ 먼저 해결할 문제 — 모델 2개가 필요하다
+## 3. ⚠️ 모델 2개가 필요하다 — VRAM 확인
 
 `diagnosis/run_labeling.py`의 `SAME_FAMILY` 규칙:
 
-> 판정자는 트레이스 생성 모델과 **다른 계열**이어야 한다 (자기선호 편향 통제, 부록 A(a)).
+> 트레이스 판정자는 생성 모델과 **다른 계열**이어야 한다 (자기선호 편향 통제, 부록 A(a)).
 > 같은 계열을 지정하면 `SystemExit`으로 거부한다.
-
-즉 **생성용 Qwen + 판정용 gpt-oss** 두 개가 필요하다. 그런데:
 
 | 모델 | 대략 VRAM (bf16) |
 |---|---|
-| Qwen3.6-27B | ~54GB |
-| gpt-oss-20b (MoE 21B) | ~40GB |
+| Qwen3.6-27B (생성) | ~54GB |
+| gpt-oss-20b (판정) | ~40GB |
 | **동시 서빙** | **~94GB > 80GB** ❌ |
 
-**H100 80GB 한 장에 동시에 못 올린다.** 선택지:
+H100 80GB 한 장에 동시에 못 올린다. 선택지:
 
 | 방안 | 방법 | 비고 |
 |---|---|---|
-| **A. 순차 서빙** ✅ 권장 | Qwen 서빙 → 생성 완료 → 종료 → gpt-oss 서빙 → 라벨링 | 안전. 모델 교체 시간 필요 |
-| B. 판정자만 양자화 | gpt-oss를 MXFP4로 (~12–16GB) 올려 동시 서빙 | 판정자는 텍스트만 읽으므로 양자화 허용 가능. 단 비양자화 원칙은 **생성 모델에만** 적용됨을 논문에 명시 |
-| C. 규칙 기반 라벨만 | `--judge-model` 생략 (코드상 `None` 허용) | ⚠️ **확인 필요**: `label_generation`이 judge 없이 동작하는지 미검증. 되면 가장 빠름 |
+| **A. 순차 서빙** | Qwen 생성 완료 → 종료 → gpt-oss 서빙 → 라벨링 | 안전. 교체 시간 필요 |
+| B. 판정자만 양자화 | gpt-oss를 MXFP4(~12–16GB)로 동시 서빙 | 판정자는 텍스트만 읽으므로 허용 가능. **비양자화 원칙은 생성 모델에만** 적용됨을 논문에 명시 |
+| C. 판정자 없이 규칙 기반 | `--judge-model` 생략 (코드상 `None` 허용) | ⚠️ **미검증** — `label_generation`이 judge 없이 도는지 10건으로 먼저 확인 |
 
-**먼저 C를 10건으로 시험해 보라.** 되면 판정자 다운로드(~40GB)를 통째로 아낀다.
-안 되면 A로 간다.
+**10건으로 C부터 시험하라.** 되면 판정자 다운로드 ~40GB를 통째로 아낀다. 안 되면 A.
+
+> ※ §4.2의 **QACC 스크리닝 판정자는 이것과 별개다.** 트레이스를 읽지 않고 질문·답변만 보므로
+> API 모델로 돌리면 되고 VRAM을 쓰지 않는다.
 
 ---
 
 ## 4. 실행 순서
 
+**4.1과 4.2는 병행한다.** 다운로드가 도는 동안 QACC 준비를 끝낸다.
+
 ### 4.0 사전 확인 (다운로드 전 필수)
 
 ```bash
 df -h ~                                    # 54GB(+40GB) 여유 확인
-# HF에서 Qwen/Qwen3.6-27B 리포 ID가 실제로 존재하는지 브라우저로 확인
-#   → serving/client.py MODELS dict에 적힌 값. 틀리면 54GB 헛다운로드
+# HF에서 Qwen/Qwen3.6-27B 리포 ID 존재 확인 — serving/client.py MODELS dict 값
+#   틀리면 54GB 헛다운로드 + 1시간 손실
 ```
 
-### 4.1 환경
+### 4.1 [트랙 A] 환경 + 모델 다운로드 — 지금 바로 백그라운드
 
 ```bash
-git checkout -b pilot/air-ramdocs
 python -m venv .venv && source .venv/bin/activate
 pip install -U pip && pip install vllm && pip install -r requirements.txt
 export HF_TOKEN=<값>
-```
 
-### 4.2 모델 다운로드 (가장 긴 직렬 작업 — 제일 먼저 백그라운드로)
-
-```bash
 nohup hf download Qwen/Qwen3.6-27B > ~/dl_qwen.log 2>&1 &
 tail -f ~/dl_qwen.log
 ```
+
+### 4.2 [트랙 B] QACC 게이트① 스크리닝 — 다운로드와 동시에
+
+가짜 충돌(표기·granularity 차이만 있는 것)을 걸러내는 단계. 현재 **268문항이 `pending_screen`** 상태다.
+
+```bash
+python -m preprocessing.llm_assist qacc --judge 1
+python -m preprocessing.llm_assist qacc --judge 2
+# → data/2_review/qacc/qacc.llm.csv 생성
+# → sharp로 판정된 문항의 exclusion_flag를 비운다
+python -m preprocessing.qacc_prep build     # → data/3_processed/qacc/*.jsonl
+```
+
+- 판정자 2종은 **API 모델 가능** (`.env`에 GPT·Claude·Gemini 키 존재). VRAM 경합 없음
+- 비용을 먼저 보려면: `python -m preprocessing.qacc_prep estimate-cost`
+- 강행 옵션 `--allow-unresolved`가 있으나 **쓰지 말 것** — 미판정 충돌이 채점 트랙에 새어든다
 
 ### 4.3 서빙
 
@@ -102,7 +157,7 @@ tail -f ~/dl_qwen.log
 bash serving/launch_qwen.sh     # 포트 8001, bf16 비양자화 고정
 ```
 
-### 4.4 생성 — 먼저 10건으로 완주 테스트
+### 4.4 생성 — 반드시 10건 완주 테스트부터
 
 ```bash
 head -10 data/3_processed/ramdocs/ramdocs_a.jsonl > /tmp/smoke.jsonl
@@ -113,9 +168,9 @@ python -m serving.client \
   --out results/raw/qwen_standard_ramdocs_smoke.jsonl
 ```
 
-**여기서 `<think>` 블록이 JSONL에 제대로 들어갔는지 눈으로 확인할 것.**
-`results/`는 지금까지 비어 있었다 = **이 파이프라인은 한 번도 end-to-end로 안 돌았다.**
-파서·프롬프트에서 버그가 나올 가능성이 높으므로 10건 단계를 절대 건너뛰지 말 것.
+**`<think>` 블록이 JSONL에 제대로 들어갔는지 눈으로 확인할 것.**
+`results/`는 지금까지 비어 있었다 = **이 파이프라인은 한 번도 end-to-end로 돌지 않았다.**
+파서·프롬프트 버그가 나올 가능성이 높으므로 이 단계를 절대 건너뛰지 말 것.
 
 ### 4.5 라벨링 — 10건
 
@@ -131,11 +186,12 @@ python -m diagnosis.run_labeling \
 
 ### 4.6 본실행
 
-10건이 통과하면 **100–200건**으로 확대.
+10건이 통과하면 **데이터셋별 100건씩**으로 확대 (RAMDocs + QACC).
 
-- 시드: `serving/client.py`의 `SEEDS = (13, 42, 71, 108, 2026)` 중 **1–2개만** (5개는 시간 부족)
+- 시드: `SEEDS = (13, 42, 71, 108, 2026)` 중 **1–2개만** (5개는 시간 부족)
 - 환경: `standard`만. CAD·CD2는 이번 파일럿 범위 밖
-- 디코딩: `t=0.6, top_p=0.95` 고정 (사전등록, 건드리지 말 것)
+- 디코딩: `t=0.6, top_p=0.95` 고정 (사전등록 — 건드리지 말 것)
+- **데이터셋별로 AIR을 따로 보고한다.** 합치지 않는다 (과제3~5에서 확인한 원칙)
 
 ---
 
@@ -158,7 +214,7 @@ python -m diagnosis.run_labeling \
 - 폰트: 큰제목 9 · 본문 8.5 · 그림표 8 · 참고문헌 8
 - 구성: 국문제목 → 영문제목 → 저자 → **요약** → 1.서론 → 2.이론적 배경 → 3.본론 → 참고문헌
 - 캡션은 `(그림 1)` `(표 1)`, **본문 인용은 괄호 없이** "표 1과 같이"
-- 분량 **3쪽 이상** (제출안내 "최소 3쪽" ≥ 양식 "2페이지 이상")
+- 분량 **3쪽 이상**
 
 ### 노트북 제출 방식
 
@@ -205,5 +261,7 @@ H100에서 **주피터 노트북 하나로 생성 + 분석**을 모두 수행하
 
 - `docs/preregistration.md` 수정 — 커밋 타임스탬프가 사전등록의 물증
 - 생성 모델 양자화 — `launch_qwen.sh`에 bf16 고정 이유가 적혀 있음 (로짓·궤적 왜곡 방지)
-- DRAGged·QACC 검토 게이트 우회 — 논문 1 본실험의 신뢰도가 걸림
+- `qacc_prep build --allow-unresolved` 강행 — 미판정 충돌이 채점 트랙에 새어든다
+- DRAGged 검토 게이트 우회 — 논문 1 본실험의 신뢰도가 걸림
 - 시드·디코딩 설정 변경 — 사전등록 위반
+- 데이터셋 합쳐서 AIR 보고 — 반드시 분리 보고
