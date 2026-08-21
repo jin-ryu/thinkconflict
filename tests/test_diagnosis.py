@@ -170,6 +170,34 @@ def test_parse_think_and_failures():
     assert parse_record({"text": "answer", "model": "qwen", "thinking": False}).ok
 
 
+def test_parse_think_when_open_tag_is_in_the_prompt():
+    """Qwen3.6 실측 포맷: 템플릿이 '<think>\\n'을 생성 프리픽스로 붙여 완성문에는
+    닫는 태그만 남는다. 여는 태그 부재를 파싱 실패로 처리하면 전 건이 버려진다."""
+    p = parse_record({"text": "weighed the documents</think>\n\nFinal: X", "model": "qwen"})
+    assert p.ok and p.thinking == "weighed the documents" and p.answer == "Final: X"
+    # 닫는 태그 직후 절단 = 답변 미도달. 빈 답변을 흘리면 grade()가 기권으로 세어
+    # 기권율(의무 병기 지표)을 오염시키므로 파싱 실패로 잡는다.
+    assert parse_record({"text": "thought</think>", "model": "qwen"}).failure == "empty_answer"
+
+
+def test_behavior_track_keeps_l1_failures():
+    """행동 트랙 필터는 fa 기준이다 — l2로 거르면 L1 미탐지 건이 통째로 빠져
+    Loss_L1이 구조적으로 0이 되고 blind_hit 경로가 사라진다 (run_labeling.py)."""
+    records = [
+        {"question_id": "q1", "l1": "unrecognized", "l2": None, "fa": "correct",
+         "path": "blind_hit"},
+        {"question_id": "q2", "l1": "detected", "l2": "correct", "fa": "correct",
+         "path": "legitimate"},
+        {"question_id": "q3", "l1": "detected", "l2": "correct", "fa": "wrong",
+         "path": None},
+    ]
+    behav = [r for r in records if r.get("fa") is not None]
+    assert len(behav) == 3, "L1 미탐지 건이 행동 트랙에서 빠지면 안 된다"
+    m = stage_metrics(behav)
+    assert m["Loss_L1"].value == pytest.approx(1 / 3)   # l2로 걸렀다면 0이 됐을 값
+    assert path_decomposition(behav)["blind_hit"].value == pytest.approx(1 / 2)
+
+
 def test_parse_harmony_channels():
     h = parse_harmony("<|channel|>analysis<|message|>doc 1 is outdated"
                       "<|end|><|channel|>final<|message|>Answer X<|return|>")
@@ -207,6 +235,32 @@ def test_l2_is_last_explicit_support_and_counts_flips(item):
              "and reliable. Actually Document 1 is the most recent and accurate.")
     lab = label_generation(parse_think(f"<think>{trace}</think>\n{GOLD}"), item, [0, 1, 2])
     assert lab.l2 == "correct" and lab.l2_flip_count == 2
+
+
+def test_support_verb_is_not_attributed_across_a_sentence(item):
+    """실측 실패(ramdocs-0006): 'Doc 2를 신뢰한다'의 동사가 앞 문장 Doc 1에 붙어
+    conflict 문서를 지지한 것으로 뒤집혔다. 동사는 같은 문장 안에서만 귀속된다."""
+    trace = ("The documents conflict. Document 2's date is likely a scraping "
+             "error common in these datasets. I will trust the text in Document 1.")
+    lab = label_generation(parse_think(f"<think>{trace}</think>\n{GOLD}"), item, [0, 1, 2])
+    assert lab.l2 == "correct", "앞 문장의 동사가 뒤 인용에 귀속되면 안 된다"
+
+
+def test_reject_verb_does_not_cross_a_contrastive_clause(item):
+    """실측 실패(ramdocs-0012): '..., while Document 1 is explicitly titled ...'에서
+    앞 절의 'ignore'가 Document 1의 기각으로 읽혔다. 대조 접속사도 경계다."""
+    trace = ("Sources conflict. I ignore the contradictory mentions as retrieval "
+             "noise, while Document 1 is explicitly titled and accurate.")
+    lab = label_generation(parse_think(f"<think>{trace}</think>\n{GOLD}"), item, [0, 1, 2])
+    assert lab.l2 == "correct"
+
+
+def test_rule_abstains_when_support_and_reject_collide(item):
+    """한 구간에 지지·기각이 함께 있으면 규칙은 판정하지 않고 판정자에게 넘긴다 —
+    과확신 오라벨이 무판정보다 나쁘다 (부록 A(a))."""
+    trace = "Documents conflict. Document 1 is reliable and incorrect about the year."
+    lab = label_generation(parse_think(f"<think>{trace}</think>\n{GOLD}"), item, [0, 1, 2])
+    assert lab.l2 == "unresolved"
 
 
 def test_doc_order_maps_render_position_to_source_label(item):
@@ -686,3 +740,30 @@ def test_causal_contribution_is_truncation_minus_noop_and_checks_filler_ceiling(
     by_path = r["truncation"]["by_origin_path"]
     assert by_path["shortcut"]["flip_rate"] == 1.0
     assert by_path["legitimate"]["flip_rate"] == 0.0
+
+
+# ── 산출물 규격 (파일럿 인수인계 §6) ─────────────────────────────────────────
+
+def test_export_rows_follow_handoff_spec(item):
+    """records.csv 한 행 = 문항×환경. thinking off는 env 이름에 접미사로 합쳐지고,
+    L1 미탐지 건의 L2·오답의 path는 빈칸이다 (unresolved로 지어내지 않는다)."""
+    from diagnosis.export_records import COLUMNS, env_name, to_row
+    rec = {"question_id": item.question_id, "dataset": "dragged", "env": "standard",
+           "seed": 13, "thinking": False, "l1": "unrecognized", "l2": None, "fa": "wrong",
+           "path": None, "provenance": {"l2": "rule"}}
+    row = to_row(rec, item)
+    assert list(row) == COLUMNS
+    assert env_name(rec) == "standard_nothink"
+    assert row["L2"] == "" and row["path"] == "" and row["is_correct"] == 0
+    assert row["n_docs"] == 3 and row["conflict_type"] == "outdated"
+    assert row["l2_source"] == ""          # L2 판정 자체가 없으면 출처도 없다
+
+
+def test_export_cell_nulls_ratios_below_min_n():
+    """N<20 셀은 비율을 null로 두고 개수만 남긴다 (규격 §6.2, 사전등록 §2.1)."""
+    from diagnosis.export_records import cell_summary
+    recs = [{"question_id": f"q{i}", "l1": "detected", "l2": "correct", "fa": "correct",
+             "path": "legitimate", "seed": 13} for i in range(5)]
+    cell = cell_summary("ramdocs_a", "standard", recs)
+    assert cell["metrics"]["AIR"] is None and cell["air_denominator"] == 5
+    assert cell["paths"]["legitimate"] == 5

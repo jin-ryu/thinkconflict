@@ -8,9 +8,14 @@ set -euo pipefail
 
 MODEL_ID="${GPTOSS_MODEL_ID:-openai/gpt-oss-20b}"
 PORT="${GPTOSS_PORT:-8003}"
+# 기본은 bf16 비양자화 — 이 모델을 **생성 모델**로 쓸 때의 원칙(로짓·궤적 왜곡 방지)이다.
+# 다만 gpt-oss 배포 체크포인트는 원래 MXFP4라, **판정자로만** 쓰는 실행에서는
+# DTYPE=auto로 네이티브 정밀도를 그대로 올린다 (판정자는 텍스트만 읽으므로 허용 —
+# 부록 A(a), 파일럿 인수인계 §3 B안). 생성 실행에서는 이 값을 건드리지 않는다.
+DTYPE="${DTYPE:-bfloat16}"
 
 exec vllm serve "$MODEL_ID" \
-  --dtype bfloat16 \
+  --dtype "$DTYPE" \
   --port "$PORT" \
   --max-model-len "${MAX_LEN:-32768}" \
   --tensor-parallel-size "${TP:-1}" \

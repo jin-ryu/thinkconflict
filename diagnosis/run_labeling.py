@@ -30,7 +30,10 @@ SAME_FAMILY = {"qwen": {"qwen"}, "gemma": {"gemma"}, "gptoss": {"gptoss", "gpt"}
 def make_judge(judge_model: str | None, judge_url: str | None, target_model: str):
     if not judge_model:
         return None
-    if judge_model.lower() in SAME_FAMILY.get(target_model, set()):
+    # 부분 문자열로 본다 — 실제로 넘기는 값은 서빙 모델 id("Qwen/Qwen3.6-27B")라
+    # 논리명("qwen")과 정확히 일치하지 않는다. 정확 일치로 검사하면 같은 계열
+    # 판정자가 가드를 그냥 통과해 자기선호 편향 통제가 무력화된다.
+    if any(f in judge_model.lower() for f in SAME_FAMILY.get(target_model, set())):
         raise SystemExit(
             f"판정자 '{judge_model}'는 대상 모델 '{target_model}'과 동일 계열 — "
             "자기선호 편향 통제 위반 (부록 A(a)). 다른 계열 판정자를 지정할 것.")
@@ -80,7 +83,11 @@ def main() -> None:
             out.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     print(f"라벨 {len(records)}건 → {args.out} (파싱 실패 {n_unparsed}건 제외)")
-    behav = [r for r in records if r.get("l2") is not None]
+    # 행동 트랙 = **채점이 성립하는 문항**(정답이 있는 문항)이다. 기준은 fa이지 l2가
+    # 아니다 — labeler는 L1 미탐지 시 l2를 None으로 두므로, l2로 거르면 L1 실패 건이
+    # 통째로 빠져 Loss_L1이 구조적으로 0이 되고 blind_hit 경로가 사라진다.
+    # 정답이 없는 문항(의견 충돌)만 fa=None으로 제외돼야 한다 (§3.2 이중 트랙).
+    behav = [r for r in records if r.get("fa") is not None]
     if behav:
         print_report(behav, f"{args.generations.stem} — behavior track")
 

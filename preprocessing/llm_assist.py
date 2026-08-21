@@ -50,20 +50,73 @@ def make_client(base_url: str, api_key: str) -> OpenAI:
     return OpenAI(base_url=base_url, api_key=api_key)
 
 
-def ask(client: OpenAI, model: str, prompt: str, max_tokens: int = 40) -> str:
-    resp = client.chat.completions.create(
-        model=model, messages=[{"role": "user", "content": prompt}],
-        temperature=0.0, max_tokens=max_tokens)
-    return (resp.choices[0].message.content or "").strip()
+def ask(client: OpenAI, model: str, prompt: str, max_tokens: int = 256) -> str:
+    """형식-채움 한 줄 판정을 받는다.
+
+    사고형 모델(Qwen3.6 등)은 기본으로 추론을 먼저 뱉으므로 짧은 토큰 예산이 사고에
+    다 쓰이고 폼 값에 도달하지 못한다 — 실측: 333건 전부 빈 판정. 전처리 판정은
+    한 단어 폼 채움이라 사고가 필요 없으므로 사고 채널을 끈다. 템플릿이 이 인자를
+    받지 않는 엔드포인트(비-Qwen 계열)면 인자 없이 한 번 더 시도한다.
+    """
+    kw = {"model": model, "messages": [{"role": "user", "content": prompt}],
+          "temperature": 0.0, "max_tokens": max_tokens}
+    # 사고 채널을 끄는 방식이 계열마다 다르다. Qwen은 chat_template_kwargs로 끄고,
+    # gpt-oss는 끌 수 없으나 reasoning_effort='low'로 줄이면 폼 값까지 도달한다
+    # (실측: effort=medium은 max_tokens 256에서도 final 채널에 도달하지 못한다).
+    for extra in ({"chat_template_kwargs": {"enable_thinking": False}},
+                  {"reasoning_effort": "low"},
+                  None):
+        try:
+            resp = client.chat.completions.create(**kw, extra_body=extra)
+        except Exception:  # noqa: BLE001 — 엔드포인트가 그 인자를 모르는 경우
+            continue
+        text = (resp.choices[0].message.content or "").strip()
+        if text:
+            return text
+    return ""
 
 
 def first_token(text: str, allowed: tuple[str, ...]) -> str | None:
-    """형식-채움 응답에서 처음 등장하는 허용 라벨을 고른다 (부록 A(a) G-Eval 방식).
-    "label = support" 같은 폼 에코를 건너뛰기 위해 허용 라벨이 나올 때까지 훑는다."""
-    for tok in re.findall(r"[a-z_]+", text.lower()):
+    """형식-채움 응답에서 채워진 값을 고른다 (부록 A(a) G-Eval 방식).
+
+    폼 에코를 건너뛰되, **선택지 목록까지 에코하는 모델**을 조심해야 한다. 실측:
+    gpt-oss는 "verdict ∈ {sharp, soft} = soft"처럼 통째로 되받아쓴다. 이때 앞에서부터
+    허용 라벨을 찾으면 답이 아니라 **첫 번째 선택지**('sharp')를 집어 전 문항이 같은
+    값으로 오염된다. 폼 규약상 값은 '=' 뒤에 오므로 '=' 뒤를 우선 판독한다.
+    """
+    for tok in re.findall(r"[a-z_]+", OPTION_LIST_RE.sub(" ", text).lower()):
         if tok in allowed:
             return tok
     return None
+
+
+OPTION_LIST_RE = re.compile(r"\{[^}]*\}")   # 되받아쓴 '{sharp, soft}' 같은 선택지 목록
+
+
+def form_field(text: str, field: str, allowed: tuple[str, ...]) -> str | None:
+    """폼 응답에서 `field`에 채워진 값을 뽑는다.
+
+    줄 위치에 의존하지 않는다 — 같은 모델도 응답 모양이 갈린다 (실측, gpt-oss):
+        "verdict ∈ {sharp, soft} = sharp"   (값이 같은 줄)
+        "verdict\\nsharp"                    (값이 다음 줄)
+    앞의 것만 가정하면(lines[0]/lines[1] 고정 배치) 뒤의 모양에서 전 문항이 빈 판정이 된다.
+    """
+    body = OPTION_LIST_RE.sub(" ", text)
+    lines = [ln for ln in body.splitlines() if ln.strip()]
+    pat = re.compile(rf"\b{re.escape(field)}\b", re.IGNORECASE)
+    for i, line in enumerate(lines):
+        m = pat.search(line)
+        if not m:
+            continue
+        tail = line.split("=", 1)[1] if "=" in line else line[m.end():]
+        got = first_token(tail, allowed)
+        if got:
+            return got
+        if i + 1 < len(lines):            # 값이 다음 줄에 온 모양
+            got = first_token(lines[i + 1], allowed)
+            if got:
+                return got
+    return first_token(body, allowed)     # 필드명 자체가 없으면 전체에서 후퇴 탐색
 
 
 # ── DRAGged: 문서별 정답 지지 판정 → 빈 `label` 칸 ───────────────────────────
@@ -170,11 +223,10 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int,
         raw = ask(client, model, QACC_PROMPT.format(
             question=head["question"], gold=gold or "(재검증 필요)",
             wrong=" | ".join(wrong), docs=docs))
-        lines = [l for l in raw.splitlines() if l.strip()]
-        verdict = first_token(lines[0] if lines else "", ("sharp", "soft")) or ""
-        ctype = first_token(lines[1] if len(lines) > 1 else "",
-                            ("outdated", "misinformation", "conflicting_opinions",
-                             "na")) or ""
+        verdict = form_field(raw, "verdict", ("sharp", "soft")) or ""
+        ctype = form_field(raw, "type",
+                           ("outdated", "misinformation", "conflicting_opinions",
+                            "na")) or ""
         mine[qid] = {"question_id": qid, "verdict": verdict,
                      "conflict_type": "" if ctype == "na" else ctype, "model": model}
 

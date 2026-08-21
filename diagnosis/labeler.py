@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Protocol
 
 from diagnosis.grading import adopted_wrong_answer, grade
+from preprocessing.llm_assist import form_field
 from diagnosis.trace_parser import ParsedTrace
 from preprocessing.schema import Item
 
@@ -86,6 +87,37 @@ def recognize_type(thinking: str, gold_type: str) -> str:
     return "correct_type" if hit else "surface_only"
 
 
+# 문장/절 경계 — 지지 판독은 이 안에서만. 대조 접속사까지 경계로 삼는 이유는 실측:
+# "ignore the contradictory Beatles mentions ..., while Doc 2 is explicitly titled ..."
+# 에서 앞 절의 'ignore'가 Doc 2의 기각으로 읽혀 correct 문서가 wrong으로 뒤집혔다.
+SENT_BREAK_RE = re.compile(
+    r"[.!?;:,\n]|\b(?:while|whereas|but|however|although|though|meanwhile|yet)\b",
+    re.IGNORECASE)
+
+
+def _cue_window(thinking: str, refs: list[re.Match], i: int) -> str:
+    """인용 refs[i]에 귀속시킬 수 있는 텍스트 구간.
+
+    같은 문장 안에서, 앞뒤로 **인접한 다른 문서 인용을 넘지 않는** 범위만 돌려준다.
+    'Doc 2 and Doc 5' 처럼 인용이 연달아 오면 그 사이에는 동사가 없으므로 두 인용
+    모두 빈 구간을 받아 기권하게 되고, 문장 앞의 'trust'는 가장 가까운 인용(Doc 2)에만
+    귀속된다 — 엉뚱한 인용에 동사가 붙는 것을 막는 것이 목적이다.
+    """
+    m = refs[i]
+    lo = refs[i - 1].end() if i > 0 else 0
+    hi = refs[i + 1].start() if i + 1 < len(refs) else len(thinking)
+    before = thinking[lo:m.start()]
+    after = thinking[m.end():hi]
+    # 문장 경계에서 자른다: 앞은 마지막 경계 이후, 뒤는 첫 경계 이전
+    breaks = list(SENT_BREAK_RE.finditer(before))
+    if breaks:
+        before = before[breaks[-1].end():]
+    nxt = SENT_BREAK_RE.search(after)
+    if nxt:
+        after = after[:nxt.start()]
+    return before + " " + after
+
+
 def last_explicit_support(thinking: str, doc_order: list[int],
                           item: Item) -> tuple[str | None, int, int | None]:
     """마지막 명시적 문서 지지를 찾아 (지지 문서의 원본 라벨 기반 L2, 번복 횟수, 지점)을 반환.
@@ -95,19 +127,28 @@ def last_explicit_support(thinking: str, doc_order: list[int],
     """
     label_by_id = {c.doc_id: c.label for c in item.chunks}
     stances: list[tuple[int, str]] = []  # (offset, 'correct'|'wrong')
-    for m in DOC_REF_RE.finditer(thinking):
+    refs = [m for m in DOC_REF_RE.finditer(thinking)]
+    for i, m in enumerate(refs):
         pos = int(m.group(1))
         if not (1 <= pos <= len(doc_order)):
             continue
-        window = thinking[m.end(): m.end() + 160]  # 인용 직후 문맥에서 지지/기각 판독
+        # 지지/기각 동사는 인용 뒤에도("Doc 3 is outdated") 앞에도("I will trust Doc 2")
+        # 온다. 뒤 고정폭만 보면 다음 문장의 동사를 이 인용에 잘못 붙인다 — 실측 실패:
+        # "Doc 3's 1885 is a scraping error. I will trust the text in Doc 2 and Doc 5."
+        # 에서 'trust'가 Doc 3의 지지로 읽혀 conflict 문서를 지지한 것으로 뒤집혔다.
+        # 따라서 **같은 문장 안**만 보고, 그 안에서도 다른 인용을 넘지 않는 구간만 본다.
+        window = _cue_window(thinking, refs, i)
         support = re.search(SUPPORT_CUES, window, re.IGNORECASE)
         reject = re.search(REJECT_CUES, window, re.IGNORECASE)
         if not support and not reject:
             continue
+        if support and reject:
+            continue   # 같은 구간에 지지·기각이 공존 = 판독 불가. 규칙은 기권하고
+                       # 판정자에게 넘긴다 (과확신이 무판정보다 나쁘다, 부록 A(a))
         doc_label = label_by_id.get(doc_order[pos - 1], "unknown")
         if doc_label not in ("correct", "conflict"):
             continue
-        backs_gold = (doc_label == "correct") == bool(support and not reject)
+        backs_gold = (doc_label == "correct") == bool(support)
         stances.append((m.start(), "correct" if backs_gold else "wrong"))
     if not stances:
         return None, 0, None
@@ -213,8 +254,21 @@ def build_openai_judge(client, model: str, *, swap_options: bool = False) -> Jud
     호출부(실험 스크립트)에서 모델 매핑으로 강제한다."""
     def _judge(question: str, trace: str, docs_summary: str, task: str) -> str:
         prompt = make_judge_prompt(question, trace, docs_summary, task, swap_options)
-        resp = client.chat.completions.create(
-            model=model, messages=[{"role": "user", "content": prompt}],
-            temperature=0.0, max_tokens=8)
-        return (resp.choices[0].message.content or "").strip().lower().split()[0]
+        kw = {"model": model, "messages": [{"role": "user", "content": prompt}],
+              "temperature": 0.0, "max_tokens": 256}
+        # 사고형 판정자는 짧은 예산을 사고에 다 쓰고 폼 값에 도달하지 못한다. 끄는 방법이
+        # 계열마다 달라 순서대로 시도한다 (Qwen: chat_template_kwargs, gpt-oss: effort).
+        for extra in ({"chat_template_kwargs": {"enable_thinking": False}},
+                      {"reasoning_effort": "low"}, None):
+            try:
+                resp = client.chat.completions.create(**kw, extra_body=extra)
+            except Exception:  # noqa: BLE001 — 엔드포인트가 그 인자를 모르는 경우
+                continue
+            text = (resp.choices[0].message.content or "").strip()
+            if text:
+                # 판정자가 선택지 목록을 되받아쓰면 앞에서부터 찾을 때 첫 선택지를
+                # 집는다 — 폼 값만 읽도록 필드 기준으로 뽑는다 (llm_assist와 같은 규약).
+                return form_field(text, "final_stance",
+                                  ("correct", "wrong", "unresolved")) or ""
+        return ""
     return _judge
