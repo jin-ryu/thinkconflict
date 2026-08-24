@@ -9,7 +9,7 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 - **RQ3 (충돌 고유성):** 관측된 불일치(AIR)와 특이 경로는 충돌 고유 실패인가, 난이도·문서 수의 부수 효과인가? (충돌 vs 비충돌 대조군)
 - **RQ4 (인과 규명):** 사고 결론은 최종 답변을 인과적으로 구동하는가? (truncation·resampling 개입)
 
-정본 계획서: [`docs/plan/연구계획서_ThinkConflict.md`](docs/plan/연구계획서_ThinkConflict.md) · 레포 구축 계획: [`docs/thinkconflict_repo_plan.md`](docs/thinkconflict_repo_plan.md) · 사전등록 규약: [`docs/preregistration.md`](docs/preregistration.md)
+정본 계획서: [`docs/plan/연구계획서_ThinkConflict.md`](docs/plan/연구계획서_ThinkConflict.md) · 사전등록 규약: [`docs/preregistration.md`](docs/preregistration.md)
 
 ## 구조
 
