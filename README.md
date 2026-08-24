@@ -14,7 +14,7 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 ## 구조
 
 ```
-docs/            정본 계획서 · 구축 계획 · 사전등록 규약
+docs/            plan/ 정본 계획서·연구보고 PPT · admin/ 학사 양식 · preregistration.md 사전등록(수정·이동 금지)
 data/1_raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
 data/            raw / review / processed 세 단계, 각 단계 안에 데이터셋별 폴더
   raw/           원본 (git 미포함 — download.sh + checksums.lock으로 재현)
@@ -58,4 +58,5 @@ python -m analysis.aggregate                                        # 집계 →
 
 - 데이터셋은 **풀링하지 않고 분리 보고**, 유효 분모 **N < 20 셀은 비교 주장 금지**.
 - 라벨 규약·게이트 기준은 해당 데이터 생성 **전에** `docs/preregistration.md`로 커밋 (개정 시 이력 보존).
+- 일회성 작업 문서(인수인계 등)는 작업 종료 시 **삭제** — 기록은 git 히스토리로 남는다(`git log --diff-filter=D --summary -- docs/`). 실행 기록은 docs/가 아니라 `results/RUNLOG.md`.
 - 커밋은 한 줄, co-author 없음, 푸시는 명시 요청 시만.
