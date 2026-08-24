@@ -9,12 +9,12 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 - **RQ3 (충돌 고유성):** 관측된 불일치(AIR)와 특이 경로는 충돌 고유 실패인가, 난이도·문서 수의 부수 효과인가? (충돌 vs 비충돌 대조군)
 - **RQ4 (인과 규명):** 사고 결론은 최종 답변을 인과적으로 구동하는가? (truncation·resampling 개입)
 
-연구 계획: [`docs/paper/ThinkConflict_연구보고.md`](docs/paper/ThinkConflict_연구보고.md) · 실험 규약(사전등록): [`docs/experiments/실험계획_사전등록.md`](docs/experiments/실험계획_사전등록.md)
+연구 계획: [`docs/paper/ThinkConflict_연구보고.md`](docs/paper/ThinkConflict_연구보고.md) · 실험 규약(사전등록): [`docs/experiments/2026-07-10_실험계획_사전등록.md`](docs/experiments/2026-07-10_실험계획_사전등록.md)
 
 ## 구조
 
 ```
-docs/            experiments/ 실험계획(사전등록)·실험결과 페어 · paper/ 논문 관련(연구보고 md/PPT·학사 양식)
+docs/            experiments/ 날짜 접두어(YYYY-MM-DD_실험계획|실험결과_이름)로 페어링된 실험 타임라인 · paper/ 논문 관련(연구보고 md/PPT·학사 양식)
 data/1_raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
 data/            raw / review / processed 세 단계, 각 단계 안에 데이터셋별 폴더
   raw/           원본 (git 미포함 — download.sh + checksums.lock으로 재현)
@@ -57,6 +57,6 @@ python -m analysis.aggregate                                        # 집계 →
 ## 원칙 (요약)
 
 - 데이터셋은 **풀링하지 않고 분리 보고**, 유효 분모 **N < 20 셀은 비교 주장 금지**.
-- 라벨 규약·게이트 기준은 해당 데이터 생성 **전에** `docs/experiments/실험계획_사전등록.md`(사전등록)으로 커밋 (개정 시 이력 보존).
+- 라벨 규약·게이트 기준은 해당 데이터 생성 **전에** `docs/experiments/2026-07-10_실험계획_사전등록.md`(사전등록)으로 커밋 (개정 시 이력 보존).
 - 일회성 작업 문서(인수인계 등)는 작업 종료 시 **삭제** — 기록은 git 히스토리로 남는다(`git log --diff-filter=D --summary -- docs/`). 실행 기록은 docs/가 아니라 `results/RUNLOG.md`.
 - 커밋은 한 줄, co-author 없음, 푸시는 명시 요청 시만.
