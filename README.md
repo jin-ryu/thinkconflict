@@ -9,12 +9,12 @@ RAG 문서 간 충돌(inter-context conflict)에서 완화 기법이 올린 정�
 - **RQ3 (충돌 고유성):** 관측된 불일치(AIR)와 특이 경로는 충돌 고유 실패인가, 난이도·문서 수의 부수 효과인가? (충돌 vs 비충돌 대조군)
 - **RQ4 (인과 규명):** 사고 결론은 최종 답변을 인과적으로 구동하는가? (truncation·resampling 개입)
 
-정본 계획서: [`docs/plan/연구계획서_ThinkConflict.md`](docs/plan/연구계획서_ThinkConflict.md) · 사전등록 규약: [`docs/preregistration.md`](docs/preregistration.md)
+정본 계획서: [`docs/experiments/연구계획서_ThinkConflict.md`](docs/experiments/연구계획서_ThinkConflict.md) · 사전등록 규약: [`docs/preregistration.md`](docs/preregistration.md)
 
 ## 구조
 
 ```
-docs/            plan/ 정본 계획서·연구보고 PPT · admin/ 학사 양식 · preregistration.md 사전등록(수정·이동 금지)
+docs/            experiments/ 실험 계획(정본 계획서) · paper/ 논문 관련(연구보고 PPT·학사 양식) · pilot/ 파일럿 결과 정리 · preregistration.md 사전등록(수정·이동 금지)
 data/1_raw/        원본 데이터셋 (git 미포함 — download.sh로 재현)
 data/            raw / review / processed 세 단계, 각 단계 안에 데이터셋별 폴더
   raw/           원본 (git 미포함 — download.sh + checksums.lock으로 재현)
