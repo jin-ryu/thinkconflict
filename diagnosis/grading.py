@@ -66,6 +66,16 @@ def _as_date(s: str):
         return None
 
 
+def _contains_tokens(hay: str, needle: str) -> bool:
+    """정규화 문자열에서 **토큰 경계를 지키는** 포함 검사.
+
+    맨 substring 검사는 수치 접두를 오인한다 — 실측: gold "428"이 오답 "42,800"(정규화
+    "42800")의 부분 문자열이라 오답이 correct로 채점된다 (RAMDocs가 심은 428×100 혼동 오답,
+    충돌 실재성 검사가 발견). 정규화 결과는 단일 공백 구분이므로 공백 패딩으로 경계를 강제한다.
+    """
+    return f" {needle} " in f" {hay} "
+
+
 def equivalent(pred: str, gold: str) -> bool:
     """동치 판정 (문자열 EM 아님 — 사전등록 §1.4).
 
@@ -78,7 +88,7 @@ def equivalent(pred: str, gold: str) -> bool:
     p, g = normalize(pred), normalize(gold)
     if not p or not g:
         return False
-    if p == g or g in p:               # gold가 핵심만 담은 일반적 경우
+    if p == g or _contains_tokens(p, g):   # gold가 핵심만 담은 일반적 경우 (토큰 경계 준수)
         return True
     dp, dg = _as_date(pred), _as_date(gold)
     if dp and dg and dp == dg:
@@ -89,7 +99,7 @@ def equivalent(pred: str, gold: str) -> bool:
     if gnums and not gnums <= pnums:   # gold의 수치를 하나라도 놓치면 동치가 아니다
         return False
 
-    if p in g:                         # 모델 답이 서술형 gold의 연속 부분 = 답의 핵심
+    if _contains_tokens(g, p):         # 모델 답이 서술형 gold의 연속 부분 = 답의 핵심
         if gnums:
             return True                # 수치 앵커를 모두 담았음이 위에서 보장됨
         return len(ptok) >= 2 and set(ptok) <= set(gtok)

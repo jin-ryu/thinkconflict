@@ -3,7 +3,6 @@ qacc-0049,soft,,rule:equivalence
 qacc-0110,soft,,rule:equivalence
 qacc-0126,soft,,rule:equivalence
 qacc-0457,soft,,rule:equivalence
-qacc-0474,soft,,rule:equivalence
 qacc-0498,soft,,rule:equivalence
 qacc-0518,soft,,rule:equivalence
 qacc-0583,soft,,rule:equivalence
@@ -14,7 +13,6 @@ qacc-1003,soft,,rule:equivalence
 qacc-1148,soft,,rule:equivalence
 qacc-1381,soft,,rule:equivalence
 qacc-1453,soft,,rule:equivalence
-qacc-1470,soft,,rule:equivalence
 qacc-1504,soft,,rule:equivalence
 qacc-1511,soft,,rule:equivalence
 qacc-1585,soft,,rule:equivalence
@@ -332,3 +330,5 @@ qacc-1581,sharp,misinformation,mistralai/Mistral-Small-3.2-24B-Instruct-2506
 qacc-1588,sharp,misinformation,mistralai/Mistral-Small-3.2-24B-Instruct-2506
 qacc-1598,sharp,outdated,mistralai/Mistral-Small-3.2-24B-Instruct-2506
 qacc-1602,sharp,outdated,mistralai/Mistral-Small-3.2-24B-Instruct-2506
+qacc-0474,sharp,misinformation,mistralai/Mistral-Small-3.2-24B-Instruct-2506
+qacc-1470,sharp,misinformation,mistralai/Mistral-Small-3.2-24B-Instruct-2506

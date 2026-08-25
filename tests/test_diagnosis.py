@@ -817,3 +817,11 @@ def test_supported_answer_citation_check():
     assert _cited_in("population of 3559", doc)    # 수치 앵커
     assert not _cited_in("10,000 people", doc)     # 본문에 없음 → 무효
     assert _cited_in("", doc)                      # 결측은 검증 대상 아님
+
+
+def test_numeric_substring_is_not_equivalent():
+    """토큰 경계 없는 포함 검사는 수치 접두를 오인한다 — 실측: gold "428" vs 오답 "42,800"
+    (RAMDocs의 428×100 혼동 오답이 correct로 채점되던 버그, 충돌 실재성 검사가 발견)."""
+    assert grade("42,800", ["428"]) == "wrong"
+    assert grade("The population is 428.", ["428"]) == "correct"   # 경계 있는 포함은 유지
+    assert not equivalent("1,759", "759")
