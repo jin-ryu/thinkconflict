@@ -334,6 +334,8 @@ def main() -> None:
     ap.add_argument("--raw-dir", default="data/1_raw/dragged", type=Path)
     ap.add_argument("--review-dir", default="data/2_review/dragged", type=Path)
     ap.add_argument("--out-dir", default="data/3_processed", type=Path)
+    ap.add_argument("--defer-unresolved", action="store_true",
+                    help="검토 전용 exclusion_flag 문항을 최종본에서 제외(보류)하고 진행 — 실험계획서 §1.4")
     ap.add_argument("--allow-unresolved", action="store_true",
                     help="라벨 미확정인 채로 최종본 생성 (검토 전 테스트용 — 채점 표본 0건)")
     args = ap.parse_args()
@@ -375,7 +377,8 @@ def main() -> None:
                 f"확인·수정하고 build를 다시 실행한다.\n"
                 f"  (검토 없이 강행하려면 --allow-unresolved — 채점 표본이 0건이 된다)")
 
-        written = write_by_type(items, args.out_dir, "dragged")
+        written = write_by_type(items, args.out_dir, "dragged",
+                                defer_review_flags=args.defer_unresolved)
         print("입력:", ", ".join(p.name for p in used))
         print("유형별 파일:")
         for name, n in written:

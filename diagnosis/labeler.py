@@ -19,7 +19,7 @@ from typing import Callable, Protocol
 from diagnosis.grading import adopted_wrong_answer, grade
 from preprocessing.llm_assist import form_field
 from diagnosis.trace_parser import ParsedTrace
-from preprocessing.schema import Item
+from preprocessing.schema import Item, derive_wrong_answers
 
 # ── 규칙 기반 신호 ────────────────────────────────────────────────────────────
 
@@ -227,7 +227,7 @@ def label_generation(parsed: ParsedTrace, item: Item, doc_order: list[int],
         type_recognition=(recognize_type(thinking, item.conflict_type)
                           if l1_detected and item.conflict_type in TYPE_CUES else None),
         l2_flip_count=flips, l2_char_offset=offset, provenance=prov,
-        adopted_wrong=(adopted_wrong_answer(parsed.answer, item.wrong_answers)
+        adopted_wrong=(adopted_wrong_answer(parsed.answer, derive_wrong_answers(item))
                        if fa == "wrong" else None),
     )
 

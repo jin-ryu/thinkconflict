@@ -35,6 +35,13 @@ CONFLICT_TYPES = ("outdated", "misinformation", "conflicting_opinions",
                   "complementary", "no_conflict")
 CHUNK_LABELS = ("correct", "conflict", "noise", "unknown")
 
+# exclusion_flag 닫힌 목록 (실험계획서 §1.4). 목록 밖 값은 검증이 거부하고, 새 값은 개정 이력로만.
+# 최종 데이터셋(3_processed)에는 영구 판정만 남는다 — 검토 전용 값은 작업 대기 상태다.
+FINAL_EXCLUSION_FLAGS = ("no_valid_conflict_pair", "date_tie", "date_absent", "soft_conflict")
+REVIEW_EXCLUSION_FLAGS = ("pending_screen", "judge_disagreement", "no_match",
+                          "multi_match_needs_authority", "gold_not_in_candidates",
+                          "unresolved_chunk_labels")
+
 
 @dataclass
 class Chunk:
@@ -63,11 +70,8 @@ class Item:
     question: str
     conflict_type: str
     correct_answers: list[str]         # any-gold: 이 중 하나면 correct (사전등록 §1.5)
-    # 문서에 실린 '틀린 답'들. 채점(FA 라벨)에는 쓰이지 않는다 — 오답은 어차피 wrong이다.
-    # 용도는 부가 관측 하나뿐: 모델이 오정보 문서의 답을 그대로 삼켰는지(adopted_wrong_answer)와
-    # 엉뚱한 답을 지어냈는지를 가른다. 원본이 주는 데이터셋에서만 채워진다:
-    # RAMDocs(gold/wrong 내장) · QACC(다른 후보 답) · DRAGged는 원본에 없어 빈 리스트.
-    wrong_answers: list[str] = field(default_factory=list)
+    # 오답 목록은 스키마 필드가 아니다 (실험계획서 §1.2) — conflict 청크의 supported_answer와
+    # meta['wrong_answers'](RAMDocs 원본 주석)에서 derive_wrong_answers()로 파생한다.
     chunks: list[Chunk] = field(default_factory=list)
     exclusion_flag: str | None = None  # 예: "no_match", "date_tie" — 채점 제외 사유
     meta: dict = field(default_factory=dict)  # 원본 필드 보존 (source_row, mapping_provenance 등)
@@ -81,8 +85,25 @@ def item_to_dict(item: Item) -> dict:
 
 def item_from_dict(d: dict) -> Item:
     d = dict(d)
+    # 구버전 파일 호환: 폐지된 wrong_answers 필드는 meta로 옮겨 읽는다 (실험계획서 §1.2)
+    legacy_wrong = d.pop("wrong_answers", None)
     d["chunks"] = [Chunk(**c) for c in d.get("chunks", [])]
-    return Item(**d)
+    it = Item(**d)
+    if legacy_wrong:
+        it.meta.setdefault("wrong_answers", legacy_wrong)
+    return it
+
+
+def derive_wrong_answers(item: Item) -> list[str]:
+    """문서들이 주장한 틀린 답 — conflict 청크의 supported_answer + 원본 오답 주석(meta).
+
+    스키마 필드가 아니라 파생값이다 (실험계획서 §1.2): 채점에 쓰지 않고,
+    adopted_wrong 부가 관측과 판정자 이관 조건 계산에만 쓴다."""
+    wrongs = [c.supported_answer for c in item.chunks
+              if c.label == "conflict" and c.supported_answer]
+    wrongs += [w for w in item.meta.get("wrong_answers", []) if w]
+    seen: set[str] = set()
+    return [w for w in wrongs if not (w in seen or seen.add(w))]
 
 
 def write_jsonl(items: list[Item], path: str | Path) -> None:
@@ -115,6 +136,13 @@ def validate_item(item: Item) -> list[str]:
         errs.append(f"question_id '{item.question_id}' does not carry dataset prefix")
     if not item.chunks:
         errs.append("chunks is empty")
+    if item.exclusion_flag is not None:
+        if item.exclusion_flag in REVIEW_EXCLUSION_FLAGS:
+            errs.append(f"exclusion_flag '{item.exclusion_flag}'는 검토 전용 값 — "
+                        "최종 데이터셋 진입 금지 (실험계획서 §1.4)")
+        elif item.exclusion_flag not in FINAL_EXCLUSION_FLAGS:
+            errs.append(f"exclusion_flag '{item.exclusion_flag}'는 닫힌 목록에 없는 값 "
+                        "(실험계획서 §1.4 — 새 값은 개정 이력로만)")
     for c in item.chunks:
         if c.label not in CHUNK_LABELS:
             errs.append(f"chunk {c.doc_id}: label '{c.label}' not in {CHUNK_LABELS}")
@@ -206,14 +234,21 @@ def main() -> None:
         # 게이트는 충돌 문항에만 적용된다 — 비충돌 대조군은 정의상 충돌 문서가 없다
         conflict = [it for it in scorable if it.conflict_type in CONFLICT_CONDITIONS]
         gate = sum(1 for it in conflict if passes_valid_conflict_gate(it))
+        # 충돌 실재성 검사 (실험계획서 §1.4): conflict 문서의 주장 답이 골드와 동치면 충돌이 아니다
+        from diagnosis.grading import equivalent
+        sham = [(it.question_id, c.doc_id) for it in items for c in it.chunks
+                if c.label == "conflict" and c.supported_answer and it.correct_answers
+                and any(equivalent(c.supported_answer, g) for g in it.correct_answers)]
         msg = (f"{Path(path).name}: N={len(items)}  스키마 위반={n_err}  "
-               f"채점 가능={len(scorable)}")
+               f"채점 가능={len(scorable)}  실재성 위반={len(sham)}")
         if conflict:
             msg += f"  유효충돌게이트 {gate}/{len(conflict)} ({gate / len(conflict):.1%})"
         print(msg)
         for it in items:
             for e in validate_item(it):
                 print(f"  [{it.question_id}] {e}")
+        for qid, did in sham:
+            print(f"  [실재성] {qid} doc{did}: conflict 문서의 주장 답이 골드와 동치 — 라벨 재검 필요")
 
 
 if __name__ == "__main__":

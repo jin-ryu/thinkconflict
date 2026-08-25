@@ -118,9 +118,6 @@ def to_items(rows: list[dict], *,
                 date=_cell(r, "date") or None, url=_cell(r, "url") or None,
                 supported_answer=_cell(r, "supported_answer") or None,
             ))
-        # 문서에 실린 오답 = 문서별 지지 답 중 정답이 아닌 것 (원본 귀속 주석에서 파생)
-        wrong = sorted({(r.get("supported_answer") or "").strip()
-                        for r in entry["rows"]} - {"", answer})
         meta = {
             "n_docs": len(chunks),                                   # RQ3 공변량
             "doc_len_words": [len(c.text.split()) for c in chunks],  # RQ3 공변량
@@ -135,7 +132,6 @@ def to_items(rows: list[dict], *,
             question=head["question"],
             conflict_type=_cell(head, "conflict_type"),
             correct_answers=[answer] if answer else [],
-            wrong_answers=wrong,
             chunks=chunks,
             exclusion_flag=(_cell(head, "exclusion_flag") or None),
             meta=meta,
@@ -144,7 +140,7 @@ def to_items(rows: list[dict], *,
 
 
 def write_by_type(items: list[Item], out_dir: str | Path,
-                  dataset: str) -> list[tuple[str, int]]:
+                  dataset: str, *, defer_review_flags: bool = False) -> list[tuple[str, int]]:
     """**충돌 유형별로 파일을 나눠 쓴다** — 파일 하나가 곧 하나의 실험 조건이다.
 
     트랙 플래그를 아이템에 달고 다니는 대신, 분석이 필요한 파일만 골라 합친다:
@@ -153,7 +149,22 @@ def write_by_type(items: list[Item], out_dir: str | Path,
     의견 충돌은 정답이 없어 채점 파일에 섞이지 않는다 — 파일이 분리돼 있으므로
     실수로 채점 파이프라인에 넣을 수 없다.
     """
-    from preprocessing.schema import write_jsonl
+    from preprocessing.schema import REVIEW_EXCLUSION_FLAGS, write_jsonl
+    # 최종 데이터셋 게이트 (실험계획서 §1.4): 검토 전용 플래그(작업 대기)가 남은 문항은
+    # 3_processed에 들어갈 수 없다. 기본은 거부, --defer-unresolved면 보류(제외)하고 진행 —
+    # 보류 문항은 검토 CSV에 대기 상태로 남아 감사 가능하다.
+    pending = [it for it in items if it.exclusion_flag in REVIEW_EXCLUSION_FLAGS]
+    if pending:
+        if not defer_review_flags:
+            raise SystemExit(
+                f"검토 전용 exclusion_flag가 남은 문항 {len(pending)}건 — 최종 데이터셋에 넣을 수 없다 "
+                f"(실험계획서 §1.4). 해소하거나 --defer-unresolved로 보류(최종본 제외)할 것.\n"
+                f"  예: {[(it.question_id, it.exclusion_flag) for it in pending[:5]]}")
+        deferred = {}
+        for it in pending:
+            deferred[it.exclusion_flag] = deferred.get(it.exclusion_flag, 0) + 1
+        print(f"보류(최종본 제외) {len(pending)}건: {deferred} — 검토 CSV에 대기 상태로 남음")
+        items = [it for it in items if it.exclusion_flag not in REVIEW_EXCLUSION_FLAGS]
     out_dir = Path(out_dir) / dataset      # data/3_processed/<ds>/ — stage 안에서 데이터셋별 폴더
     by_type: dict[str, list[Item]] = {}
     for it in items:

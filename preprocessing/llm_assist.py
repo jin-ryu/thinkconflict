@@ -162,8 +162,23 @@ def run_dragged(client: OpenAI, model: str, rows: list[dict], only_flagged: bool
             continue
         r["label"] = label
         # noise 문서는 질문에 답하지 않으므로 supported_answer가 없다 (스키마 규약)
-        r["supported_answer"] = "" if label == "noise" else _asserted(raw)
+        sa = "" if label == "noise" else _asserted(raw)
+        # 인용 검증 (실험계획서 §1.3): LLM이 뽑은 '주장 답'은 정규화 후 문서 본문에 실재해야
+        # 유효하다 — 지어낸 값이 구조적으로 걸러진다. 미통과는 결측(빈칸)으로 남긴다.
+        r["supported_answer"] = sa if _cited_in(sa, r.get("text") or "") else ""
     return len(targets)
+
+
+def _cited_in(supported_answer: str, doc_text: str) -> bool:
+    """추출값이 문서 본문에 실재하는가 — 정규화 문자열 포함 또는 수치 앵커 전부 존재."""
+    if not supported_answer:
+        return True                      # 결측은 검증 대상이 아니다
+    from diagnosis.grading import _numbers, normalize
+    sa, tx = normalize(supported_answer), normalize(doc_text)
+    if sa and sa in tx:
+        return True
+    nums = _numbers(sa)
+    return bool(nums) and nums <= _numbers(tx)
 
 
 def _asserted(raw: str) -> str:
@@ -214,6 +229,28 @@ def run_qacc(client: OpenAI, model: str, rows: list[dict], judge_idx: int,
 
     mine = _read_judge(judge_dir / f"judge{judge_idx}.csv")
     other = _read_judge(judge_dir / f"judge{2 if judge_idx == 1 else 1}.csv")
+
+    # 규칙 선별 (실험계획서 §1.4): 후보 오답이 골드와 동치이면 사이비 충돌 — 판정자 없이
+    # soft 확정. 규칙 판정분은 결정적·재현 가능하고 판정자 호출량이 줄어든다.
+    from diagnosis.grading import equivalent
+    n_rule_soft = 0
+    for qid, rs in by_item.items():
+        head = rs[0]
+        gold = (head.get("correct_answer") or "").strip()
+        if not gold:
+            continue
+        wrongs = {(r.get("supported_answer") or "").strip() for r in rs} - {"", gold}
+        if any(equivalent(w, gold) for w in wrongs):
+            for r in rs:
+                if (r.get("exclusion_flag") or "").strip() == PENDING_SCREEN:
+                    r["exclusion_flag"] = SOFT_CONFLICT
+            if qid not in mine:
+                mine[qid] = {"question_id": qid, "verdict": "soft",
+                             "conflict_type": "", "model": "rule:equivalence"}
+                n_rule_soft += 1
+    if n_rule_soft:
+        print(f"규칙 선별 soft 확정: {n_rule_soft}문항 (후보 답이 골드와 동치 — 판정자 생략)")
+
     todo = [(qid, rs) for qid, rs in by_item.items() if qid not in mine]
 
     for qid, rs in tqdm(todo, desc=f"qacc/judge{judge_idx}/{model}", unit="item"):

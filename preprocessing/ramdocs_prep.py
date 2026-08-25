@@ -95,9 +95,9 @@ def build_b(rows: list[dict]) -> list[Item]:
             # 싸우는 것도 아니므로 no_conflict로 두고, 모호성 자체는 meta.n_gold에 남긴다.
             conflict_type=("misinformation" if misinfo else "no_conflict"),
             correct_answers=list(row.get("gold_answers", [])),
-            wrong_answers=list(row.get("wrong_answers", [])),
             chunks=(ch := to_chunks(row["documents"])),
             meta={**_common_meta(row, ch, i),
+                  "wrong_answers": list(row.get("wrong_answers", [])),
                   "n_gold": len(row.get("gold_answers", []))},
         ))
     return items
@@ -121,9 +121,9 @@ def build_a(rows: list[dict]) -> tuple[list[Item], dict]:
                 question=row["question"],
                 conflict_type=("misinformation" if misinfo else "no_conflict"),
                 correct_answers=[gold],
-                wrong_answers=list(row.get("wrong_answers", [])),
                 chunks=(ch := to_chunks(support + misinfo + noise)),
                 meta={**_common_meta(row, ch, i),
+                      "wrong_answers": list(row.get("wrong_answers", [])),
                       "gold_index": j, "variant": "full",
                       "original_gold_answers": golds,
                       "n_misinfo": len(misinfo), "n_noise": len(noise)},
@@ -155,14 +155,13 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
                 continue
             pair_id = f"ramdocs-{i:04d}-a{j}"
             common = {"dataset": "ramdocs_a", "question": row["question"],
-                      "correct_answers": [gold],
-                      "wrong_answers": list(row.get("wrong_answers", [])),
-                      }
+                      "correct_answers": [gold]}
+            wrong_meta = {"wrong_answers": list(row.get("wrong_answers", []))}
             # 충돌 변형: misinfo k개가 noise k개를 밀어낸다
             items.append(Item(
                 question_id=f"{pair_id}-conflict", conflict_type="misinformation",
                 chunks=(ch := to_chunks(support + misinfo[:k] + noise[k:])),
-                meta={**_common_meta(row, ch, i),
+                meta={**_common_meta(row, ch, i), **wrong_meta,
                       "gold_index": j, "variant": "conflict",
                       "pair_id": pair_id, "n_swapped": k,
                       "misinfo_dropped": len(misinfo) - k}, **common))
@@ -170,7 +169,7 @@ def build_pairs(rows: list[dict]) -> tuple[list[Item], dict]:
             items.append(Item(
                 question_id=f"{pair_id}-control", conflict_type="no_conflict",
                 chunks=(ch := to_chunks(support + noise)),
-                meta={**_common_meta(row, ch, i),
+                meta={**_common_meta(row, ch, i), **wrong_meta,
                       "gold_index": j, "variant": "control",
                       "pair_id": pair_id, "n_swapped": k}, **common))
             stats["pairs"] += 1

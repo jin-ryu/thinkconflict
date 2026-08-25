@@ -170,11 +170,12 @@ def build_items(rows: list[dict]) -> tuple[list[Item], Counter]:
             question=row["question"],
             conflict_type=conflict_type_of(row),
             correct_answers=[str(gold)] if gold_n else [],
-            wrong_answers=[str(row.get(f)) for f, _ in ANSWER_SLOTS
-                           if not is_nan(row.get(f)) and norm_answer(row.get(f)) != gold_n],
             chunks=chunks,
             exclusion_flag=flag,
             meta={"source_row": i, "split": row.get("split"),
+                  # 원본 후보 답 중 오답 — 스키마 필드가 아니라 meta 보존 (실험계획서 §1.2)
+                  "wrong_answers": [str(row.get(f)) for f, _ in ANSWER_SLOTS
+                                    if not is_nan(row.get(f)) and norm_answer(row.get(f)) != gold_n],
                   "reasons": as_list(row.get("reasons")),
                   "n_answers": 1 + sum(1 for f in ("secondAnswerExist", "thirdAnswerExist",
                                                    "fourthAnswerExist")
@@ -261,6 +262,8 @@ def main() -> None:
     ap.add_argument("--out-dir", default="data/3_processed", type=Path)
     ap.add_argument("--dragged-review-dir", default="data/2_review/dragged", type=Path)
     ap.add_argument("--csv", type=Path, help="build 입력 CSV (기본: qacc.llm.csv → qacc.draft.csv)")
+    ap.add_argument("--defer-unresolved", action="store_true",
+                    help="검토 전용 exclusion_flag 문항을 최종본에서 제외(보류)하고 진행 — 실험계획서 §1.4")
     ap.add_argument("--allow-unresolved", action="store_true",
                     help="게이트 ① 미완료 상태로 최종본 생성 (테스트용)")
     args = ap.parse_args()
@@ -299,7 +302,8 @@ def main() -> None:
                                             read_csv(draft_csv))
         if not items:
             raise SystemExit("게이트 ① 통과 문항이 없다 — sharp로 판정된 문항이 하나도 없다")
-        written = write_by_type(items, args.out_dir, "qacc")
+        written = write_by_type(items, args.out_dir, "qacc",
+                                defer_review_flags=args.defer_unresolved)
         print(f"입력: {src}")
         print(f"게이트 통과 N={len(items)} (채점 가능 {stats['scorable']}건)")
         print("유형별 파일:")

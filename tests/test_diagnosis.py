@@ -629,7 +629,8 @@ def test_wrong_answers_are_derived_from_supported_answers(tmp_path):
                       Chunk(2, "t3", "noise")])
     path = tmp_path / "x.csv"
     write_csv([it], path)
-    assert to_items(read_csv(path))[0].wrong_answers == ["B"]
+    from preprocessing.schema import derive_wrong_answers
+    assert derive_wrong_answers(to_items(read_csv(path))[0]) == ["B"]
 
 
 def test_qacc_gate_is_expressed_as_exclusion_flag(tmp_path):
@@ -780,3 +781,39 @@ def test_dragged_llm_form_parsing_is_field_anchored():
         assert TO_LABEL[form_field(raw, "label", tuple(TO_LABEL))] == "conflict"
         assert _asserted(raw) == "April 22, 2024"
     assert _asserted("label = irrelevant\nanswer = NONE") == ""
+
+
+# ── exclusion_flag 닫힌 목록·최종본 게이트 (실험계획서 §1.4) ────────────────
+
+def test_exclusion_flag_closed_enumeration(item):
+    from preprocessing.schema import validate_item
+    ok = Item("dragged-0009", "dragged", "q", "outdated", ["A"],
+              chunks=[Chunk(0, "t", "correct")], exclusion_flag="date_tie")
+    assert validate_item(ok) == []
+    review = Item("dragged-0010", "dragged", "q", "outdated", ["A"],
+                  chunks=[Chunk(0, "t", "correct")], exclusion_flag="pending_screen")
+    assert any("검토 전용" in e for e in validate_item(review))
+    unknown = Item("dragged-0011", "dragged", "q", "outdated", ["A"],
+                   chunks=[Chunk(0, "t", "correct")], exclusion_flag="made_up_reason")
+    assert any("닫힌 목록" in e for e in validate_item(unknown))
+
+
+def test_write_by_type_blocks_review_flags(tmp_path, item):
+    """검토 전용 플래그(작업 대기)는 최종 데이터셋에 못 들어간다 — 기본 거부, defer면 제외."""
+    from preprocessing.tabular import write_by_type
+    pending = Item("dragged-0012", "dragged", "q", "outdated", ["A"],
+                   chunks=[Chunk(0, "t", "correct")], exclusion_flag="judge_disagreement")
+    with pytest.raises(SystemExit):
+        write_by_type([item, pending], tmp_path, "dragged")
+    written = write_by_type([item, pending], tmp_path, "dragged", defer_review_flags=True)
+    assert written == [("dragged/dragged_outdated.jsonl", 1)]   # 보류 문항은 빠진다
+
+
+def test_supported_answer_citation_check():
+    """DRAGged LLM 추출값은 문서 본문에 실재해야 유효 — 지어낸 값은 결측 처리 (실험계획서 §1.3)."""
+    from preprocessing.llm_assist import _cited_in
+    doc = "The city has a total population of 3,559 people as of the census."
+    assert _cited_in("3,559 people", doc)          # 정규화 포함
+    assert _cited_in("population of 3559", doc)    # 수치 앵커
+    assert not _cited_in("10,000 people", doc)     # 본문에 없음 → 무효
+    assert _cited_in("", doc)                      # 결측은 검증 대상 아님
