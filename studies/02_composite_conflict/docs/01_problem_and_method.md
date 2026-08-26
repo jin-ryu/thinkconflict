@@ -9,7 +9,7 @@
 
 ## 초록 초안
 
-검색 증강 생성(RAG)은 여러 외부 문서를 동시에 사용하지만, 기존 conflict-aware RAG 연구는 대체로 한 instance에 하나의 충돌 유형이 존재한다고 가정하거나 동일한 해결 규칙을 반복 적용한다. 실제 retrieval set에서는 충돌 지점의 수뿐 아니라 충돌의 의미와 바람직한 대응도 달라질 수 있다. 본 연구는 한 instance의 독립적인 core conflict unit 수를 **conflict cardinality `K`**, 필요한 서로 다른 의미적 resolution operator 수를 **resolution heterogeneity `H`**로 정의한다. 이에 따라 `K>1`을 **다중 충돌**, `H>1`을 **복합 충돌**로 구분한다. 기존 MAGIC은 주로 `K` 증가를, DRAGged/CONFLICTS는 여러 유형 중 하나를, RAMDocs는 고정된 ambiguity·misinformation·noise 조합을 다루지만, 일반적인 `K×H` 공간에서 여러 conflict unit을 식별하고 서로 다른 해결 행동을 합성하는 문제는 충분히 평가되지 않았다. 이를 위해 본 연구는 학습 없이 atomic claim을 분해하고, conflict unit별 relation과 resolution operator를 산출한 뒤, 하나의 전역 resolution plan으로 합성하는 **Property-Conditioned Compositional Conflict Resolution(PCCR)** 파이프라인을 제안한다. ConfRAG·NatConfQA·QACC 등 자연 검색 문서를 공통 schema로 재주석해 `K/H` 분포를 먼저 검증하고, 같은 판정 완료 데이터를 재사용한 matched comparison으로 `H`의 독립 난이도 효과를 확인한다. 그 근거가 확보된 뒤 PCCR의 해결 정확도와 test-time cost를 평가한다.
+검색 증강 생성(RAG)은 여러 외부 문서를 동시에 사용하지만, 기존 conflict-aware RAG 연구는 대체로 한 instance에 하나의 충돌 유형이 존재한다고 가정하거나 동일한 해결 규칙을 반복 적용한다. 실제 retrieval set에서는 충돌 지점의 수뿐 아니라 충돌의 의미와 바람직한 대응도 달라질 수 있다. 본 연구는 한 instance의 독립적인 core conflict unit 수를 **conflict cardinality `K`**, 필요한 서로 다른 의미적 resolution operator 수를 **resolution heterogeneity `H`**로 정의한다. 이에 따라 `K>1`을 **다중 충돌**, `H>1`을 **복합 충돌**로 구분한다. 기존 MAGIC은 주로 `K` 증가를, DRAGged/CONFLICTS는 여러 유형 중 하나를, RAMDocs는 고정된 ambiguity·misinformation·noise 조합을 다루지만, 일반적인 `K×H` 공간에서 여러 conflict unit을 식별하고 서로 다른 해결 행동을 합성하는 문제는 충분히 평가되지 않았다. 이를 위해 본 연구는 학습 없이 atomic claim을 분해하고, conflict unit별 relation과 resolution operator를 산출한 뒤, 하나의 전역 resolution plan으로 합성하는 **Property-Conditioned Compositional Conflict Resolution(PCCR)** 파이프라인을 제안한다. ConfRAG·NatConfQA·QACC 등 자연 검색 문서를 공통 schema로 재주석해 `K/H` 분포를 먼저 검증하고, 검색 파일럿의 부정 결과를 반영해 후속 단계는 long-term personalized memory에서 query-level `K/H` composition의 현실성과 독립 난이도를 검증한다. 그 근거가 확보된 뒤에만 training-free 해결 파이프라인을 개발한다.
 
 초록에는 실험 완료 전까지 성능 수치와 우월성 표현을 넣지 않는다.
 
@@ -328,7 +328,7 @@ graph node는 claim/evidence group, edge는 relation, operator와 precedence를 
 
 ## 5.2 데이터셋 적합성 조사 결과
 
-완성된 단일 데이터셋이 `K×H`, natural retrieval, action gold를 모두 제공하지는 않는다. 따라서 역할이 다른 benchmark suite를 사용한다. **파일럿 단계의 데이터 선정과 실행 순서는 [파일럿 1](04_pilot1_prevalence_plan.md)과 [파일럿 2](05_pilot2_h_effect_plan.md)를 정본으로 하며, 아래 표의 ConflictBank·DRAGged·RAMDocs는 파일럿 통과 후 검토할 본실험 후보이다.**
+완성된 단일 데이터셋이 `K×H`, natural retrieval, action gold를 모두 제공하지는 않는다. 따라서 역할이 다른 benchmark suite를 사용한다. **검색 기반 데이터 선정은 [파일럿 1](04_pilot1_prevalence_plan.md)의 완료 결과로 종료했다. 후속 실행 순서는 [Compositional Memory Conflict 파일럿](05_pilot2_compositional_memory_plan.md)을 정본으로 하며, 아래 표는 검색 중심 초안의 후보 기록으로만 보존한다.**
 
 | 데이터셋 | 규모·성격 | `K` | `H` | 활용 결정 |
 |---|---|---:|---:|---|

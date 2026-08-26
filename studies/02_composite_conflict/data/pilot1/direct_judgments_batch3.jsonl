@@ -1,0 +1,20 @@
+{"instance_id":"confrag-1731","dataset":"confrag","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"medium","rationale":"미국 LGBT 비율 3.5–5%와 7.1%는 조사 연도·정의가 다른 시계열 추정치로 최신 기준을 정해야 한다."}
+{"instance_id":"confrag-435","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"잔혹형 금지의 일반 원칙과 교정시설·비례성 적용은 보완 관계다."}
+{"instance_id":"confrag-1476","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"보안·전자파 위험 가능성과 예방조치 시 안전하다는 주장은 조건부로 양립한다."}
+{"instance_id":"confrag-323","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"10월에 기여를 기념하는 집단은 복수일 수 있어 후보들이 상호 배타적이지 않다."}
+{"instance_id":"confrag-497","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"신념·경제환경·낙인 스트레스는 문화가 비만에 미치는 보완 경로다."}
+{"instance_id":"confrag-1382","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"법·교육·권력 형성·대화는 인종주의 완화의 병행 전략이다."}
+{"instance_id":"confrag-1602","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"주된 처형 방식으로는 폐기됐지만 일부 주에서 여전히 사용된다는 설명은 양립한다."}
+{"instance_id":"confrag-873","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"유럽의 마지막 로마군을 누가 언제 격파했는지에 대한 역사적 사실 후보가 직접 대립한다."}
+{"instance_id":"confrag-1805","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"대통령 투표가 선거인단을 결정한다는 동일 설명이다."}
+{"instance_id":"confrag-1973","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"관련 문서가 권한 여부를 답하지 못하는 불충분 사례이며 반대 주장은 없다."}
+{"instance_id":"confrag-86","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"최초 지역 노조·최초 전국 조직·최초 공인 전국 조직의 범위를 구분해야 한다."}
+{"instance_id":"confrag-1895","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"crony capitalism을 자본주의의 형태로 볼지 자본주의에 반하는 현상으로 볼지 개념·이념적 관점이 대립한다."}
+{"instance_id":"confrag-1771","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"new media의 시작은 디지털 기술·개인용 컴퓨팅·소셜미디어 중 어떤 정의를 쓰는지에 따라 달라진다."}
+{"instance_id":"confrag-1154","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"KCR/TRS와 학생·지식인 등 광범위한 참여자는 포함 관계다."}
+{"instance_id":"confrag-19","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"values가 규범 가치·정상 참고치·성과 지표 중 무엇을 뜻하는지 질문 의미를 조건화해야 한다."}
+{"instance_id":"confrag-649","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"미국 입국 자격이 있으면 별도 비자가 없고 그 외에는 비자가 필요하다는 동일 규칙이다."}
+{"instance_id":"confrag-18","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"찬반 논거를 요청한 질문에 서로 보완되는 양측 설명이다."}
+{"instance_id":"confrag-826","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"명료성 효용과 사용 찬반 논쟁의 존재는 양립한다."}
+{"instance_id":"confrag-1720","dataset":"confrag","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"DHS 합의 도달과 협상 교착은 문서 시점에 따라 이전 상태가 최신 상태로 갱신된다."}
+{"instance_id":"confrag-1785","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"쿠바 혁명 역할·상징 이미지·처형 행적은 Che Guevara에 관한 서로 다른 역사 측면이다."}

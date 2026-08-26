@@ -1,0 +1,10 @@
+{"instance_id":"qacc-0574","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Guyana의 첫 executive president는 Forbes Burnham으로 근거가 일치한다."}
+{"instance_id":"qacc-0376","dataset":"qacc","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"Arrow는 8시즌으로 종료됐다는 근거와 9시즌·새 episode가 나온다는 비공식 주장을 구분해 검증해야 한다."}
+{"instance_id":"qacc-1423","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"calculus의 독립 발명자는 Isaac Newton과 Gottfried Wilhelm Leibniz로 일치한다."}
+{"instance_id":"qacc-1394","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Princess Tilde 역은 Hanna Alström으로 일치한다."}
+{"instance_id":"qacc-1565","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Luther Vandross와 1982 cover를 부른 가수는 Cheryl Lynn으로 일치한다."}
+{"instance_id":"qacc-0134","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"The Bacchae 말미에 maenads에게 찢긴 인물은 Pentheus로 일치한다."}
+{"instance_id":"qacc-0965","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Virginia Declaration of Rights와 English Bill of Rights가 주요 두 선행 문서라는 근거가 일치한다."}
+{"instance_id":"qacc-0435","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"L.K. Advani의 My Country My Life와 Ehud Barak의 동명·유사 표기 책을 저자·판본으로 구분해야 한다."}
+{"instance_id":"qacc-0278","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"곡의 원작자·최초 가수는 Stuart Hamblen이며 다른 문서는 cover·앨범이다."}
+{"instance_id":"qacc-0850","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"Valhalla가 최신이던 문서가 Mirage 출시 전후 정보로 갱신되며 upcoming Nexus는 출시작과 구분된다."}

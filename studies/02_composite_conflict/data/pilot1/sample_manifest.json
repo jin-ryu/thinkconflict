@@ -1,0 +1,969 @@
+{
+  "manifest_version": "pilot1-sampling-v1",
+  "seed": 20260826,
+  "source_counts": {
+    "confrag_suggested": 1098,
+    "natconfqa_all": 855,
+    "natconfqa_conflict_wh": 89,
+    "natconfqa_strict_wh_mix": 22,
+    "qacc_factual": 138
+  },
+  "selection_counts": {
+    "calibration": 20,
+    "confrag_prevalence": 120,
+    "natconfqa_strict_wh_mix": 22,
+    "qacc_control": 60
+  },
+  "selections": [
+    {
+      "instance_id": "confrag-1557",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-1752",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-146",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-261",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-1000",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-530",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-1676",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-677",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-284",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-256",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-875",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-156",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "natconfqa-healthver_119_claims_3.4.1",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.78.1",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "natconfqa-healthver_2_claims_31.88.1",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.79.1",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "qacc-0573",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "qacc-1557",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "qacc-1151",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "qacc-0878",
+      "role": "calibration"
+    },
+    {
+      "instance_id": "confrag-666",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-428",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-171",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-806",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-467",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-369",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-556",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-121",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1499",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1822",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-874",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-480",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1732",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1872",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-487",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1037",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-229",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-909",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1993",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-964",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-406",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1099",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-451",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-564",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1120",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1332",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1975",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1854",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1751",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1415",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-664",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-983",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-640",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1610",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-633",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-918",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1708",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1563",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1352",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1810",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1731",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-435",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1476",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-323",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-497",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1382",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1602",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-873",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1805",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1973",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-86",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1895",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1771",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1154",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-19",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-649",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-18",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-826",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1720",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1785",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-634",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1155",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-87",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1570",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-957",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-494",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1010",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-437",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1937",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-655",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-241",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-602",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1172",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-228",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1754",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-876",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1700",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1105",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-543",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1647",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-110",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1399",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-481",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1938",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1325",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-60",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-979",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-401",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1355",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1537",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1965",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1304",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-305",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-705",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1858",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-924",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-895",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-389",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-646",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1195",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1066",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-734",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1650",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1094",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-404",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1691",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1381",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-85",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1629",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-541",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1934",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-703",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-846",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-907",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-49",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1607",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1032",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-570",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "confrag-1861",
+      "role": "confrag_prevalence"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.70.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.82.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.78.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.79.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.40.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.46.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.45.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-healthver_4_claims_12.89.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-healthver_2_claims_31.88.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.58.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.41.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.30.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.37.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.84.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.61.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.48.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.44.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-healthver_10_claims_16.87.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.62.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.69.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.38.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "natconfqa-climate-fever.43.1",
+      "role": "natconfqa_strict_wh_mix"
+    },
+    {
+      "instance_id": "qacc-1283",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0880",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0958",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0456",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0146",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0201",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0870",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0156",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0657",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0287",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1588",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1503",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0067",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0365",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1333",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1430",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1339",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1086",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0296",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0741",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0973",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1296",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1187",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0855",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0470",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1477",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0853",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0191",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0658",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0729",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0574",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0376",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1423",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1394",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1565",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0134",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0965",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0435",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0278",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0850",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1554",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1025",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1424",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0477",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0939",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1065",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1159",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1107",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1409",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1470",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0777",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1237",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0517",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0202",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1256",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1121",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1295",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0746",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-1377",
+      "role": "qacc_control"
+    },
+    {
+      "instance_id": "qacc-0781",
+      "role": "qacc_control"
+    }
+  ],
+  "notes": [
+    "Calibration is coverage-oriented and excluded from ConfRAG/QACC prevalence samples.",
+    "NatConfQA strict WH-mix means at least one conflicting and one non-conflicting answer pair.",
+    "Source conflict labels are omitted from all annotation views."
+  ],
+  "human_b_random_audit": {
+    "seed": 20260827,
+    "fraction": 0.2,
+    "calibration_ids_excluded": true,
+    "eligible_counts": {
+      "confrag": 120,
+      "natconfqa": 19,
+      "qacc": 60
+    },
+    "selected_counts": {
+      "confrag": 24,
+      "natconfqa": 4,
+      "qacc": 12
+    },
+    "instance_ids": [
+      "confrag-437",
+      "confrag-646",
+      "confrag-964",
+      "confrag-1172",
+      "confrag-1647",
+      "confrag-664",
+      "confrag-1771",
+      "confrag-666",
+      "confrag-957",
+      "confrag-60",
+      "confrag-1805",
+      "confrag-369",
+      "confrag-1895",
+      "confrag-1010",
+      "confrag-110",
+      "confrag-1610",
+      "confrag-564",
+      "confrag-983",
+      "confrag-451",
+      "confrag-467",
+      "confrag-541",
+      "confrag-1751",
+      "confrag-121",
+      "confrag-228",
+      "natconfqa-climate-fever.82.1",
+      "natconfqa-healthver_10_claims_16.87.1",
+      "natconfqa-climate-fever.58.1",
+      "natconfqa-climate-fever.44.1",
+      "qacc-1295",
+      "qacc-1565",
+      "qacc-1025",
+      "qacc-1377",
+      "qacc-1237",
+      "qacc-0853",
+      "qacc-0958",
+      "qacc-0741",
+      "qacc-1554",
+      "qacc-1470",
+      "qacc-0191",
+      "qacc-1086"
+    ]
+  }
+}

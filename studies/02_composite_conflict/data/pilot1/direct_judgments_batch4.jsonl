@@ -1,0 +1,20 @@
+{"instance_id":"confrag-634","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"주관적 증상 평가와 의학적 감별의 어려움은 물리검사 한계의 보완 설명이다."}
+{"instance_id":"confrag-1155","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"서방이 일반 동맹으로 Sunni를 지원하면서 특정 맥락에서 Shia와 협력하는 것은 양립한다."}
+{"instance_id":"confrag-87","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"공화당의 gerrymandering 총이익이 크다는 주장과 양당의 aggregate advantage가 없다는 경험적 주장이 대립한다."}
+{"instance_id":"confrag-1570","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"합법 porn 사이트 자체와 이를 사칭한 악성 사이트·제3자 광고를 구분해야 위험 주장이 양립한다."}
+{"instance_id":"confrag-957","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"죄책감의 문화적 원인과 행위가 의학적으로 안전하다는 설명은 양립한다."}
+{"instance_id":"confrag-494","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"herbal therapy가 보조 치료일 수 있지만 단독 완치는 아니라는 데 답들이 합의한다."}
+{"instance_id":"confrag-1010","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"통화정책 경직성·충격 전파·자원 비용은 금본위제 반대의 보완 근거다."}
+{"instance_id":"confrag-437","dataset":"confrag","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"medium","rationale":"세계 성인 HIV prevalence 수치가 조사 연도에 따라 달라지므로 최신 동일 연령 기준으로 갱신해야 한다."}
+{"instance_id":"confrag-1937","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"공룡의 시기·지역·다양화 계기는 서로 보완되며 인간 이전이라는 설명과도 양립한다."}
+{"instance_id":"confrag-655","dataset":"confrag","K":1,"H":1,"operators":["ABSTAIN_QUALIFY"],"confidence":"high","rationale":"인공감미료가 설탕보다 안전한지 더 위험한지 근거가 불확정적이므로 단일 우열 선택을 유보해야 한다."}
+{"instance_id":"confrag-241","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Eye of Providence에 대한 일관된 상징 설명만 있다."}
+{"instance_id":"confrag-602","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"설탕이 주원인은 아니라는 주장과 위험을 높이는 중요한 요인이라는 주장은 양립한다."}
+{"instance_id":"confrag-1172","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"관계 불만·개인 성향·기회는 외도의 병존 가능한 원인이다."}
+{"instance_id":"confrag-228","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Commonwealth·영국·뉴질랜드·Queensland·미국 등 관할별 최초 의회와 의장을 구분해야 한다."}
+{"instance_id":"confrag-1754","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"고대 중국 지배와 근대 프랑스 식민전쟁 중 imperial power의 시대·정의를 명시해야 한다."}
+{"instance_id":"confrag-876","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"생백신 위험·낮은 면역반응·백신이 면역계를 약화시키지 않는다는 주장은 서로 다른 효과다."}
+{"instance_id":"confrag-1700","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"의료용 대마 비범죄화의 정책 찬반과 입법 경로에 관한 규범적 입장 차이다."}
+{"instance_id":"confrag-1105","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"예술 표현·직접 선동 부재·장르 보편성은 기소하지 않는 이유의 보완 설명이다."}
+{"instance_id":"confrag-543","dataset":"confrag","K":1,"H":1,"operators":["ABSTAIN_QUALIFY"],"confidence":"high","rationale":"생명 기원의 primordial soup·panspermia·geysers 등 가설은 현재 근거로 하나를 확정하기 어렵다."}
+{"instance_id":"confrag-1647","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"점성술의 정치 예측 정확성에 관한 긍정·부정 주장을 경험적 검증으로 평가해야 한다."}

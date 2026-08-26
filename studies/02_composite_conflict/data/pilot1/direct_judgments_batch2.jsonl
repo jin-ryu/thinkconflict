@@ -1,0 +1,20 @@
+{"instance_id":"confrag-406","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"정부 붕괴 양상에 따른 통제 시나리오들이며 동일 사건에 대한 배타적 결과 주장이 아니다."}
+{"instance_id":"confrag-1099","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"인도 민족주의 운동의 서로 다른 단계와 변화 축을 보완적으로 설명한다."}
+{"instance_id":"confrag-451","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"예수·성육신·성경·가치 등 기독교 신앙의 서로 다른 구성 요소다."}
+{"instance_id":"confrag-564","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"수확량 증대·기아 완화·식량 자급은 같은 Green Revolution 목표의 수단과 결과다."}
+{"instance_id":"confrag-1120","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"가장 존경받는 래퍼는 평가 기준과 개인 선호에 따라 후보가 달라지는 주관적 판단이다."}
+{"instance_id":"confrag-1332","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"Horseshoe Theory의 설명력에 대한 정치학적 찬반 관점을 함께 제시해야 한다."}
+{"instance_id":"confrag-1975","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"정부 통제·재정·정치적 기반 등 폐지 동기의 보완 설명이다."}
+{"instance_id":"confrag-1854","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"HFCS가 다른 당과 유사한 위험인지 고유한 주원인인지에 관한 경험적 주장이 대립한다."}
+{"instance_id":"confrag-1751","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"유전·문화·해부·언어는 인간 지능 진화의 병존 가능한 요인이다."}
+{"instance_id":"confrag-1415","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"징병제 필요성·자유·공동책임에 대한 규범적 정책 판단이 대립한다."}
+{"instance_id":"confrag-664","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"적정량 MSG의 안전성과 독성 위험에 대한 동일 건강 사실 주장을 근거 수준으로 검증해야 한다."}
+{"instance_id":"confrag-983","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"개인별 선호 차이를 인정하는 긍정 답들은 양립하며 언급 부재 문서는 반대 근거가 아니다."}
+{"instance_id":"confrag-640","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"재귀성과 선천 구조·사회문화 고려는 Chomsky–Everett 논쟁의 보완적 쟁점이다."}
+{"instance_id":"confrag-1610","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"핵융합·양자컴퓨팅·의료영상은 helium-3의 서로 다른 응용이다."}
+{"instance_id":"confrag-633","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"임사체험의 생물학적 설명과 영적 해석은 증거 성격이 달라 불확실성을 표시해 병기해야 한다."}
+{"instance_id":"confrag-918","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"영국 축구 최고 역사는 우승·기간·시대 등 평가 기준에 따라 달라지는 가치 판단이다."}
+{"instance_id":"confrag-1708","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"참여 규모·불의 노출·활동 방해·정치 지지는 시위 효과의 보완 메커니즘이다."}
+{"instance_id":"confrag-1563","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"medium","rationale":"태평양 함대 무력화라는 일본의 전략 목적과 미국 참전을 의도했다는 주장이 역사적 의도 슬롯에서 대립한다."}
+{"instance_id":"confrag-1352","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"마리아의 영구 동정에 관한 가톨릭·정교회 전통과 성서 해석의 교리적 관점 차이다."}
+{"instance_id":"confrag-1810","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"효과가 있다는 주장과 다른 열량 제한식보다 우월하지 않다는 주장은 양립한다."}

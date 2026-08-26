@@ -1,0 +1,20 @@
+{"instance_id":"confrag-1195","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"증거 수집 시간과 불명확한 법적 기준은 FTC 조치 지연의 보완 설명이다."}
+{"instance_id":"confrag-1066","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"일본의 최악 환경문제는 평가 시기·피해 지표·지역에 따라 대기오염·기후·산업오염·산불로 달라진다."}
+{"instance_id":"confrag-734","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"가장 영향력 있는 가수는 영향력 기준과 평가자에 따라 달라지는 가치 판단이다."}
+{"instance_id":"confrag-1650","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Iraq 직접 예산·장기 간접비용·Iraq와 Afghanistan 합산액의 비용 범위를 구분해야 한다."}
+{"instance_id":"confrag-1094","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"변경 내용·Lucas의 목적·팬 반응은 서로 보완되는 설명이다."}
+{"instance_id":"confrag-404","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"FY2025 enacted/requested DoD 예산·총 budgetary resources·FY2026 proposal은 회계연도와 범위가 다르다."}
+{"instance_id":"confrag-1691","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"medium","rationale":"각 의회가 모든 proceedings를 공개할 법적 의무가 있는지에 대한 yes/no 주장을 헌법상 예외와 함께 검증해야 한다."}
+{"instance_id":"confrag-1381","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"연방제·지방자치·주별 기준은 경찰 조직 분산의 동일 원인 체계다."}
+{"instance_id":"confrag-85","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Act의 명문 정의 부재와 판례·Mitakshara상 ancestral/coparcenary property 용례를 법원천별로 구분해야 한다."}
+{"instance_id":"confrag-1629","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"위험 분담·비용 상쇄·경쟁력·고용 유지는 기업 보조금 요청의 보완 동기다."}
+{"instance_id":"confrag-541","dataset":"confrag","K":1,"H":1,"operators":["ABSTAIN_QUALIFY"],"confidence":"high","rationale":"WiFi 수면 근접의 안전·위험 연구가 충돌하고 문맥도 불확정적이므로 확신을 제한해야 한다."}
+{"instance_id":"confrag-1934","dataset":"confrag","K":1,"H":1,"operators":["ABSTAIN_QUALIFY"],"confidence":"high","rationale":"aura를 초자연적 실재·학습 능력·시각 현상으로 보는 주장은 과학적 근거가 부족해 단일 실재 주장으로 확정할 수 없다."}
+{"instance_id":"confrag-703","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"배우자 상대 일반 불법행위·정신적 손해·제3자 alienation of affection는 관할과 청구 원인에 따라 가능 여부가 달라진다."}
+{"instance_id":"confrag-846","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Espionage Act·공개 방식·법정 채널·제도 한계는 Snowden 보호 부재의 보완 설명이다."}
+{"instance_id":"confrag-907","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"성구의 권한 주체와 heaven–earth 방향에 관한 교단·번역별 신학 해석을 병기해야 한다."}
+{"instance_id":"confrag-49","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"권력 남용·공직자 강요·공적 권한 남용은 동일 기소의 혐의명과 행위 설명이다."}
+{"instance_id":"confrag-1607","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Jesuit 창설·선교·교육·문화 교류·Counter-Reformation 역할은 보완 정보다."}
+{"instance_id":"confrag-1032","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"두 답 모두 섬유·불포화지방이 많은 자연식품이 단순 low-fat 표시보다 낫다는 데 합의한다."}
+{"instance_id":"confrag-570","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"장기 내전의 다양한 행위자와 특정 시점의 주된 HTS 공세는 포함·시점 관계이며 직접 대립하지 않는다."}
+{"instance_id":"confrag-1861","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"인성·리더십 프로그램과 사회 변화 적응은 BSA 중요성의 보완 설명이다."}

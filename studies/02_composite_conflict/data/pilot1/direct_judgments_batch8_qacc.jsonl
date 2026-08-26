@@ -1,0 +1,10 @@
+{"instance_id":"qacc-1283","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Boss Baby soundtrack 가수는 Missi Hale로 문서가 일치한다."}
+{"instance_id":"qacc-0880","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"town 전체 최대 34와 household·lot당 4, VIP별 5–6을 범위로 구분해야 한다."}
+{"instance_id":"qacc-0958","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"최초 실험 텔레비전 중계 1939와 최초 coast-to-coast·national broadcast를 중계 범위로 구분해야 한다."}
+{"instance_id":"qacc-0456","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"1971 TV movie와 정규 CBS series의 1972-09-14 첫 방영을 구분해야 한다."}
+{"instance_id":"qacc-0146","dataset":"qacc","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"Cassie 사망 episode 날짜가 2005-05-24와 2005-03-24로 직접 대립한다."}
+{"instance_id":"qacc-0201","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Yom Kippur War에 대한 Arab oil embargo·생산 감소·가격 상승은 1973–74 위기의 보완 원인이다."}
+{"instance_id":"qacc-0870","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"2017 Laureus World Sportsman 수상자는 Usain Bolt로 관련 근거가 일치한다."}
+{"instance_id":"qacc-0156","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"146·180·184·185 수치는 조사일과 visa-free에 visa-on-arrival·territories를 포함하는지에 따라 달라진다."}
+{"instance_id":"qacc-0657","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"2018 Super Bowl LII가 과거 최신이었으나 Eagles가 2023 Super Bowl LVII에 출전해 최신값이 갱신됐다."}
+{"instance_id":"qacc-0287","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"2018 New York U.S. Open golf 우승자는 Brooks Koepka로 문서가 일치한다."}

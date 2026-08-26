@@ -1,5 +1,7 @@
 # 파일럿 1: 자연 검색 문서의 복합 충돌 존재·분포 검증 계획
 
+> **실행 상태: 완료.** 실제 실행은 시간 제약으로 독립 인간 주석 대신 Codex 직접 판정으로 축소되었다. 202건에서 strict `K>1,H>1`은 0건이었으며, 상세 결과와 계획 대비 변경은 [파일럿 1 결과](06_pilot1_result.md)를 따른다. 이 문서의 나머지 내용은 사전 계획으로 보존한다.
+
 > 작성일: 2026-08-26
 > 목적: 본 데이터셋 구축 전에 `K>1,H>1` 사례의 존재, 분석 가능성, 제한된 target distribution 내 분포를 검증한다.
 > 관련 본문: [복합 충돌 문제 정의·관련 연구·해결 방법](./01_problem_and_method.md)
@@ -66,23 +68,40 @@ operator-pair distribution
 
 | Relation | Core operator | 의미 |
 |---|---|---|
-| `COMPLEMENT` | `MERGE` | 양립하는 부분 정보를 결합 |
 | `TEMPORAL_UPDATE` | `SUPERSEDE` | 최신 정보로 대체 |
 | `SCOPE_CONDITIONED` | `CONDITION` | 시점·대상·범위를 명시해 조건화 |
 | `PERSPECTIVE_DISAGREEMENT` | `KEEP_BOTH` | 정당한 관점을 함께 보존 |
 | `CONTRADICT_FACT` | `VERIFY_PREFER` | 근거·출처를 검증해 우선 claim 선택 |
 | `UNRESOLVED` | `ABSTAIN_QUALIFY` | 판정 유보 또는 불확실성 표시 |
 
-동일 relation도 metadata와 evidence sufficiency에 따라 operator가 달라질 수 있으므로 relation label 수가 아니라 **확정 operator 종류 수**로 `H`를 계산한다.
+`COMPLEMENT`는 양립 불가능한 claim이 아니므로 strict pilot에서는 core conflict에서 제외하고 보조 evidence relation으로만 기록한다. 동일 relation도 metadata와 evidence sufficiency에 따라 operator가 달라질 수 있으므로 relation label 수가 아니라 **확정 operator 종류 수**로 `H`를 계산한다.
 
 ---
 
 # 3. 데이터셋 조사 결과와 활용 결정
 
+## 3.0 공식 논문·데이터 주소
+
+| 데이터셋 | 논문 | 공식 데이터·코드 | 파일럿 역할 |
+|---|---|---|---|
+| ConfRAG | [ACL 2026](https://aclanthology.org/2026.acl-long.11/) | [OracleY/ConfRAG (Hugging Face)](https://huggingface.co/datasets/OracleY/ConfRAG) — 저자가 공개한 데이터 위치이며 별도 공식 GitHub는 확인되지 않음 | 주 자연 원자료 |
+| NatConfQA | [UncertaiNLP 2025](https://aclanthology.org/2025.uncertainlp-main.13/) | [EN555/ContraQA](https://github.com/EN555/ContraQA) | `K`·answer-pair graph 구조 검증 |
+| QACC | [Findings of NAACL 2025](https://aclanthology.org/2025.findings-naacl.99/) | [amazon-science/qa-with-conflicting-context](https://github.com/amazon-science/qa-with-conflicting-context) | factual `H=1` 대조군 |
+| ConflictingQA | [ACL 2024](https://aclanthology.org/2024.acl-long.403/) | [AlexWan0/rag-convincingness](https://github.com/AlexWan0/rag-convincingness) | 희귀 operator 발견 표본 |
+
+파일럿에서 제외하거나 통과 후 검토할 자료의 주소는 다음과 같다.
+
+| 데이터셋 | 논문 | 데이터·코드 |
+|---|---|---|
+| DRAGged/CONFLICTS | [arXiv:2506.08500](https://arxiv.org/abs/2506.08500) | [google-research-datasets/rag_conflicts](https://github.com/google-research-datasets/rag_conflicts) |
+| RAMDocs | [arXiv:2504.13079](https://arxiv.org/abs/2504.13079) | [HanNight/RAMDocs](https://github.com/HanNight/RAMDocs) |
+| ConflictBank | [arXiv:2408.12076](https://arxiv.org/abs/2408.12076) | [zhaochen0110/conflictbank](https://github.com/zhaochen0110/conflictbank) |
+| MAGIC | [Findings of EMNLP 2025](https://aclanthology.org/2025.findings-emnlp.466/) | 공식 논문 페이지 참조 |
+
 ## 3.1 ConfRAG — 주 자연 원자료
 
 - ACL 2026 Long Paper
-- 1,814개 실제 질문, 평균 9.58개 web document
+- 전체 원본은 1,814개이며, 본 파일럿이 사용하는 권장판 `ConfRAGsuggested.jsonl`은 공개 revision에서 1,098개
 - 57.2%가 explicit contradiction
 - 질문마다 2~8개 answer cluster
 - full markdown webpage, 문서별 implied answer·reason·trust score 보존
@@ -97,7 +116,7 @@ operator-pair distribution
 - 269 conflicting instance, 408 non-conflicting instance
 - conflicting instance당 평균 5.6 passage, 평균 1.3 conflict pair
 - answer별 evidence link와 conflicting answer-pair gold
-- 62개 WH-mix instance에 conflicting/non-conflicting answer pair가 함께 존재
+- 공개 v1.0에서 conflict WH 문항은 89개이며, conflicting/non-conflicting answer pair가 실제로 함께 있는 strict WH-mix는 22개
 
 answer-pair graph가 있어 `K` 후보를 만들기 좋다. 그러나 fact-checking의 support/refute evidence에서 만들었고 resolution type은 주석되지 않았으므로, `H` 다양성보다 unit graph와 혼합 relation 검증에 사용한다.
 
@@ -136,7 +155,7 @@ answer-pair graph가 있어 `K` 후보를 만들기 좋다. 그러나 fact-check
 
 ## 4.2 NatConfQA 구조 표본
 
-- WH-mix 62개 전수 분석
+- 공개 v1.0 strict WH-mix 22개 전수 분석
 - 각 answer pair를 unit 후보로 변환
 - 같은 proposition의 여러 pair를 하나의 conflict unit으로 병합
 - conflict와 non-conflict relation이 섞인 상황에서 `K` 일치도 측정
@@ -212,22 +231,29 @@ AIR 연구의 스키마는 수정하지 않는다. 복합 충돌 연구는 독�
 6. full webpage가 필요한지 표시하고 최소 범위만 확인한다.
 7. unit·operator 확정 후 `K/H`를 자동 계산한다.
 
-## 5.3 주석 품질
+## 5.3 주석 품질 — LLM 초벌 + 인간 검토 + 독립 감사
 
-1. 20개 calibration set을 두 주석자가 독립 처리
-2. guideline v2 동결
-3. 전체 표본 이중 독립 주석
-4. reconciliation 후 남은 불일치는 제3 adjudicator 처리
-5. 원 annotation과 adjudicated gold 모두 보존
+비용과 재현성을 함께 확보하기 위해 다음 hybrid protocol을 사용한다.
+
+1. **Blind calibration:** 20개를 인간 A와 B가 LLM 초벌을 보지 않고 독립 처리한다.
+2. calibration에서 `H>1` kappa와 operator agreement를 확인하고 guideline v2를 동결한다.
+3. **LLM pre-annotation:** 동결된 schema로 전체 표본의 unit·relation·operator 후보와 근거 span을 생성한다. 모델·prompt·temperature·출력 원문을 보존한다.
+4. **Human A full verification:** A가 LLM 초벌을 전수 검토해 accept, edit, reject 중 하나로 확정한다. `K/H`는 확정 unit에서 자동 파생한다.
+5. **Human B blind audit:** B는 LLM과 A의 답을 보지 않고, 사전 고정한 데이터셋별 무작위 20%를 독립 주석한다. 희귀 `H>1`의 오류 분석을 위해 A가 판정한 `H>1` 전수를 추가 감사하되 무작위 IAA와 분리 보고한다.
+6. audit 불일치는 reconciliation 후 필요할 때 제3 adjudicator가 확정한다. LLM 원안, A 수정본, B 독립본, adjudicated gold를 모두 보존한다.
 
 측정 지표:
 
-- `H>1` Cohen's kappa
+- calibration 및 blind random audit의 `H>1` Cohen's kappa
 - `K/H` exact agreement와 weighted kappa
 - conflict-unit localization F1
 - matched unit의 relation/operator macro-F1
+- LLM draft의 unit/operator precision·recall, 인간 accept/edit/reject 비율
+- instance당 인간 검토 시간과 full manual annotation 대비 절감량
 
-진행 기준은 `H>1` kappa ≥ 0.70, operator macro-F1 ≥ 0.75다. 미달하면 데이터 규모를 늘리지 않고 taxonomy와 unit atomicity 지침을 먼저 수정한다.
+진행 기준은 calibration의 `H>1` kappa ≥ 0.70, operator macro-F1 ≥ 0.75다. 미달하면 LLM 초벌을 확대하지 않고 taxonomy와 unit atomicity 지침을 먼저 수정한다. blind random audit에서도 같은 기준을 목표로 하며, 미달하면 audit 비율을 늘리거나 전체 이중 주석으로 전환한다.
+
+인간 B 없이 **LLM 초벌 + 인간 A 한 명**만 사용하는 설계도 탐색적 파일럿에는 가능하다. 그러나 이 경우 human-human IAA를 보고할 수 없으므로 결과를 gold benchmark나 재현 가능한 새 taxonomy로 강하게 주장하지 않고, 후속 논문 단계에서 독립 인간 감사를 추가해야 한다.
 
 ---
 
@@ -270,17 +296,20 @@ NatConfQA에서는 unit graph 통계와 `K` 일치도를, QACC에서는 strict `
 ## 7.1 산출물
 
 - `data/pilot1/sample_manifest.json`
-- `data/pilot1/annotations_A.jsonl`
-- `data/pilot1/annotations_B.jsonl`
+- `data/pilot1/llm_drafts.jsonl`
+- `data/pilot1/human_A_verified.jsonl`
+- `data/pilot1/human_B_random_audit.jsonl`
+- `data/pilot1/human_B_h_gt1_audit.jsonl`
 - `data/pilot1/adjudicated.jsonl`
-- `data/pilot1/guideline.md`
+- `docs/annotation_guideline.md`
 - `results/pilot1/prevalence_summary.json`
 - `docs/06_pilot1_result.md`
 
 ## 7.2 예상 작업량
 
 - 데이터 확보·변환과 calibration: 1~2일
-- ConfRAG 120개·NatConfQA 62개·QACC 60개 이중 주석: cluster/reason 선검토 기준 3~6인일
+- 전체 표본 LLM 초벌 + 인간 A 전수 검토: 모델 비용과 검토 속도에 따라 2~4인일
+- 인간 B calibration 20개 + 무작위 20% blind audit + `H>1` 추가 감사: 1~3인일
 - reconciliation·adjudication: 1~2인일
 - 집계·오류 분석: 1일
 
@@ -294,7 +323,9 @@ LLM은 claim·span 후보를 미리 표시하는 보조 도구로만 사용한�
 - [ ] ConfRAG 대표 표본과 ConflictingQA 발견 표본을 분리한다.
 - [ ] 원 conflict label을 숨긴 annotation view를 만든다.
 - [ ] 20개 calibration에서 unit atomicity와 operator 경계를 합의한다.
-- [ ] 두 주석자가 독립 주석하고 agreement를 계산한다.
+- [ ] calibration 20개는 인간 A/B가 LLM 없이 독립 주석하고 agreement를 계산한다.
+- [ ] guideline 동결 후 LLM 초벌과 인간 A 전수 검토를 수행한다.
+- [ ] 인간 B가 사전 고정 random 20%를 blind audit하고, `H>1` 추가 감사는 별도로 보고한다.
 - [ ] ConfRAG 대표 표본에서만 feasibility 비율을 계산한다.
 - [ ] 일반 prevalence를 주장하려면 unfiltered `Fresh-Retrieval`을 추가한다.
 - [ ] 사전 기준에 따라 본 구축·범위 축소·중단 중 하나를 기록한다.

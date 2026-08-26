@@ -1,0 +1,10 @@
+{"instance_id":"qacc-0777","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Australian one-dollar coin 1984·decimal coins 1966·colonial holey dollar 1814를 coin 종류와 통화체계로 구분해야 한다."}
+{"instance_id":"qacc-1237","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"India national parks 수가 2021년 104개에서 2023년 106개로 갱신됐다."}
+{"instance_id":"qacc-0517","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Gods and Generals의 Stonewall Jackson 역은 Stephen Lang으로 일치하며 Russell Crowe는 초기 후보였다."}
+{"instance_id":"qacc-0202","dataset":"qacc","K":1,"H":1,"operators":["ABSTAIN_QUALIFY"],"confidence":"high","rationale":"Mona Lisa 완성 시점은 1506·1516·1519 및 미완성설이 있어 현재 문맥만으로 단일 완료일을 확정하기 어렵다."}
+{"instance_id":"qacc-1256","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"GDP·IGR 기준 Nigeria 최고 부유 주는 Lagos로 근거가 일치한다."}
+{"instance_id":"qacc-1121","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Narora·Kakrapar·Tarapur는 원자력 발전소로 atomic/nuclear energy를 생산한다."}
+{"instance_id":"qacc-1295","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"미국 최대 운영 광산·최대 매장층·과거 북미 최대·캐나다의 세계 최대를 국가·운영 상태·측정 지표로 구분해야 한다."}
+{"instance_id":"qacc-0746","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"road transport industry 창립자의 이름을 snippet이 생략해 충분하지 않지만 서로 다른 후보 claim은 없다."}
+{"instance_id":"qacc-1377","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"1987 Masters of the Universe의 Skeletor 역은 Frank Langella로 일치한다."}
+{"instance_id":"qacc-0781","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"medium","rationale":"Season 8의 2023-01-17 premiere 정보와 이후 Season 9 예정 정보가 query 시점에 따라 new season 값을 갱신한다."}

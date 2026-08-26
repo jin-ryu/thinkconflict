@@ -31,3 +31,5 @@ studies/*/results/**/raw/
 studies/*/results/**/generations/
 *.log
 literature/papers/
+studies/02_composite_conflict/data/raw/
+studies/02_composite_conflict/data/pilot1/*_view.jsonl

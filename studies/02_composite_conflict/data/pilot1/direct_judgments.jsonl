@@ -1,0 +1,20 @@
+{"instance_id":"confrag-666","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"비만 촉진과 보호 효과는 미생물 구성·대사 조건에 따라 달라지는 동일 효과 방향 충돌이다."}
+{"instance_id":"confrag-428","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"low","rationale":"이혼 법원의 성별 편향 방향에 관한 경험적·관점적 주장이 대립하지만 관할과 사례 차이가 크다."}
+{"instance_id":"confrag-171","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"유전·생화학·환경 요인을 결합한 단일 보완 설명뿐이다."}
+{"instance_id":"confrag-806","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"치료·가족 지원·의사소통·전문가 도움은 함께 적용 가능한 조언이다."}
+{"instance_id":"confrag-467","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"공직 윤리와 Public Trust Doctrine은 서로 다른 법적 맥락의 예시이지 양립 불가능한 정의가 아니다."}
+{"instance_id":"confrag-369","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"신 존재에 대한 철학·신앙적 입장은 단일 사실 선택보다 정당한 관점 보존이 필요하다."}
+{"instance_id":"confrag-556","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"Airfone 통화와 저고도 일부 휴대전화 통화는 동시에 발생할 수 있다."}
+{"instance_id":"confrag-121","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"켄터키 최초 학교 총격의 시기·장소 후보가 동일 슬롯에서 직접 대립한다."}
+{"instance_id":"confrag-1499","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"시간 단위의 물리적 표준과 달력·진법 표기 체계를 구분해야 상반된 설명이 해소된다."}
+{"instance_id":"confrag-1822","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"달의 여신 이름은 그리스·로마·마야 신화라는 문화 범위를 명시해야 한다."}
+{"instance_id":"confrag-874","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"설탕의 직접 원인 부정과 체중 증가를 통한 위험 상승은 양립한다."}
+{"instance_id":"confrag-480","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Manifest Destiny에 대한 단일 설명만 존재한다."}
+{"instance_id":"confrag-1732","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"피자 자체의 법적 정의와 학교급식에서 토마토소스를 채소 제공량으로 인정하는 규칙을 구분해야 한다."}
+{"instance_id":"confrag-1872","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"raw/cooked의 영양 보존 우열은 식품·영양소·조리법별로 조건화해야 한다."}
+{"instance_id":"confrag-487","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"두 손가락 제스처의 방향·문화·의미가 달라 서로 다른 기원을 갖는다."}
+{"instance_id":"confrag-1037","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"유가 수입·예산 배분·우선순위는 러시아 현대화 재원의 보완 설명이다."}
+{"instance_id":"confrag-229","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"비용·복잡성·정치적 반대 등 복수 원인이 결합된 답이다."}
+{"instance_id":"confrag-909","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"운명에 관한 개인적·심리학적 관점은 하나의 사실값으로 축약하기 어렵다."}
+{"instance_id":"confrag-1993","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"1959년 봉기 진압과 중국의 침공·점령은 망명 원인의 보완적 역사 설명이다."}
+{"instance_id":"confrag-964","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"원자 개념 제안·현대 원자론·원자 내부 발견을 discovery의 정의와 시기로 구분해야 한다."}

@@ -1,0 +1,20 @@
+{"instance_id":"confrag-110","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"상업화 비판과 음악을 통한 집단 표현은 병존 가능한 해석이며 곡의 품질 평가는 질문과 다르다."}
+{"instance_id":"confrag-1399","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"배울 최적의 영어 억양은 학습 목적·사용 지역·개인 선호에 따른 가치 판단이다."}
+{"instance_id":"confrag-481","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"정당 규칙 아래 primary·caucus·district·state 절차로 대의원을 선발한다는 포함 관계다."}
+{"instance_id":"confrag-1938","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"현재 완공된 최고층 Burj Khalifa와 미래 완공 예상 Jeddah Tower를 상태·시점으로 구분해야 한다."}
+{"instance_id":"confrag-1325","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"영아 사후 운명과 원죄에 대한 교파·성서 해석이 달라 단일 사실로 확정할 수 없다."}
+{"instance_id":"confrag-60","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"27개 주가 일부라도 북쪽이고 13개 주가 전역이 북쪽이라는 서로 다른 기준의 수치다."}
+{"instance_id":"confrag-979","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"기후·토양·관개·인프라·경제성은 캘리포니아 농업의 보완 설명이다."}
+{"instance_id":"confrag-401","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"인터넷 망중립성 질문에서 부동산 데이터의 동명 용례는 무관 문서이지 반대 claim이 아니다."}
+{"instance_id":"confrag-1355","dataset":"confrag","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"visa 보유 자체와 EAD 자격을 주는 별도 immigration status·신청 범주를 구분해야 한다."}
+{"instance_id":"confrag-1537","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"국제 승인·영토·국가성 요건은 신생 국가 설립 장벽의 보완 설명이다."}
+{"instance_id":"confrag-1965","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"AI의 독립적 도덕 판단 능력 부재라는 단일 주장만 있다."}
+{"instance_id":"confrag-1304","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"high","rationale":"예수 없이 가능한 세속적 영성과 예수 중심 기독교 영성은 신념 체계의 관점 차이다."}
+{"instance_id":"confrag-1","dataset":"confrag","K":1,"H":1,"operators":["KEEP_BOTH"],"confidence":"medium","rationale":"창조론 내부에서도 홍수 배수 위치·메커니즘에 서로 다른 비검증적 해석이 존재한다."}
+{"instance_id":"confrag-305","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"9·11 리더십·선거 전략·상대 약점·2000년 판결은 두 차례 당선의 서로 다른 기여 요인이다."}
+{"instance_id":"confrag-705","dataset":"confrag","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"Maratha guerrilla tactics가 자생했는지 Malik Ambar·Deccan 군대에서 차용했는지 역사적 기원 주장이 대립한다."}
+{"instance_id":"confrag-1858","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"실종 사례는 있으나 납치의 증거는 없고 자연현상·인적 오류로 설명된다는 데 합의한다."}
+{"instance_id":"confrag-924","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"역사적 원인과 최근 증가 증거를 보완적으로 제시한다."}
+{"instance_id":"confrag-895","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"California duty-day tax와 연방·주 세금 결합은 198.8% 계산의 병존 가능한 구성 요소다."}
+{"instance_id":"confrag-389","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"문화 상징이 운명 인식과 집단 행동에 영향을 준다는 단일 주장이다."}
+{"instance_id":"confrag-646","dataset":"confrag","K":0,"H":0,"operators":[],"confidence":"high","rationale":"일반인의 만성질환 예방 효과는 낮지만 결핍 등 특정 집단에는 유익할 수 있다는 조건부 합의다."}

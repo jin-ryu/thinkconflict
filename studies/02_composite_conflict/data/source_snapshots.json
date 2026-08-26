@@ -1,0 +1,26 @@
+{
+  "snapshot_version": "pilot1-sources-v1",
+  "sources": {
+    "confrag": {
+      "url": "https://huggingface.co/datasets/OracleY/ConfRAG",
+      "revision": "529e760a78a58791d0387fe469e0732377a6d94d",
+      "file": "ConfRAGsuggested.jsonl",
+      "sha256": "bfe5fdc8e1e56300e36e7477626e118ba489469d971d9fc3f815ffd3e243bdcf",
+      "records": 1098,
+      "license": "CC BY 4.0"
+    },
+    "natconfqa": {
+      "url": "https://github.com/EN555/ContraQA",
+      "revision": "71864ed8d3913b879e9032755458cd411084c6b5",
+      "file": "data/v1.0/ContraQA.json",
+      "sha256": "49829eae8af04be047bbad8fbfa3ad2dbb3bde026ef3d26c6c0768bf82b7ae60",
+      "records": 855,
+      "license": "repository contains no explicit license file; verify before redistribution"
+    },
+    "qacc": {
+      "source": "studies/01_air_trace/data/3_processed/qacc",
+      "records": 138,
+      "license": "CC BY-SA 3.0; see AIR raw licenses"
+    }
+  }
+}

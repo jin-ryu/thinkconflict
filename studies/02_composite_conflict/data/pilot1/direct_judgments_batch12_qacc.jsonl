@@ -1,0 +1,10 @@
+{"instance_id":"qacc-1554","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"From Dusk till Dawn: The Series는 3시즌 30화로 일치한다."}
+{"instance_id":"qacc-1025","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"현재 수상자·최초 수상자·최다 반복 수상 기록을 구분해야 하며 반복 수상자는 공동 기록일 수 있다."}
+{"instance_id":"qacc-1424","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Holden V8 Supercar 엔진은 규정 세대·차종에 따라 5.0L에서 5.4/5.7L로 달라진다."}
+{"instance_id":"qacc-0477","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"snippet은 Janis Joplin과 Michael McClure의 기여를 암시하지만 상반된 단독 작곡자 후보를 충분히 제시하지 않는다."}
+{"instance_id":"qacc-0939","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Elvis와 Michael Jackson 판매량 비교는 albums·records·physical·RIAA certified·claimed worldwide sales 지표에 따라 달라진다."}
+{"instance_id":"qacc-1065","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"방광은 비었을 때 lesser pelvis에 있고 차면 abdomen으로 확장되며 아동 위치도 다르다는 해부 설명이 양립한다."}
+{"instance_id":"qacc-1159","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"11대 캐나다 총리는 R. B. Bennett로 보이며 반대 후보 근거가 없다."}
+{"instance_id":"qacc-1107","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"Pisa Tower 기울기는 보강 전 1990년 5.5도에서 현재 약 3.97–3.99도로 감소했다."}
+{"instance_id":"qacc-1409","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Rock and Roll All Nite의 가수는 KISS로 일치한다."}
+{"instance_id":"qacc-1470","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"최소 UDP payload 0 bytes·UDP datagram/header 8 bytes·IPv4/IPv6 packet 28/48 bytes를 프로토콜 계층으로 구분해야 한다."}

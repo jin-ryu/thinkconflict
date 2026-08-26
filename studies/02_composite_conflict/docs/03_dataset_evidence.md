@@ -12,7 +12,7 @@
 
 1. **여러 요인의 동시 존재:** RAMDocs의 ambiguity + misinformation + noise
 2. **모순 위치의 개수 증가:** MAGIC의 1~4 conflict locations
-3. **복수 답·관점 cluster:** QACC·ConfRAG·GroupQA
+3. **복수 답·관점 cluster 및 pair graph:** QACC·NatConfQA·ConfRAG·GroupQA
 4. **여러 conflict type 중 하나를 instance에 부여:** CONFLICTS/DRAGged
 5. **implicit reasoning이 필요한 모순:** Ragability
 
@@ -232,7 +232,35 @@ QACC는 **자연 발생 필요성**과 factual adjudication을 보여주는 핵�
 - 기존 단일 label을 claim-pair multi-label로 재주석해 mixed-type co-occurrence를 확인하는 후보
 - 단, misinformation 표본이 5개뿐이므로 misinformation 성능의 주 benchmark로는 부적합
 
-## 2.5 ConfRAG
+## 2.5 NatConfQA / Consensus or Conflict?
+
+- 논문: [Consensus or Conflict? Fine-Grained Evaluation of Conflicting Answers in Question-Answering](https://aclanthology.org/2025.uncertainlp-main.13/)
+- 등재: UncertaiNLP 2025
+- 데이터·코드: [EN555/ContraQA](https://github.com/EN555/ContraQA)
+- 공개 v1.0: 855개 문항; Conflict 269, Support 408, Neutral 178
+- 다중 충돌의 의미: 한 질문의 복수 answer와 모든 answer pair에 대한 conflict graph
+
+### 논문이 정의한 문제
+
+NatConfQA는 multi-answer QA에서 여러 답을 모두 생성하는 것만으로 충분하지 않고, **어떤 answer pair가 서로 충돌하는지**까지 식별해야 한다고 정의한다. fact-checking 자료의 support·refute evidence를 이용해 자연 문장과 근거를 구성하고, 각 답을 evidence에 연결하며 `conflicting_answer_pairs`를 제공한다. 따라서 문서나 답의 개수를 곧바로 충돌 수로 간주하지 않고, pair graph를 통해 실제 양립 불가능 관계를 분리할 수 있다.
+
+공개 v1.0을 재집계하면 conflict WH 문항은 89개다. 그중 적어도 하나의 conflicting pair와 하나의 non-conflicting pair가 함께 있는 strict WH-mix는 22개다. 이 22개는 한 instance 안에서 모든 answer pair가 같은 관계라고 가정할 수 없음을 직접 보여준다. 다만 이것은 공개 파일에 대한 본 연구의 파생 조건이며, 일반 web prevalence 수치가 아니다.
+
+### 왜 해결해야 하는가
+
+원 논문은 강한 LLM도 conflict 존재 여부, 전체 답 coverage, 특정 conflict pair 식별을 동시에 안정적으로 수행하지 못하며, 모델이 일부 답을 누락하거나 모든 답을 서로 충돌한다고 과잉 일반화할 수 있음을 보인다. 이는 복수 answer를 단순 나열하는 것과 unit별 관계를 정확히 구조화하는 것이 다른 과제라는 근거다.
+
+### 우리와의 관계와 한계
+
+NatConfQA의 answer-pair graph는 `K` 후보와 unit 병합 규칙을 검증하기에 가장 직접적이다. 특히 같은 proposition을 공유하는 여러 pair를 한 conflict unit으로 병합해야 하므로 문서 수·pair 수·`K`가 다르다는 점을 시험할 수 있다.
+
+그러나 원 gold는 주로 factual support/refute 관계이며 `SUPERSEDE`, `CONDITION`, `KEEP_BOTH` 같은 resolution operator를 제공하지 않는다. 따라서 NatConfQA만으로 `H>1` prevalence를 주장하지 않고 다음 역할로 제한한다.
+
+- answer-pair graph에서 atomic conflict unit과 `K`를 파생하는 구조 검증
+- conflicting/non-conflicting pair가 섞인 strict WH-mix의 과분해 방지
+- ConfRAG에서 만든 넓은 operator taxonomy가 factual graph에 무리하게 적용되지 않는지 보는 보조 자료
+
+## 2.6 ConfRAG
 
 - 논문: [Benchmarking LLM’s Capability in Reasoning over Conflicting Web References](https://aclanthology.org/2026.acl-long.11/)
 - 등재: ACL 2026 Main, Long
@@ -260,7 +288,7 @@ ConfRAG은 여러 answer·reason cluster를 보존하는 능력을 평가하기�
 - cluster 수 증가에 따른 compositional degradation
 - long-form answer에서 evidence attribution과 reason coverage
 
-## 2.6 GroupQA
+## 2.7 GroupQA
 
 - 논문: [Rational Synthesizers or Heuristic Followers?](https://aclanthology.org/2026.findings-acl.2003/)
 - 등재: Findings of ACL 2026
@@ -283,7 +311,7 @@ ConfRAG은 여러 answer·reason cluster를 보존하는 능력을 평가하기�
 - evidence order와 repetition bias
 - 동일 정보의 반복과 독립 근거를 구분하는 counterfactual test
 
-## 2.7 Ragability
+## 2.8 Ragability
 
 - 논문: [Ragability Benchmark](https://aclanthology.org/2026.lrec-1.182/)
 - 등재: LREC 2026
@@ -293,7 +321,7 @@ ConfRAG은 여러 answer·reason cluster를 보존하는 능력을 평가하기�
 
 주요 활용은 implicit-relation detector와 no-conflict gate 검증이며, 복수 action composition의 주 데이터셋으로는 적합하지 않다.
 
-## 2.8 ContraPRT / Cross-Validated Re-ranking
+## 2.9 ContraPRT / Cross-Validated Re-ranking
 
 - 논문: [Eliminating Retrieval Knowledge Conflicts: Cross-Validated Re-ranking with Large Language Models](https://doi.org/10.1109/IJCNN64981.2025.11228012)
 - 등재: IJCNN 2025
@@ -327,7 +355,7 @@ DRAGged의 type은 주로 **충돌 원인과 기대 출력 행동**이다.
 - `K`와 type/aspect 수를 분리하는 참고 benchmark
 - 우리 taxonomy가 원인·표현 형식·해결 action을 혼합하지 않도록 하는 경고 사례
 
-## 2.9 DRUID와 CONFACT: 간접적인 현실성 근거
+## 2.10 DRUID와 CONFACT: 간접적인 현실성 근거
 
 ### DRUID
 
@@ -359,6 +387,7 @@ RAMDocs와 ContraPRT는 복수 요인·복수 type의 **직접 가능성**을, D
 |---|:---:|:---:|---|:---:|:---:|---|
 | RAMDocs | 일부 검색 + synthetic misinfo | X | ambiguity+misinfo+noise 동시 | O | 문서 type에서 일부 파생 | **주 controlled benchmark** |
 | QACC | O | **O: 약 25%** | 평균 2.47 answer candidates | 일부 | X | **주 real-world factual validation** |
+| NatConfQA | fact-checking 기반 자연 evidence | X, conflict-enriched | answer-pair conflict graph; strict WH-mix 22 | 주로 factual select | pair-level conflict gold | **K·unit graph 구조 검증** |
 | CONFLICTS/DRAGged | O | X, conflict-enriched sampling | instance-level 단일 type | **O** | type별 behavior | **다양한 action과 재주석 후보** |
 | ConfRAG | O | X, controversy-filtered | 2~8 answer/reason clusters | 관점 보존 중심 | cluster gold | external multi-view test |
 | MAGIC | KG 기반 synthetic text | X | 1~4 locations, single/multi-hop | X | conflict spans | detector/localizer stress test |
@@ -370,17 +399,16 @@ RAMDocs와 ContraPRT는 복수 요인·복수 type의 **직접 가능성**을, D
 
 ### 2026년 10월 ARR을 고려한 현실적 구성
 
-필수 세트:
+파일럿 1 필수 세트:
 
-1. **RAMDocs:** 이미 mixed-factor resolution과 MADAM-RAG baseline이 있어 직접 비교 가능
-2. **QACC:** 충돌의 자연 발생성과 factual adjudication을 뒷받침
-3. **CONFLICTS/DRAGged:** temporal·opinion·complementary 등 action 다양성을 확보
+1. **ConfRAG:** 자연 web에서 `K/H` 재주석과 제한된 conflict-rich prevalence
+2. **NatConfQA:** answer-pair graph를 이용한 `K`·unit 병합 규칙 검증
+3. **QACC:** factual conflict가 주로 `H=1`로 수렴하는지 보는 대조군
 
-시간이 허용될 때 external set:
+발견·후속 세트:
 
-4. **ConfRAG:** multi-view clustering·reason coverage 일반화
-5. **MAGIC:** conflict count·hop에 따른 localization 일반화
-6. **GroupQA:** repetition·order counterfactual robustness
+4. **ConflictingQA:** 희귀 operator 후보 탐색; prevalence 계산 제외
+5. **RAMDocs·MAGIC·DRAGged:** 파일럿 통과 후 각각 mixed-factor, `K`, single-type 외부 평가에 사용
 
 새 데이터 전체를 처음부터 구축하기보다 기존 세 데이터에 공통 claim-relation-action annotation layer를 얹는 편이 현실적이다. 다만 실제 annotation 규모는 별도의 prevalence pilot 이후 결정한다.
 
@@ -394,7 +422,7 @@ RAMDocs와 ContraPRT는 복수 요인·복수 type의 **직접 가능성**을, D
 QACC는 명확한 open-domain question의 약 25%에서 Google top-10 contexts가 서로 다른 답을 포함한다고 보고했다.
 
 **주장 B — conflict set은 흔히 둘 이상의 후보를 포함한다.**
-QACC conflict subset은 평균 2.47개 답을 가지며, ConfRAG은 질문당 2~8개의 answer clusters를 제공한다.
+QACC conflict subset은 평균 2.47개 답을 가지며, NatConfQA는 모든 answer pair의 conflict graph를 제공하고, ConfRAG은 질문당 2~8개의 answer clusters를 제공한다.
 
 **주장 C — 다중성은 단순 detection보다 localization·coverage·resolution을 어렵게 한다.**
 MAGIC에서는 conflict 수가 늘수록 localization이 악화되고, ConfRAG에서는 cluster 수가 늘수록 answer/reason coverage가 감소한다.
@@ -476,7 +504,7 @@ RAMDocs에서 강한 baseline과 MADAM-RAG 모두 낮은 EM을 보이고, ConfRA
 
 이 문서에서는 데이터셋 자체를 재집계하지 않는다. 후속 prevalence audit에서 다음을 확인한다.
 
-1. QACC·CONFLICTS·ConfRAG의 한 instance에 둘 이상의 claim relation type이 실제로 나타나는가?
+1. QACC·NatConfQA·ConfRAG의 한 instance에 둘 이상의 claim relation type이 실제로 나타나는가?
 2. 둘 이상의 서로 다른 action이 필요한 instance 비율은 얼마인가?
 3. action들이 단순 병렬 적용 가능한가, 아니면 dependency·order가 필요한가?
 4. mixed-action 사례가 모델의 정답률·coverage·attribution을 실제로 더 낮추는가?

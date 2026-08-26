@@ -1,0 +1,22 @@
+{"instance_id":"natconfqa-climate-fever.70.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"CO2–온도 관계가 강하고 온난화를 증폭한다는 주장과 관계가 약하거나 포화됐다는 주장이 대립한다."}
+{"instance_id":"natconfqa-climate-fever.82.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"medium","rationale":"CO2 두 배 증가 시 온도 민감도 수치가 동일 질문 슬롯에서 달라 모델·근거를 검증해야 한다."}
+{"instance_id":"natconfqa-climate-fever.78.1","dataset":"natconfqa","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"2007 high-end 60cm가 2014 약 90cm로 갱신되며 나머지 값은 시점·배출 시나리오별 조건값이다."}
+{"instance_id":"natconfqa-climate-fever.79.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"감가상각된 기존 coal과 신규 wind·fossil 설비의 비용을 자산 연식·지역·비용 지표로 구분해야 한다."}
+{"instance_id":"natconfqa-climate-fever.40.1","dataset":"natconfqa","K":0,"H":0,"operators":[],"confidence":"medium","rationale":"21세기·수세기·수천년 및 severe scenario가 다른 전망치로, 명시된 시간 범위에서는 함께 참일 수 있다."}
+{"instance_id":"natconfqa-climate-fever.46.1","dataset":"natconfqa","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"기록이 추가되며 1998·2005에서 2016으로 warmest year가 갱신되는 시계열 사실이다."}
+{"instance_id":"natconfqa-climate-fever.45.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Arctic ice-free 예측 시점은 예측 발표연도·모델·ice-free 정의에 따라 크게 달라진다."}
+{"instance_id":"natconfqa-healthver_4_claims_12.89.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"PPE 부족은 감염·시스템 위험 원인이고 pneumonia·respiratory failure는 환자의 근접 사망 원인이므로 인과 수준을 구분해야 한다."}
+{"instance_id":"natconfqa-healthver_2_claims_31.88.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"온도 영향의 방향과 1°C당 계수는 독립 unit이 아니라 같은 temperature–transmission 효과 슬롯이며, 재생산지수·누적확진·지역·온도구간별 추정치를 조건화해야 한다. 일부 source answer–evidence 연결은 원문과 불일치한다."}
+{"instance_id":"natconfqa-climate-fever.58.1","dataset":"natconfqa","K":0,"H":0,"operators":[],"confidence":"high","rationale":"규제 제한 표결·Clean Power Plan 반대·수정안 공동발의는 Portman의 서로 다른 의정 행위다."}
+{"instance_id":"natconfqa-climate-fever.41.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"CO2 흡수가 산성도를 높인다는 화학 과정과 산성도에 영향이 없다는 주장이 직접 대립한다."}
+{"instance_id":"natconfqa-climate-fever.30.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"20세기 온도 추세가 상승·하락·무상승이라는 방향 주장으로 직접 대립한다."}
+{"instance_id":"natconfqa-climate-fever.37.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"온난화가 growing season을 늘리거나 줄인다는 효과는 지역·작물·온도 범위로 조건화해야 한다."}
+{"instance_id":"natconfqa-climate-fever.84.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"해수면 표층 온도가 하락 또는 상승한다는 주장은 대상 해역·사건·기간 범위가 누락돼 있다."}
+{"instance_id":"natconfqa-climate-fever.61.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"수십 cm와 수 m 전망은 기간·배출·빙상 붕괴 시나리오가 다른 동일 sea-level amount 슬롯이다."}
+{"instance_id":"natconfqa-climate-fever.48.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"우주선이 구름량·기후에 유의한 영향을 준다는 주장과 통계적으로 영향이 없다는 주장이 대립한다."}
+{"instance_id":"natconfqa-climate-fever.44.1","dataset":"natconfqa","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"21세기 high-end 60cm가 후속 평가에서 90cm로 갱신되고 61–110cm 범위와 조정된다."}
+{"instance_id":"natconfqa-healthver_10_claims_16.87.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"사회적 거리두기가 성장률을 낮추는지 영향이 없는지에 대한 경험적 효과 주장이 직접 대립한다."}
+{"instance_id":"natconfqa-climate-fever.62.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Republican Party 내부의 기후변화 존재·인간 기여 입장은 인물·시기·공식 platform별로 이질적이다."}
+{"instance_id":"natconfqa-climate-fever.69.1","dataset":"natconfqa","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"medium","rationale":"NOAA 연구자의 엄정성·조작 부재와 데이터 투명성 부족 주장을 공개 기록으로 검증해야 한다."}
+{"instance_id":"natconfqa-climate-fever.38.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Paris Accord의 국가별 자발 목표 존재와 법적 구속·집행 목표 부재를 target의 의미로 구분해야 한다."}
+{"instance_id":"natconfqa-climate-fever.43.1","dataset":"natconfqa","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"Antarctic ice mass 순변화의 부호는 관측기간·지역·측정법과 thickness 정보에 따라 달라진다."}

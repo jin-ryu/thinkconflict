@@ -1,0 +1,10 @@
+{"instance_id":"qacc-0973","dataset":"qacc","K":1,"H":1,"operators":["SUPERSEDE"],"confidence":"high","rationale":"Elizabeth II 재위기의 Charles 답이 왕위 계승 후 William으로 갱신됐다."}
+{"instance_id":"qacc-1296","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"첫 Horrid Henry 책은 1994년에 쓰이고 출판된 것으로 근거가 일치한다."}
+{"instance_id":"qacc-1187","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"유사 제목·가사를 가진 The Dramatics의 1971 곡과 Milira의 1990 곡 및 후속 cover를 정확한 제목·녹음으로 구분해야 한다."}
+{"instance_id":"qacc-0855","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"1st Middlesex and Norfolk와 Norfolk, Bristol and Middlesex는 다른 선거구이므로 정확한 district 명칭·시점이 필요하다."}
+{"instance_id":"qacc-0470","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Simon Commission의 1928 방문 당시 Viceroy는 Lord Irwin으로 문서가 일치한다."}
+{"instance_id":"qacc-1477","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"shortstop 최다 Gold Gloves는 Ozzie Smith 13회로 일치한다."}
+{"instance_id":"qacc-0853","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Arnold Winkler 역 Ronnie Dapo와 Arnold Bailey 역 Sheldon Collins는 같은 프로그램의 서로 다른 Arnold 캐릭터다."}
+{"instance_id":"qacc-0191","dataset":"qacc","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"모든 변 길이만 같은 polygon은 equilateral이며 각까지 같아야 regular라는 수학 정의와 regular 답이 대립한다."}
+{"instance_id":"qacc-0658","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"1917-04-02 Wilson의 선전포고 요청과 04-06 공식 참전을 사건 단계로 구분해야 한다."}
+{"instance_id":"qacc-0729","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"세계·프랑스·스위스 및 공개·비공개·공식 처형 범위를 구분하면 1939·1940·1977이 해소된다."}

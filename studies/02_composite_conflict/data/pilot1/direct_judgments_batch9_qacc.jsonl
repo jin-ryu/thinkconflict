@@ -1,0 +1,10 @@
+{"instance_id":"qacc-1588","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"medium","rationale":"Gandhi Nagar의 기준 지점·경계와 도보 입구에 따라 Seelampur·East Azad Nagar·Shastri Park가 달라진다."}
+{"instance_id":"qacc-1503","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Snow Dogs의 Nana는 Border Collie로 관련 근거가 일치한다."}
+{"instance_id":"qacc-0067","dataset":"qacc","K":1,"H":1,"operators":["VERIFY_PREFER"],"confidence":"high","rationale":"Columbo의 개가 이름 없이 Dog로 불렸다는 다수 근거와 원래 Fang이라는 주장이 대립한다."}
+{"instance_id":"qacc-0365","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Bob 배역 배우를 명시하는 충분한 근거와 반대 후보가 없어 불충분 사례다."}
+{"instance_id":"qacc-1333","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"공식 PGA Tour 82승과 과거 81승·대안 Snead criteria 95승을 기준일과 집계 규칙으로 구분해야 한다."}
+{"instance_id":"qacc-1430","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"문서들은 June 16과 1976 Soweto uprising을 설명하지만 최초 기념 연도를 서로 다르게 주장하지 않는다."}
+{"instance_id":"qacc-1339","dataset":"qacc","K":0,"H":0,"operators":[],"confidence":"high","rationale":"Kelly Taylor의 어머니 Jackie 역은 Ann Gillespie로 문서가 일치한다."}
+{"instance_id":"qacc-1086","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"방송 premiere 2017-09-28과 home-media 상품 출시 2018-10-22를 release 매체로 구분해야 한다."}
+{"instance_id":"qacc-0296","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"Gavin and Stacey의 Smithy 여동생 Rudi 역 Sheridan Smith와 James Corden의 실제 자매 cameo를 구분해야 한다."}
+{"instance_id":"qacc-0741","dataset":"qacc","K":1,"H":1,"operators":["CONDITION"],"confidence":"high","rationale":"1947 첫 영국인 Commander-in-Chief Lockhart·첫 인도인 Cariappa·COAS 명칭의 첫 Rajendrasinhji를 직함·국적·시기로 구분해야 한다."}
