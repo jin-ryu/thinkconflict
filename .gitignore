@@ -13,12 +13,12 @@ venv/
 .pytest_cache/
 
 # 원본 데이터는 git에 넣지 않는다 — download.sh로 재현 (계획서 §2)
-data/1_raw/dragged/
-data/1_raw/qacc/
-data/1_raw/ramdocs/
-!data/1_raw/download.sh
-!data/1_raw/checksums.lock
-!data/1_raw/LICENSES/
+studies/01_air_trace/data/1_raw/dragged/
+studies/01_air_trace/data/1_raw/qacc/
+studies/01_air_trace/data/1_raw/ramdocs/
+!studies/01_air_trace/data/1_raw/download.sh
+!studies/01_air_trace/data/1_raw/checksums.lock
+!studies/01_air_trace/data/1_raw/LICENSES/
 
 # data/3_processed/는 커밋한다 — 중간 CSV(사람이 채운 라벨)는 재현 불가능한 인간 노동의
 # 산물이라 이력으로 남겨야 하고, 검토 상태를 그대로 추적하기 위해서다 (계획서 §5).
@@ -27,7 +27,7 @@ data/1_raw/ramdocs/
 #   라이선스 사본: data/1_raw/LICENSES/
 
 # 실행 산출물: raw 생성물은 git 미포함, 집계만 포함 (계획서 §3)
-results/raw/
-results/**/generations/
+studies/*/results/**/raw/
+studies/*/results/**/generations/
 *.log
-references/
+literature/papers/
