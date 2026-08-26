@@ -3,7 +3,7 @@
 > 작성일: 2026-08-26
 > 상태: 실행 전
 > 목적: 장기 사용자 메모리가 검색 문서보다 `K>1,H>1`의 현실적 검증 환경인지 확인하고, 기존 memory-conflict 연구가 다루지 않은 query-level composition failure가 존재하는지 최소 비용으로 검증한다.
-> 선행 결과: [파일럿 1 결과](06_pilot1_result.md)
+> 선행 결과: [파일럿 1 결과](../pilot1_search/result.md)
 
 ## 0. 연구 방향 결정
 
@@ -282,7 +282,7 @@ paired bootstrap 신뢰구간과 McNemar 검정을 사용한다. 작은 파일�
 - `results/pilot2_memory/raw/<method>.jsonl`
 - `results/pilot2_memory/metrics.json`
 - `results/pilot2_memory/error_analysis.jsonl`
-- `docs/07_pilot2_memory_result.md`
+- `docs/pilot2_memory/result.md`
 
 ## 10. 실행 순서
 

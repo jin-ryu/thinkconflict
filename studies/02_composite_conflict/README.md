@@ -16,18 +16,18 @@ generic memory conflict 또는 conflict-type routing만으로는 MemConflict·TA
 ## 읽는 순서
 
 1. [현재 결론과 안내](START_HERE.md)
-2. [파일럿 1 결과](docs/06_pilot1_result.md)
+2. [파일럿 1 결과](docs/pilot1_search/result.md)
 3. [파일럿 1 전체 판정표](results/pilot1/final_llm_judgment_table.md)
-4. [파일럿 2: Compositional Memory Conflict](docs/05_pilot2_compositional_memory_plan.md)
+4. [파일럿 2: Compositional Memory Conflict](docs/pilot2_memory/plan.md)
 
 배경 문서는 다음과 같다.
 
-5. [기존 문제 정의와 제안 방법](docs/01_problem_and_method.md)
-6. [관련 논문: 문제·방법·한계](docs/02_related_work.md)
-7. [검색 다중·복합 충돌 데이터 근거](docs/03_dataset_evidence.md)
-8. [파일럿 1 사전 계획](docs/04_pilot1_prevalence_plan.md)
-9. [주석 지침](docs/annotation_guideline.md)
-10. [파일럿 1 실행 안내](docs/pilot1_runbook.md)
+5. [기존 문제 정의와 제안 방법](docs/background/problem_and_method.md)
+6. [관련 논문: 문제·방법·한계](docs/background/related_work.md)
+7. [검색 다중·복합 충돌 데이터 근거](docs/background/dataset_evidence.md)
+8. [파일럿 1 사전 계획](docs/pilot1_search/plan.md)
+9. [주석 지침](docs/pilot1_search/annotation_guideline.md)
+10. [파일럿 1 실행 안내](docs/pilot1_search/runbook.md)
 
 ## 작업 구조
 

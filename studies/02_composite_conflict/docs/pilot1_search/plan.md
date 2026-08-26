@@ -1,10 +1,10 @@
 # 파일럿 1: 자연 검색 문서의 복합 충돌 존재·분포 검증 계획
 
-> **실행 상태: 완료.** 실제 실행은 시간 제약으로 독립 인간 주석 대신 Codex 직접 판정으로 축소되었다. 202건에서 strict `K>1,H>1`은 0건이었으며, 상세 결과와 계획 대비 변경은 [파일럿 1 결과](06_pilot1_result.md)를 따른다. 이 문서의 나머지 내용은 사전 계획으로 보존한다.
+> **실행 상태: 완료.** 실제 실행은 시간 제약으로 독립 인간 주석 대신 Codex 직접 판정으로 축소되었다. 202건에서 strict `K>1,H>1`은 0건이었으며, 상세 결과와 계획 대비 변경은 [파일럿 1 결과](result.md)를 따른다. 이 문서의 나머지 내용은 사전 계획으로 보존한다.
 
 > 작성일: 2026-08-26
 > 목적: 본 데이터셋 구축 전에 `K>1,H>1` 사례의 존재, 분석 가능성, 제한된 target distribution 내 분포를 검증한다.
-> 관련 본문: [복합 충돌 문제 정의·관련 연구·해결 방법](./01_problem_and_method.md)
+> 관련 본문: [복합 충돌 문제 정의·관련 연구·해결 방법](../background/problem_and_method.md)
 
 ## 0. 결론
 
@@ -301,9 +301,9 @@ NatConfQA에서는 unit graph 통계와 `K` 일치도를, QACC에서는 strict `
 - `data/pilot1/human_B_random_audit.jsonl`
 - `data/pilot1/human_B_h_gt1_audit.jsonl`
 - `data/pilot1/adjudicated.jsonl`
-- `docs/annotation_guideline.md`
+- `docs/pilot1_search/annotation_guideline.md`
 - `results/pilot1/prevalence_summary.json`
-- `docs/06_pilot1_result.md`
+- `docs/pilot1_search/result.md`
 
 ## 7.2 예상 작업량
 

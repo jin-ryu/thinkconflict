@@ -660,7 +660,7 @@ QACC는 **명확한 open-domain question의 약 25%에서 Google 검색 문맥�
 
 ### 3.8.5 복합 충돌 해결 파이프라인에서 남은 공백
 
-다중 충돌 데이터셋별 정의·발생 근거·활용 우선순위와 논문 주장 논리는 [03_dataset_evidence.md](./03_dataset_evidence.md)에 별도로 상세 정리했다.
+다중 충돌 데이터셋별 정의·발생 근거·활용 우선순위와 논문 주장 논리는 [dataset_evidence.md](./dataset_evidence.md)에 별도로 상세 정리했다.
 
 “복합 충돌 파이프라인” 전체가 비어 있는 것은 아니다. RAMDocs/MADAM-RAG은 ambiguity·misinformation·noise를 함께 처리하고, ConflictRAG은 탐지·분류·해결 파이프라인을 제공하며, ArbGraph는 atomic claim graph를 만든다. 따라서 **여러 충돌을 유형별로 나눠 pipeline으로 해결한다**는 주장만으로는 신규성이 약하다.
 

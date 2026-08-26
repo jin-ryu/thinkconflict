@@ -3,7 +3,7 @@
 > ACL 논문 초안 구조, 2026-08-26 개정
 > 현재 단계: 문제 정의·관련 연구·방법론·실험 계획
 > 아직 작성하지 않는 부분: 실험 결과, 결론, 한계
-> 관련 문서: [다중·복합 충돌 데이터셋 논문 분석과 연구 주장 논리](./03_dataset_evidence.md)
+> 관련 문서: [다중·복합 충돌 데이터셋 논문 분석과 연구 주장 논리](./dataset_evidence.md)
 
 ---
 
@@ -328,7 +328,7 @@ graph node는 claim/evidence group, edge는 relation, operator와 precedence를 
 
 ## 5.2 데이터셋 적합성 조사 결과
 
-완성된 단일 데이터셋이 `K×H`, natural retrieval, action gold를 모두 제공하지는 않는다. 따라서 역할이 다른 benchmark suite를 사용한다. **검색 기반 데이터 선정은 [파일럿 1](04_pilot1_prevalence_plan.md)의 완료 결과로 종료했다. 후속 실행 순서는 [Compositional Memory Conflict 파일럿](05_pilot2_compositional_memory_plan.md)을 정본으로 하며, 아래 표는 검색 중심 초안의 후보 기록으로만 보존한다.**
+완성된 단일 데이터셋이 `K×H`, natural retrieval, action gold를 모두 제공하지는 않는다. 따라서 역할이 다른 benchmark suite를 사용한다. **검색 기반 데이터 선정은 [파일럿 1](../pilot1_search/plan.md)의 완료 결과로 종료했다. 후속 실행 순서는 [Compositional Memory Conflict 파일럿](../pilot2_memory/plan.md)을 정본으로 하며, 아래 표는 검색 중심 초안의 후보 기록으로만 보존한다.**
 
 | 데이터셋 | 규모·성격 | `K` | `H` | 활용 결정 |
 |---|---|---:|---:|---|

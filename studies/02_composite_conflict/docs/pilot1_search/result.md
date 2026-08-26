@@ -2,14 +2,14 @@
 
 > 실행일: 2026-08-26
 > 상태: 완료 — exploratory go/no-go pilot
-> 상세 판정표: [final_llm_judgment_table.md](../results/pilot1/final_llm_judgment_table.md)
-> 구조화 결과: [final_llm_judgments.jsonl](../data/pilot1/final_llm_judgments.jsonl)
+> 상세 판정표: [final_llm_judgment_table.md](../../results/pilot1/final_llm_judgment_table.md)
+> 구조화 결과: [final_llm_judgments.jsonl](../../data/pilot1/final_llm_judgments.jsonl)
 
 ## 0. 결론
 
 ConfRAG, NatConfQA, QACC의 202건을 strict `K/H` 기준으로 판정한 결과 `K>1,H>1` 복합 충돌은 한 건도 관측되지 않았다. 따라서 “자연 검색 문서에서 query-level 복합 충돌이 충분히 자주 발생한다”는 주장은 현재 자료로 지지되지 않는다.
 
-기존 파일럿 2였던 자연 `H=1/H>1` matched comparison은 필요한 treatment 사례가 없어 중단한다. 후속 파일럿은 `K/H`를 유지하되 장기 사용자 메모리에서 query-level composition의 현실성과 독립 난이도를 검증하는 [Compositional Memory Conflict 계획](05_pilot2_compositional_memory_plan.md)으로 변경한다.
+기존 파일럿 2였던 자연 `H=1/H>1` matched comparison은 필요한 treatment 사례가 없어 중단한다. 후속 파일럿은 `K/H`를 유지하되 장기 사용자 메모리에서 query-level composition의 현실성과 독립 난이도를 검증하는 [Compositional Memory Conflict 계획](../pilot2_memory/plan.md)으로 변경한다.
 
 ## 1. 표본과 결과
 

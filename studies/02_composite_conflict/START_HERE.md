@@ -14,11 +14,11 @@
 
 ## 지금 볼 파일 세 개
 
-1. [`docs/06_pilot1_result.md`](docs/06_pilot1_result.md)
+1. [`docs/pilot1_search/result.md`](docs/pilot1_search/result.md)
    - 파일럿 1 결과, 실행 방식, 계획 대비 변경, 연구 결정
 2. [`results/pilot1/final_llm_judgment_table.md`](results/pilot1/final_llm_judgment_table.md)
    - 데이터셋별 분포와 202건 전체 판정표
-3. [`docs/05_pilot2_compositional_memory_plan.md`](docs/05_pilot2_compositional_memory_plan.md)
+3. [`docs/pilot2_memory/plan.md`](docs/pilot2_memory/plan.md)
    - 새 파일럿 2의 문제 정의, 데이터, 실험, go/stop 기준
 
 구조화된 최종 판정은 [`data/pilot1/final_llm_judgments.jsonl`](data/pilot1/final_llm_judgments.jsonl)에 있다.
@@ -50,10 +50,10 @@
 
 ## 나머지 문서의 용도
 
-- `docs/01_problem_and_method.md`: 기존 검색 중심 논문 초안; memory 파일럿 통과 전에는 확정 본문이 아님
-- `docs/02_related_work.md`: 검색 문서 conflict 관련 연구
-- `docs/03_dataset_evidence.md`: 검색 conflict 데이터셋 조사
-- `docs/04_pilot1_prevalence_plan.md`: 파일럿 1의 사전 계획과 실제 실행 안내
-- `docs/annotation_guideline.md`, `docs/pilot1_runbook.md`: 재현·정식 주석 운영 자료
+- `docs/background/problem_and_method.md`: 기존 검색 중심 논문 초안; memory 파일럿 통과 전에는 확정 본문이 아님
+- `docs/background/related_work.md`: 검색 문서 conflict 관련 연구
+- `docs/background/dataset_evidence.md`: 검색 conflict 데이터셋 조사
+- `docs/pilot1_search/plan.md`: 파일럿 1의 사전 계획과 실제 실행 안내
+- `docs/pilot1_search/annotation_guideline.md`, `docs/pilot1_search/runbook.md`: 재현·정식 주석 운영 자료
 
 현재 의사결정에는 위 문서 전체를 읽을 필요가 없다.
