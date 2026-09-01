@@ -1,0 +1,2227 @@
+{
+  "unit_level": {
+    "ALL": {
+      "worst_order": {
+        "n": 390,
+        "both_correct": 187,
+        "atomic_only": 144,
+        "composite_only": 3,
+        "both_wrong": 56,
+        "atomic_accuracy": {
+          "n": 390,
+          "success": 331,
+          "rate": 0.8487,
+          "wilson95": [
+            0.8098,
+            0.8809
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 390,
+          "success": 190,
+          "rate": 0.4872,
+          "wilson95": [
+            0.4379,
+            0.5367
+          ]
+        },
+        "gap": 0.3615,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 331,
+          "success": 187,
+          "rate": 0.565,
+          "wilson95": [
+            0.5111,
+            0.6173
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.303,
+            0.4167
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 390,
+          "both_correct": 229,
+          "atomic_only": 102,
+          "composite_only": 7,
+          "both_wrong": 52,
+          "atomic_accuracy": {
+            "n": 390,
+            "success": 331,
+            "rate": 0.8487,
+            "wilson95": [
+              0.8098,
+              0.8809
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 390,
+            "success": 236,
+            "rate": 0.6051,
+            "wilson95": [
+              0.5558,
+              0.6524
+            ]
+          },
+          "gap": 0.2436,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 331,
+            "success": 229,
+            "rate": 0.6918,
+            "wilson95": [
+              0.6401,
+              0.7391
+            ]
+          }
+        },
+        "reverse": {
+          "n": 390,
+          "both_correct": 247,
+          "atomic_only": 84,
+          "composite_only": 7,
+          "both_wrong": 52,
+          "atomic_accuracy": {
+            "n": 390,
+            "success": 331,
+            "rate": 0.8487,
+            "wilson95": [
+              0.8098,
+              0.8809
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 390,
+            "success": 254,
+            "rate": 0.6513,
+            "wilson95": [
+              0.6027,
+              0.6969
+            ]
+          },
+          "gap": 0.1974,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 331,
+            "success": 247,
+            "rate": 0.7462,
+            "wilson95": [
+              0.6967,
+              0.7901
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 390,
+          "both_correct": 233,
+          "atomic_only": 98,
+          "composite_only": 15,
+          "both_wrong": 44,
+          "atomic_accuracy": {
+            "n": 390,
+            "success": 331,
+            "rate": 0.8487,
+            "wilson95": [
+              0.8098,
+              0.8809
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 390,
+            "success": 248,
+            "rate": 0.6359,
+            "wilson95": [
+              0.587,
+              0.6821
+            ]
+          },
+          "gap": 0.2128,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 331,
+            "success": 233,
+            "rate": 0.7039,
+            "wilson95": [
+              0.6526,
+              0.7505
+            ]
+          }
+        }
+      }
+    },
+    "K2": {
+      "worst_order": {
+        "n": 120,
+        "both_correct": 62,
+        "atomic_only": 42,
+        "composite_only": 0,
+        "both_wrong": 16,
+        "atomic_accuracy": {
+          "n": 120,
+          "success": 104,
+          "rate": 0.8667,
+          "wilson95": [
+            0.7944,
+            0.9162
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 120,
+          "success": 62,
+          "rate": 0.5167,
+          "wilson95": [
+            0.4281,
+            0.6042
+          ]
+        },
+        "gap": 0.35,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 104,
+          "success": 62,
+          "rate": 0.5962,
+          "wilson95": [
+            0.5001,
+            0.6854
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 120,
+          "both_correct": 73,
+          "atomic_only": 31,
+          "composite_only": 2,
+          "both_wrong": 14,
+          "atomic_accuracy": {
+            "n": 120,
+            "success": 104,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7944,
+              0.9162
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 120,
+            "success": 75,
+            "rate": 0.625,
+            "wilson95": [
+              0.5358,
+              0.7065
+            ]
+          },
+          "gap": 0.2417,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 104,
+            "success": 73,
+            "rate": 0.7019,
+            "wilson95": [
+              0.6081,
+              0.7814
+            ]
+          }
+        },
+        "reverse": {
+          "n": 120,
+          "both_correct": 80,
+          "atomic_only": 24,
+          "composite_only": 1,
+          "both_wrong": 15,
+          "atomic_accuracy": {
+            "n": 120,
+            "success": 104,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7944,
+              0.9162
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 120,
+            "success": 81,
+            "rate": 0.675,
+            "wilson95": [
+              0.5869,
+              0.7522
+            ]
+          },
+          "gap": 0.1917,
+          "mcnemar_exact_p": 2e-06,
+          "retained_given_atomic_correct": {
+            "n": 104,
+            "success": 80,
+            "rate": 0.7692,
+            "wilson95": [
+              0.6795,
+              0.8397
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 120,
+          "both_correct": 80,
+          "atomic_only": 24,
+          "composite_only": 2,
+          "both_wrong": 14,
+          "atomic_accuracy": {
+            "n": 120,
+            "success": 104,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7944,
+              0.9162
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 120,
+            "success": 82,
+            "rate": 0.6833,
+            "wilson95": [
+              0.5955,
+              0.7598
+            ]
+          },
+          "gap": 0.1833,
+          "mcnemar_exact_p": 1e-05,
+          "retained_given_atomic_correct": {
+            "n": 104,
+            "success": 80,
+            "rate": 0.7692,
+            "wilson95": [
+              0.6795,
+              0.8397
+            ]
+          }
+        }
+      }
+    },
+    "K2_H1": {
+      "worst_order": {
+        "n": 60,
+        "both_correct": 30,
+        "atomic_only": 22,
+        "composite_only": 0,
+        "both_wrong": 8,
+        "atomic_accuracy": {
+          "n": 60,
+          "success": 52,
+          "rate": 0.8667,
+          "wilson95": [
+            0.7583,
+            0.9309
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 60,
+          "success": 30,
+          "rate": 0.5,
+          "wilson95": [
+            0.3773,
+            0.6227
+          ]
+        },
+        "gap": 0.3667,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 52,
+          "success": 30,
+          "rate": 0.5769,
+          "wilson95": [
+            0.4419,
+            0.7013
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.2333,
+            0.5167
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 60,
+          "both_correct": 39,
+          "atomic_only": 13,
+          "composite_only": 1,
+          "both_wrong": 7,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 40,
+            "rate": 0.6667,
+            "wilson95": [
+              0.5406,
+              0.7727
+            ]
+          },
+          "gap": 0.2,
+          "mcnemar_exact_p": 0.001831,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 39,
+            "rate": 0.75,
+            "wilson95": [
+              0.6179,
+              0.8477
+            ]
+          }
+        },
+        "reverse": {
+          "n": 60,
+          "both_correct": 36,
+          "atomic_only": 16,
+          "composite_only": 1,
+          "both_wrong": 7,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 37,
+            "rate": 0.6167,
+            "wilson95": [
+              0.4902,
+              0.7291
+            ]
+          },
+          "gap": 0.25,
+          "mcnemar_exact_p": 0.000275,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 36,
+            "rate": 0.6923,
+            "wilson95": [
+              0.5573,
+              0.8009
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 60,
+          "both_correct": 40,
+          "atomic_only": 12,
+          "composite_only": 2,
+          "both_wrong": 6,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 42,
+            "rate": 0.7,
+            "wilson95": [
+              0.5749,
+              0.801
+            ]
+          },
+          "gap": 0.1667,
+          "mcnemar_exact_p": 0.012939,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 40,
+            "rate": 0.7692,
+            "wilson95": [
+              0.6387,
+              0.8628
+            ]
+          }
+        }
+      }
+    },
+    "K2_H2": {
+      "worst_order": {
+        "n": 60,
+        "both_correct": 32,
+        "atomic_only": 20,
+        "composite_only": 0,
+        "both_wrong": 8,
+        "atomic_accuracy": {
+          "n": 60,
+          "success": 52,
+          "rate": 0.8667,
+          "wilson95": [
+            0.7583,
+            0.9309
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 60,
+          "success": 32,
+          "rate": 0.5333,
+          "wilson95": [
+            0.4089,
+            0.6537
+          ]
+        },
+        "gap": 0.3333,
+        "mcnemar_exact_p": 2e-06,
+        "retained_given_atomic_correct": {
+          "n": 52,
+          "success": 32,
+          "rate": 0.6154,
+          "wilson95": [
+            0.4796,
+            0.7353
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.2167,
+            0.45
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 60,
+          "both_correct": 34,
+          "atomic_only": 18,
+          "composite_only": 1,
+          "both_wrong": 7,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 35,
+            "rate": 0.5833,
+            "wilson95": [
+              0.4573,
+              0.6994
+            ]
+          },
+          "gap": 0.2833,
+          "mcnemar_exact_p": 7.6e-05,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 34,
+            "rate": 0.6538,
+            "wilson95": [
+              0.518,
+              0.7685
+            ]
+          }
+        },
+        "reverse": {
+          "n": 60,
+          "both_correct": 44,
+          "atomic_only": 8,
+          "composite_only": 0,
+          "both_wrong": 8,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 44,
+            "rate": 0.7333,
+            "wilson95": [
+              0.6099,
+              0.8287
+            ]
+          },
+          "gap": 0.1333,
+          "mcnemar_exact_p": 0.007812,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 44,
+            "rate": 0.8462,
+            "wilson95": [
+              0.7248,
+              0.9199
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 60,
+          "both_correct": 40,
+          "atomic_only": 12,
+          "composite_only": 0,
+          "both_wrong": 8,
+          "atomic_accuracy": {
+            "n": 60,
+            "success": 52,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7583,
+              0.9309
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 60,
+            "success": 40,
+            "rate": 0.6667,
+            "wilson95": [
+              0.5406,
+              0.7727
+            ]
+          },
+          "gap": 0.2,
+          "mcnemar_exact_p": 0.000488,
+          "retained_given_atomic_correct": {
+            "n": 52,
+            "success": 40,
+            "rate": 0.7692,
+            "wilson95": [
+              0.6387,
+              0.8628
+            ]
+          }
+        }
+      }
+    },
+    "K3": {
+      "worst_order": {
+        "n": 270,
+        "both_correct": 125,
+        "atomic_only": 102,
+        "composite_only": 3,
+        "both_wrong": 40,
+        "atomic_accuracy": {
+          "n": 270,
+          "success": 227,
+          "rate": 0.8407,
+          "wilson95": [
+            0.7924,
+            0.8796
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 270,
+          "success": 128,
+          "rate": 0.4741,
+          "wilson95": [
+            0.4153,
+            0.5336
+          ]
+        },
+        "gap": 0.3667,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 227,
+          "success": 125,
+          "rate": 0.5507,
+          "wilson95": [
+            0.4856,
+            0.614
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 270,
+          "both_correct": 156,
+          "atomic_only": 71,
+          "composite_only": 5,
+          "both_wrong": 38,
+          "atomic_accuracy": {
+            "n": 270,
+            "success": 227,
+            "rate": 0.8407,
+            "wilson95": [
+              0.7924,
+              0.8796
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 270,
+            "success": 161,
+            "rate": 0.5963,
+            "wilson95": [
+              0.5368,
+              0.6531
+            ]
+          },
+          "gap": 0.2444,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 227,
+            "success": 156,
+            "rate": 0.6872,
+            "wilson95": [
+              0.6242,
+              0.744
+            ]
+          }
+        },
+        "reverse": {
+          "n": 270,
+          "both_correct": 167,
+          "atomic_only": 60,
+          "composite_only": 6,
+          "both_wrong": 37,
+          "atomic_accuracy": {
+            "n": 270,
+            "success": 227,
+            "rate": 0.8407,
+            "wilson95": [
+              0.7924,
+              0.8796
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 270,
+            "success": 173,
+            "rate": 0.6407,
+            "wilson95": [
+              0.5819,
+              0.6956
+            ]
+          },
+          "gap": 0.2,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 227,
+            "success": 167,
+            "rate": 0.7357,
+            "wilson95": [
+              0.6747,
+              0.7888
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 270,
+          "both_correct": 153,
+          "atomic_only": 74,
+          "composite_only": 13,
+          "both_wrong": 30,
+          "atomic_accuracy": {
+            "n": 270,
+            "success": 227,
+            "rate": 0.8407,
+            "wilson95": [
+              0.7924,
+              0.8796
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 270,
+            "success": 166,
+            "rate": 0.6148,
+            "wilson95": [
+              0.5555,
+              0.6709
+            ]
+          },
+          "gap": 0.2259,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 227,
+            "success": 153,
+            "rate": 0.674,
+            "wilson95": [
+              0.6106,
+              0.7317
+            ]
+          }
+        }
+      }
+    },
+    "K3_H1": {
+      "worst_order": {
+        "n": 90,
+        "both_correct": 39,
+        "atomic_only": 39,
+        "composite_only": 0,
+        "both_wrong": 12,
+        "atomic_accuracy": {
+          "n": 90,
+          "success": 78,
+          "rate": 0.8667,
+          "wilson95": [
+            0.7813,
+            0.9221
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 90,
+          "success": 39,
+          "rate": 0.4333,
+          "wilson95": [
+            0.3358,
+            0.5364
+          ]
+        },
+        "gap": 0.4333,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 78,
+          "success": 39,
+          "rate": 0.5,
+          "wilson95": [
+            0.3917,
+            0.6083
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.3111,
+            0.5556
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 90,
+          "both_correct": 55,
+          "atomic_only": 23,
+          "composite_only": 0,
+          "both_wrong": 12,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 78,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7813,
+              0.9221
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 55,
+            "rate": 0.6111,
+            "wilson95": [
+              0.5078,
+              0.7053
+            ]
+          },
+          "gap": 0.2556,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 78,
+            "success": 55,
+            "rate": 0.7051,
+            "wilson95": [
+              0.5962,
+              0.7948
+            ]
+          }
+        },
+        "reverse": {
+          "n": 90,
+          "both_correct": 55,
+          "atomic_only": 23,
+          "composite_only": 1,
+          "both_wrong": 11,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 78,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7813,
+              0.9221
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 56,
+            "rate": 0.6222,
+            "wilson95": [
+              0.519,
+              0.7154
+            ]
+          },
+          "gap": 0.2444,
+          "mcnemar_exact_p": 3e-06,
+          "retained_given_atomic_correct": {
+            "n": 78,
+            "success": 55,
+            "rate": 0.7051,
+            "wilson95": [
+              0.5962,
+              0.7948
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 90,
+          "both_correct": 50,
+          "atomic_only": 28,
+          "composite_only": 2,
+          "both_wrong": 10,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 78,
+            "rate": 0.8667,
+            "wilson95": [
+              0.7813,
+              0.9221
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 52,
+            "rate": 0.5778,
+            "wilson95": [
+              0.4746,
+              0.6746
+            ]
+          },
+          "gap": 0.2889,
+          "mcnemar_exact_p": 1e-06,
+          "retained_given_atomic_correct": {
+            "n": 78,
+            "success": 50,
+            "rate": 0.641,
+            "wilson95": [
+              0.5303,
+              0.7385
+            ]
+          }
+        }
+      }
+    },
+    "K3_H2": {
+      "worst_order": {
+        "n": 90,
+        "both_correct": 40,
+        "atomic_only": 34,
+        "composite_only": 0,
+        "both_wrong": 16,
+        "atomic_accuracy": {
+          "n": 90,
+          "success": 74,
+          "rate": 0.8222,
+          "wilson95": [
+            0.7306,
+            0.8875
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 90,
+          "success": 40,
+          "rate": 0.4444,
+          "wilson95": [
+            0.3462,
+            0.5473
+          ]
+        },
+        "gap": 0.3778,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 74,
+          "success": 40,
+          "rate": 0.5405,
+          "wilson95": [
+            0.4278,
+            0.6493
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.2667,
+            0.4889
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 90,
+          "both_correct": 48,
+          "atomic_only": 26,
+          "composite_only": 2,
+          "both_wrong": 14,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 74,
+            "rate": 0.8222,
+            "wilson95": [
+              0.7306,
+              0.8875
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 50,
+            "rate": 0.5556,
+            "wilson95": [
+              0.4527,
+              0.6538
+            ]
+          },
+          "gap": 0.2667,
+          "mcnemar_exact_p": 3e-06,
+          "retained_given_atomic_correct": {
+            "n": 74,
+            "success": 48,
+            "rate": 0.6486,
+            "wilson95": [
+              0.535,
+              0.7476
+            ]
+          }
+        },
+        "reverse": {
+          "n": 90,
+          "both_correct": 53,
+          "atomic_only": 21,
+          "composite_only": 1,
+          "both_wrong": 15,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 74,
+            "rate": 0.8222,
+            "wilson95": [
+              0.7306,
+              0.8875
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 54,
+            "rate": 0.6,
+            "wilson95": [
+              0.4967,
+              0.6951
+            ]
+          },
+          "gap": 0.2222,
+          "mcnemar_exact_p": 1.1e-05,
+          "retained_given_atomic_correct": {
+            "n": 74,
+            "success": 53,
+            "rate": 0.7162,
+            "wilson95": [
+              0.6048,
+              0.8063
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 90,
+          "both_correct": 51,
+          "atomic_only": 23,
+          "composite_only": 6,
+          "both_wrong": 10,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 74,
+            "rate": 0.8222,
+            "wilson95": [
+              0.7306,
+              0.8875
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 57,
+            "rate": 0.6333,
+            "wilson95": [
+              0.5302,
+              0.7255
+            ]
+          },
+          "gap": 0.1889,
+          "mcnemar_exact_p": 0.002316,
+          "retained_given_atomic_correct": {
+            "n": 74,
+            "success": 51,
+            "rate": 0.6892,
+            "wilson95": [
+              0.5766,
+              0.7831
+            ]
+          }
+        }
+      }
+    },
+    "K3_H3": {
+      "worst_order": {
+        "n": 90,
+        "both_correct": 46,
+        "atomic_only": 29,
+        "composite_only": 3,
+        "both_wrong": 12,
+        "atomic_accuracy": {
+          "n": 90,
+          "success": 75,
+          "rate": 0.8333,
+          "wilson95": [
+            0.7431,
+            0.8963
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 90,
+          "success": 49,
+          "rate": 0.5444,
+          "wilson95": [
+            0.4418,
+            0.6434
+          ]
+        },
+        "gap": 0.2889,
+        "mcnemar_exact_p": 3e-06,
+        "retained_given_atomic_correct": {
+          "n": 75,
+          "success": 46,
+          "rate": 0.6133,
+          "wilson95": [
+            0.5002,
+            0.7154
+          ]
+        },
+        "cluster_bootstrap": {
+          "draws": 2000,
+          "gap_ci95": [
+            0.1667,
+            0.4
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 90,
+          "both_correct": 53,
+          "atomic_only": 22,
+          "composite_only": 3,
+          "both_wrong": 12,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 75,
+            "rate": 0.8333,
+            "wilson95": [
+              0.7431,
+              0.8963
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 56,
+            "rate": 0.6222,
+            "wilson95": [
+              0.519,
+              0.7154
+            ]
+          },
+          "gap": 0.2111,
+          "mcnemar_exact_p": 0.000157,
+          "retained_given_atomic_correct": {
+            "n": 75,
+            "success": 53,
+            "rate": 0.7067,
+            "wilson95": [
+              0.5956,
+              0.7976
+            ]
+          }
+        },
+        "reverse": {
+          "n": 90,
+          "both_correct": 59,
+          "atomic_only": 16,
+          "composite_only": 4,
+          "both_wrong": 11,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 75,
+            "rate": 0.8333,
+            "wilson95": [
+              0.7431,
+              0.8963
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 63,
+            "rate": 0.7,
+            "wilson95": [
+              0.5987,
+              0.7849
+            ]
+          },
+          "gap": 0.1333,
+          "mcnemar_exact_p": 0.011818,
+          "retained_given_atomic_correct": {
+            "n": 75,
+            "success": 59,
+            "rate": 0.7867,
+            "wilson95": [
+              0.6812,
+              0.8642
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 90,
+          "both_correct": 52,
+          "atomic_only": 23,
+          "composite_only": 5,
+          "both_wrong": 10,
+          "atomic_accuracy": {
+            "n": 90,
+            "success": 75,
+            "rate": 0.8333,
+            "wilson95": [
+              0.7431,
+              0.8963
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 90,
+            "success": 57,
+            "rate": 0.6333,
+            "wilson95": [
+              0.5302,
+              0.7255
+            ]
+          },
+          "gap": 0.2,
+          "mcnemar_exact_p": 0.000912,
+          "retained_given_atomic_correct": {
+            "n": 75,
+            "success": 52,
+            "rate": 0.6933,
+            "wilson95": [
+              0.5817,
+              0.7861
+            ]
+          }
+        }
+      }
+    },
+    "heterogeneous": {
+      "worst_order": {
+        "n": 240,
+        "both_correct": 118,
+        "atomic_only": 83,
+        "composite_only": 3,
+        "both_wrong": 36,
+        "atomic_accuracy": {
+          "n": 240,
+          "success": 201,
+          "rate": 0.8375,
+          "wilson95": [
+            0.7856,
+            0.8788
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 240,
+          "success": 121,
+          "rate": 0.5042,
+          "wilson95": [
+            0.4413,
+            0.5669
+          ]
+        },
+        "gap": 0.3333,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 201,
+          "success": 118,
+          "rate": 0.5871,
+          "wilson95": [
+            0.518,
+            0.6529
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 240,
+          "both_correct": 135,
+          "atomic_only": 66,
+          "composite_only": 6,
+          "both_wrong": 33,
+          "atomic_accuracy": {
+            "n": 240,
+            "success": 201,
+            "rate": 0.8375,
+            "wilson95": [
+              0.7856,
+              0.8788
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 240,
+            "success": 141,
+            "rate": 0.5875,
+            "wilson95": [
+              0.5243,
+              0.6479
+            ]
+          },
+          "gap": 0.25,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 201,
+            "success": 135,
+            "rate": 0.6716,
+            "wilson95": [
+              0.604,
+              0.7328
+            ]
+          }
+        },
+        "reverse": {
+          "n": 240,
+          "both_correct": 156,
+          "atomic_only": 45,
+          "composite_only": 5,
+          "both_wrong": 34,
+          "atomic_accuracy": {
+            "n": 240,
+            "success": 201,
+            "rate": 0.8375,
+            "wilson95": [
+              0.7856,
+              0.8788
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 240,
+            "success": 161,
+            "rate": 0.6708,
+            "wilson95": [
+              0.6091,
+              0.7272
+            ]
+          },
+          "gap": 0.1667,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 201,
+            "success": 156,
+            "rate": 0.7761,
+            "wilson95": [
+              0.7136,
+              0.8283
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 240,
+          "both_correct": 143,
+          "atomic_only": 58,
+          "composite_only": 11,
+          "both_wrong": 28,
+          "atomic_accuracy": {
+            "n": 240,
+            "success": 201,
+            "rate": 0.8375,
+            "wilson95": [
+              0.7856,
+              0.8788
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 240,
+            "success": 154,
+            "rate": 0.6417,
+            "wilson95": [
+              0.5792,
+              0.6997
+            ]
+          },
+          "gap": 0.1958,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 201,
+            "success": 143,
+            "rate": 0.7114,
+            "wilson95": [
+              0.6453,
+              0.7697
+            ]
+          }
+        }
+      }
+    },
+    "homogeneous": {
+      "worst_order": {
+        "n": 150,
+        "both_correct": 69,
+        "atomic_only": 61,
+        "composite_only": 0,
+        "both_wrong": 20,
+        "atomic_accuracy": {
+          "n": 150,
+          "success": 130,
+          "rate": 0.8667,
+          "wilson95": [
+            0.803,
+            0.912
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 150,
+          "success": 69,
+          "rate": 0.46,
+          "wilson95": [
+            0.3822,
+            0.5398
+          ]
+        },
+        "gap": 0.4067,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 130,
+          "success": 69,
+          "rate": 0.5308,
+          "wilson95": [
+            0.4453,
+            0.6144
+          ]
+        }
+      },
+      "per_order_descriptive": {
+        "original": {
+          "n": 150,
+          "both_correct": 94,
+          "atomic_only": 36,
+          "composite_only": 1,
+          "both_wrong": 19,
+          "atomic_accuracy": {
+            "n": 150,
+            "success": 130,
+            "rate": 0.8667,
+            "wilson95": [
+              0.803,
+              0.912
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 150,
+            "success": 95,
+            "rate": 0.6333,
+            "wilson95": [
+              0.5538,
+              0.7062
+            ]
+          },
+          "gap": 0.2333,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 130,
+            "success": 94,
+            "rate": 0.7231,
+            "wilson95": [
+              0.6406,
+              0.7928
+            ]
+          }
+        },
+        "reverse": {
+          "n": 150,
+          "both_correct": 91,
+          "atomic_only": 39,
+          "composite_only": 2,
+          "both_wrong": 18,
+          "atomic_accuracy": {
+            "n": 150,
+            "success": 130,
+            "rate": 0.8667,
+            "wilson95": [
+              0.803,
+              0.912
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 150,
+            "success": 93,
+            "rate": 0.62,
+            "wilson95": [
+              0.5402,
+              0.6938
+            ]
+          },
+          "gap": 0.2467,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 130,
+            "success": 91,
+            "rate": 0.7,
+            "wilson95": [
+              0.6164,
+              0.7721
+            ]
+          }
+        },
+        "interleaved": {
+          "n": 150,
+          "both_correct": 90,
+          "atomic_only": 40,
+          "composite_only": 4,
+          "both_wrong": 16,
+          "atomic_accuracy": {
+            "n": 150,
+            "success": 130,
+            "rate": 0.8667,
+            "wilson95": [
+              0.803,
+              0.912
+            ]
+          },
+          "in_composite_accuracy": {
+            "n": 150,
+            "success": 94,
+            "rate": 0.6267,
+            "wilson95": [
+              0.547,
+              0.7
+            ]
+          },
+          "gap": 0.24,
+          "mcnemar_exact_p": 0.0,
+          "retained_given_atomic_correct": {
+            "n": 130,
+            "success": 90,
+            "rate": 0.6923,
+            "wilson95": [
+              0.6084,
+              0.7652
+            ]
+          }
+        }
+      }
+    }
+  },
+  "independence_null": {
+    "ALL": {
+      "bases": 150,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 150,
+        "success": 101,
+        "rate": 0.6733,
+        "wilson95": [
+          0.5948,
+          0.7432
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 150,
+        "success": 35,
+        "rate": 0.2333,
+        "wilson95": [
+          0.1728,
+          0.3072
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 150,
+        "success": 75,
+        "rate": 0.5,
+        "wilson95": [
+          0.421,
+          0.579
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 450,
+        "success": 160,
+        "rate": 0.3556,
+        "wilson95": [
+          0.3127,
+          0.4008
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.44,
+      "given_all_atomic_correct": {
+        "bases": 101,
+        "composite_success_all_orders": {
+          "n": 101,
+          "success": 34,
+          "rate": 0.3366,
+          "wilson95": [
+            0.252,
+            0.4333
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 303,
+          "success": 150,
+          "rate": 0.495,
+          "wilson95": [
+            0.4392,
+            0.5511
+          ]
+        }
+      }
+    },
+    "K2_H1": {
+      "bases": 30,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 30,
+        "success": 22,
+        "rate": 0.7333,
+        "wilson95": [
+          0.5555,
+          0.8582
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 30,
+        "success": 13,
+        "rate": 0.4333,
+        "wilson95": [
+          0.2738,
+          0.608
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 30,
+        "success": 21,
+        "rate": 0.7,
+        "wilson95": [
+          0.5212,
+          0.8334
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 90,
+        "success": 51,
+        "rate": 0.5667,
+        "wilson95": [
+          0.4636,
+          0.6642
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.3,
+      "given_all_atomic_correct": {
+        "bases": 22,
+        "composite_success_all_orders": {
+          "n": 22,
+          "success": 13,
+          "rate": 0.5909,
+          "wilson95": [
+            0.3873,
+            0.7674
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 66,
+          "success": 48,
+          "rate": 0.7273,
+          "wilson95": [
+            0.6096,
+            0.82
+          ]
+        }
+      }
+    },
+    "K2_H2": {
+      "bases": 30,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 30,
+        "success": 22,
+        "rate": 0.7333,
+        "wilson95": [
+          0.5555,
+          0.8582
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 30,
+        "success": 7,
+        "rate": 0.2333,
+        "wilson95": [
+          0.1179,
+          0.4093
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 30,
+        "success": 18,
+        "rate": 0.6,
+        "wilson95": [
+          0.4232,
+          0.7541
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 90,
+        "success": 34,
+        "rate": 0.3778,
+        "wilson95": [
+          0.2846,
+          0.481
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.5,
+      "given_all_atomic_correct": {
+        "bases": 22,
+        "composite_success_all_orders": {
+          "n": 22,
+          "success": 7,
+          "rate": 0.3182,
+          "wilson95": [
+            0.1636,
+            0.5268
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 66,
+          "success": 33,
+          "rate": 0.5,
+          "wilson95": [
+            0.3827,
+            0.6173
+          ]
+        }
+      }
+    },
+    "K3_H1": {
+      "bases": 30,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 30,
+        "success": 22,
+        "rate": 0.7333,
+        "wilson95": [
+          0.5555,
+          0.8582
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 30,
+        "success": 8,
+        "rate": 0.2667,
+        "wilson95": [
+          0.1418,
+          0.4445
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 30,
+        "success": 18,
+        "rate": 0.6,
+        "wilson95": [
+          0.4232,
+          0.7541
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 90,
+        "success": 39,
+        "rate": 0.4333,
+        "wilson95": [
+          0.3358,
+          0.5364
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.4667,
+      "given_all_atomic_correct": {
+        "bases": 22,
+        "composite_success_all_orders": {
+          "n": 22,
+          "success": 8,
+          "rate": 0.3636,
+          "wilson95": [
+            0.1973,
+            0.5705
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 66,
+          "success": 39,
+          "rate": 0.5909,
+          "wilson95": [
+            0.4705,
+            0.7013
+          ]
+        }
+      }
+    },
+    "K3_H2": {
+      "bases": 30,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 30,
+        "success": 17,
+        "rate": 0.5667,
+        "wilson95": [
+          0.392,
+          0.7262
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 30,
+        "success": 4,
+        "rate": 0.1333,
+        "wilson95": [
+          0.0531,
+          0.2968
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 30,
+        "success": 11,
+        "rate": 0.3667,
+        "wilson95": [
+          0.2187,
+          0.5449
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 90,
+        "success": 22,
+        "rate": 0.2444,
+        "wilson95": [
+          0.1673,
+          0.3425
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.4333,
+      "given_all_atomic_correct": {
+        "bases": 17,
+        "composite_success_all_orders": {
+          "n": 17,
+          "success": 4,
+          "rate": 0.2353,
+          "wilson95": [
+            0.0955,
+            0.4726
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 51,
+          "success": 20,
+          "rate": 0.3922,
+          "wilson95": [
+            0.2703,
+            0.5292
+          ]
+        }
+      }
+    },
+    "K3_H3": {
+      "bases": 30,
+      "independence_ceiling_all_atomic_correct": {
+        "n": 30,
+        "success": 18,
+        "rate": 0.6,
+        "wilson95": [
+          0.4232,
+          0.7541
+        ]
+      },
+      "observed_all_unit_success_worst_order": {
+        "n": 30,
+        "success": 3,
+        "rate": 0.1,
+        "wilson95": [
+          0.0346,
+          0.2562
+        ]
+      },
+      "observed_all_unit_success_best_order": {
+        "n": 30,
+        "success": 7,
+        "rate": 0.2333,
+        "wilson95": [
+          0.1179,
+          0.4093
+        ]
+      },
+      "observed_all_unit_success_pooled_orders": {
+        "n": 90,
+        "success": 14,
+        "rate": 0.1556,
+        "wilson95": [
+          0.095,
+          0.2443
+        ]
+      },
+      "shortfall_worst_vs_ceiling": 0.5,
+      "given_all_atomic_correct": {
+        "bases": 18,
+        "composite_success_all_orders": {
+          "n": 18,
+          "success": 2,
+          "rate": 0.1111,
+          "wilson95": [
+            0.031,
+            0.328
+          ]
+        },
+        "composite_success_pooled_orders": {
+          "n": 54,
+          "success": 10,
+          "rate": 0.1852,
+          "wilson95": [
+            0.1038,
+            0.3084
+          ]
+        }
+      }
+    }
+  },
+  "by_policy": {
+    "CONDITION": {
+      "ALL": {
+        "n": 130,
+        "both_correct": 77,
+        "atomic_only": 52,
+        "composite_only": 1,
+        "both_wrong": 0,
+        "atomic_accuracy": {
+          "n": 130,
+          "success": 129,
+          "rate": 0.9923,
+          "wilson95": [
+            0.9577,
+            0.9986
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 130,
+          "success": 78,
+          "rate": 0.6,
+          "wilson95": [
+            0.5141,
+            0.6802
+          ]
+        },
+        "gap": 0.3923,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 129,
+          "success": 77,
+          "rate": 0.5969,
+          "wilson95": [
+            0.5106,
+            0.6776
+          ]
+        }
+      },
+      "heterogeneous": {
+        "n": 80,
+        "both_correct": 46,
+        "atomic_only": 33,
+        "composite_only": 1,
+        "both_wrong": 0,
+        "atomic_accuracy": {
+          "n": 80,
+          "success": 79,
+          "rate": 0.9875,
+          "wilson95": [
+            0.9325,
+            0.9978
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 80,
+          "success": 47,
+          "rate": 0.5875,
+          "wilson95": [
+            0.478,
+            0.6889
+          ]
+        },
+        "gap": 0.4,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 79,
+          "success": 46,
+          "rate": 0.5823,
+          "wilson95": [
+            0.4722,
+            0.6847
+          ]
+        }
+      },
+      "homogeneous": {
+        "n": 50,
+        "both_correct": 31,
+        "atomic_only": 19,
+        "composite_only": 0,
+        "both_wrong": 0,
+        "atomic_accuracy": {
+          "n": 50,
+          "success": 50,
+          "rate": 1.0,
+          "wilson95": [
+            0.9286,
+            1.0
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 50,
+          "success": 31,
+          "rate": 0.62,
+          "wilson95": [
+            0.4815,
+            0.7414
+          ]
+        },
+        "gap": 0.38,
+        "mcnemar_exact_p": 4e-06,
+        "retained_given_atomic_correct": {
+          "n": 50,
+          "success": 31,
+          "rate": 0.62,
+          "wilson95": [
+            0.4815,
+            0.7414
+          ]
+        }
+      }
+    },
+    "SUPERSEDE": {
+      "ALL": {
+        "n": 130,
+        "both_correct": 103,
+        "atomic_only": 22,
+        "composite_only": 1,
+        "both_wrong": 4,
+        "atomic_accuracy": {
+          "n": 130,
+          "success": 125,
+          "rate": 0.9615,
+          "wilson95": [
+            0.9131,
+            0.9835
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 130,
+          "success": 104,
+          "rate": 0.8,
+          "wilson95": [
+            0.7231,
+            0.8597
+          ]
+        },
+        "gap": 0.1615,
+        "mcnemar_exact_p": 6e-06,
+        "retained_given_atomic_correct": {
+          "n": 125,
+          "success": 103,
+          "rate": 0.824,
+          "wilson95": [
+            0.7479,
+            0.8808
+          ]
+        }
+      },
+      "heterogeneous": {
+        "n": 80,
+        "both_correct": 66,
+        "atomic_only": 10,
+        "composite_only": 1,
+        "both_wrong": 3,
+        "atomic_accuracy": {
+          "n": 80,
+          "success": 76,
+          "rate": 0.95,
+          "wilson95": [
+            0.8784,
+            0.9804
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 80,
+          "success": 67,
+          "rate": 0.8375,
+          "wilson95": [
+            0.7416,
+            0.9025
+          ]
+        },
+        "gap": 0.1125,
+        "mcnemar_exact_p": 0.011719,
+        "retained_given_atomic_correct": {
+          "n": 76,
+          "success": 66,
+          "rate": 0.8684,
+          "wilson95": [
+            0.7745,
+            0.9269
+          ]
+        }
+      },
+      "homogeneous": {
+        "n": 50,
+        "both_correct": 37,
+        "atomic_only": 12,
+        "composite_only": 0,
+        "both_wrong": 1,
+        "atomic_accuracy": {
+          "n": 50,
+          "success": 49,
+          "rate": 0.98,
+          "wilson95": [
+            0.895,
+            0.9965
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 50,
+          "success": 37,
+          "rate": 0.74,
+          "wilson95": [
+            0.6045,
+            0.8413
+          ]
+        },
+        "gap": 0.24,
+        "mcnemar_exact_p": 0.000488,
+        "retained_given_atomic_correct": {
+          "n": 49,
+          "success": 37,
+          "rate": 0.7551,
+          "wilson95": [
+            0.6191,
+            0.854
+          ]
+        }
+      }
+    },
+    "VERIFY_PREFER": {
+      "ALL": {
+        "n": 130,
+        "both_correct": 7,
+        "atomic_only": 70,
+        "composite_only": 1,
+        "both_wrong": 52,
+        "atomic_accuracy": {
+          "n": 130,
+          "success": 77,
+          "rate": 0.5923,
+          "wilson95": [
+            0.5064,
+            0.673
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 130,
+          "success": 8,
+          "rate": 0.0615,
+          "wilson95": [
+            0.0315,
+            0.1167
+          ]
+        },
+        "gap": 0.5308,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 77,
+          "success": 7,
+          "rate": 0.0909,
+          "wilson95": [
+            0.0447,
+            0.176
+          ]
+        }
+      },
+      "heterogeneous": {
+        "n": 80,
+        "both_correct": 6,
+        "atomic_only": 40,
+        "composite_only": 1,
+        "both_wrong": 33,
+        "atomic_accuracy": {
+          "n": 80,
+          "success": 46,
+          "rate": 0.575,
+          "wilson95": [
+            0.4657,
+            0.6774
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 80,
+          "success": 7,
+          "rate": 0.0875,
+          "wilson95": [
+            0.043,
+            0.1698
+          ]
+        },
+        "gap": 0.4875,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 46,
+          "success": 6,
+          "rate": 0.1304,
+          "wilson95": [
+            0.0612,
+            0.2567
+          ]
+        }
+      },
+      "homogeneous": {
+        "n": 50,
+        "both_correct": 1,
+        "atomic_only": 30,
+        "composite_only": 0,
+        "both_wrong": 19,
+        "atomic_accuracy": {
+          "n": 50,
+          "success": 31,
+          "rate": 0.62,
+          "wilson95": [
+            0.4815,
+            0.7414
+          ]
+        },
+        "in_composite_accuracy": {
+          "n": 50,
+          "success": 1,
+          "rate": 0.02,
+          "wilson95": [
+            0.0035,
+            0.105
+          ]
+        },
+        "gap": 0.6,
+        "mcnemar_exact_p": 0.0,
+        "retained_given_atomic_correct": {
+          "n": 31,
+          "success": 1,
+          "rate": 0.0323,
+          "wilson95": [
+            0.0057,
+            0.1619
+          ]
+        }
+      }
+    }
+  },
+  "label": "qwen3_8b_gen__llama3_1_70b_judge__v4_unit_isolated"
+}

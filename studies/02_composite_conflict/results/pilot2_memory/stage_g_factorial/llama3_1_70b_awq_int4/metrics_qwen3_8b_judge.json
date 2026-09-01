@@ -1,0 +1,2489 @@
+{
+  "generation_model": "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+  "judge_model": "Qwen/Qwen3-8B",
+  "design": {
+    "base_instances": 150,
+    "atomic_probes": 390,
+    "composite_order_trials": 450,
+    "orders": [
+      "original",
+      "reverse",
+      "interleaved"
+    ],
+    "statistical_unit": "base_instance; order variants are repeated measures"
+  },
+  "overall": {
+    "independent_base_instances": 150,
+    "atomic_unit_accuracy": {
+      "n": 390,
+      "success": 317,
+      "rate": 0.8128,
+      "wilson95": [
+        0.7711,
+        0.8484
+      ]
+    },
+    "atomic_all_units_per_base": {
+      "n": 150,
+      "success": 86,
+      "rate": 0.5733,
+      "wilson95": [
+        0.4933,
+        0.6497
+      ]
+    },
+    "composite_by_order": {
+      "original": {
+        "n": 150,
+        "success": 28,
+        "rate": 0.1867,
+        "wilson95": [
+          0.1324,
+          0.2566
+        ]
+      },
+      "reverse": {
+        "n": 150,
+        "success": 24,
+        "rate": 0.16,
+        "wilson95": [
+          0.1099,
+          0.227
+        ]
+      },
+      "interleaved": {
+        "n": 150,
+        "success": 34,
+        "rate": 0.2267,
+        "wilson95": [
+          0.167,
+          0.3
+        ]
+      }
+    },
+    "pooled_order_trials_not_independent": {
+      "n": 450,
+      "success": 86,
+      "rate": 0.1911,
+      "wilson95": [
+        0.1575,
+        0.23
+      ]
+    },
+    "worst_order_base_accuracy": {
+      "n": 150,
+      "success": 21,
+      "rate": 0.14,
+      "wilson95": [
+        0.0934,
+        0.2046
+      ]
+    },
+    "best_order_base_accuracy": {
+      "n": 150,
+      "success": 38,
+      "rate": 0.2533,
+      "wilson95": [
+        0.1905,
+        0.3285
+      ]
+    },
+    "order_flip_by_base": {
+      "n": 150,
+      "success": 17,
+      "rate": 0.1133,
+      "wilson95": [
+        0.072,
+        0.174
+      ]
+    },
+    "composition_specific_failure": {
+      "eligible_bases_atomic_all_correct": 86,
+      "base_with_any_failure": {
+        "n": 86,
+        "success": 66,
+        "rate": 0.7674,
+        "wilson95": [
+          0.6679,
+          0.8441
+        ]
+      },
+      "successful_composite_order_trials_given_atomic_all": {
+        "n": 258,
+        "success": 77,
+        "rate": 0.2984,
+        "wilson95": [
+          0.2459,
+          0.3569
+        ]
+      },
+      "failure_error_types": {
+        "wrong_fact_or_source": 95,
+        "cross_unit_contamination": 2,
+        "wrong_temporal_state": 125,
+        "omission": 9,
+        "unsupported_extra": 5
+      }
+    }
+  },
+  "by_cell": {
+    "K2_H1": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 60,
+        "success": 49,
+        "rate": 0.8167,
+        "wilson95": [
+          0.7008,
+          0.8944
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 22,
+        "rate": 0.7333,
+        "wilson95": [
+          0.5555,
+          0.8582
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 14,
+          "rate": 0.4667,
+          "wilson95": [
+            0.3023,
+            0.6386
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 9,
+          "rate": 0.3,
+          "wilson95": [
+            0.1666,
+            0.4788
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 15,
+          "rate": 0.5,
+          "wilson95": [
+            0.3315,
+            0.6685
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 38,
+        "rate": 0.4222,
+        "wilson95": [
+          0.3254,
+          0.5254
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 9,
+        "rate": 0.3,
+        "wilson95": [
+          0.1666,
+          0.4788
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 16,
+        "rate": 0.5333,
+        "wilson95": [
+          0.3614,
+          0.6977
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 7,
+        "rate": 0.2333,
+        "wilson95": [
+          0.1179,
+          0.4093
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 22,
+        "base_with_any_failure": {
+          "n": 22,
+          "success": 14,
+          "rate": 0.6364,
+          "wilson95": [
+            0.4295,
+            0.8027
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 66,
+          "success": 32,
+          "rate": 0.4848,
+          "wilson95": [
+            0.3685,
+            0.6029
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 17,
+          "cross_unit_contamination": 2,
+          "wrong_temporal_state": 12,
+          "omission": 4,
+          "unsupported_extra": 1
+        }
+      }
+    },
+    "K2_H2": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 60,
+        "success": 48,
+        "rate": 0.8,
+        "wilson95": [
+          0.6822,
+          0.8817
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 18,
+        "rate": 0.6,
+        "wilson95": [
+          0.4232,
+          0.7541
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 5,
+          "rate": 0.1667,
+          "wilson95": [
+            0.0734,
+            0.3356
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 5,
+          "rate": 0.1667,
+          "wilson95": [
+            0.0734,
+            0.3356
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 6,
+          "rate": 0.2,
+          "wilson95": [
+            0.0951,
+            0.3731
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 16,
+        "rate": 0.1778,
+        "wilson95": [
+          0.1125,
+          0.2694
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 4,
+        "rate": 0.1333,
+        "wilson95": [
+          0.0531,
+          0.2968
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 7,
+        "rate": 0.2333,
+        "wilson95": [
+          0.1179,
+          0.4093
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 3,
+        "rate": 0.1,
+        "wilson95": [
+          0.0346,
+          0.2562
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 18,
+        "base_with_any_failure": {
+          "n": 18,
+          "success": 14,
+          "rate": 0.7778,
+          "wilson95": [
+            0.5479,
+            0.91
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 54,
+          "success": 16,
+          "rate": 0.2963,
+          "wilson95": [
+            0.1914,
+            0.4283
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 28,
+          "wrong_fact_or_source": 13,
+          "unsupported_extra": 1
+        }
+      }
+    },
+    "K3_H1": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 90,
+        "success": 80,
+        "rate": 0.8889,
+        "wilson95": [
+          0.8074,
+          0.9385
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 22,
+        "rate": 0.7333,
+        "wilson95": [
+          0.5555,
+          0.8582
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 9,
+          "rate": 0.3,
+          "wilson95": [
+            0.1666,
+            0.4788
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 10,
+          "rate": 0.3333,
+          "wilson95": [
+            0.1923,
+            0.5122
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 11,
+          "rate": 0.3667,
+          "wilson95": [
+            0.2187,
+            0.5449
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 30,
+        "rate": 0.3333,
+        "wilson95": [
+          0.2445,
+          0.4358
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 8,
+        "rate": 0.2667,
+        "wilson95": [
+          0.1418,
+          0.4445
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 13,
+        "rate": 0.4333,
+        "wilson95": [
+          0.2738,
+          0.608
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 5,
+        "rate": 0.1667,
+        "wilson95": [
+          0.0734,
+          0.3356
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 22,
+        "base_with_any_failure": {
+          "n": 22,
+          "success": 14,
+          "rate": 0.6364,
+          "wilson95": [
+            0.4295,
+            0.8027
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 66,
+          "success": 29,
+          "rate": 0.4394,
+          "wilson95": [
+            0.3263,
+            0.5592
+          ]
+        },
+        "failure_error_types": {
+          "omission": 4,
+          "unsupported_extra": 2,
+          "wrong_fact_or_source": 23,
+          "wrong_temporal_state": 19
+        }
+      }
+    },
+    "K3_H2": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 90,
+        "success": 71,
+        "rate": 0.7889,
+        "wilson95": [
+          0.6937,
+          0.8605
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 14,
+        "rate": 0.4667,
+        "wilson95": [
+          0.3023,
+          0.6386
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 2,
+          "rate": 0.0667,
+          "wilson95": [
+            0.0185,
+            0.2132
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 2,
+        "rate": 0.0222,
+        "wilson95": [
+          0.0061,
+          0.0774
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 2,
+        "rate": 0.0667,
+        "wilson95": [
+          0.0185,
+          0.2132
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 2,
+        "rate": 0.0667,
+        "wilson95": [
+          0.0185,
+          0.2132
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 14,
+        "base_with_any_failure": {
+          "n": 14,
+          "success": 14,
+          "rate": 1.0,
+          "wilson95": [
+            0.7847,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 42,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.0838
+          ]
+        },
+        "failure_error_types": {
+          "unsupported_extra": 1,
+          "wrong_fact_or_source": 23,
+          "wrong_temporal_state": 36,
+          "omission": 1
+        }
+      }
+    },
+    "K3_H3": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 90,
+        "success": 69,
+        "rate": 0.7667,
+        "wilson95": [
+          0.6695,
+          0.842
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 10,
+        "rate": 0.3333,
+        "wilson95": [
+          0.1923,
+          0.5122
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.0409
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 10,
+        "base_with_any_failure": {
+          "n": 10,
+          "success": 10,
+          "rate": 1.0,
+          "wilson95": [
+            0.7225,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 30,
+          "wrong_fact_or_source": 19
+        }
+      }
+    }
+  },
+  "descriptive_H_trend": {
+    "K2_H1_to_H2_worst_order_delta": -0.1667,
+    "K3_worst_order_rates_by_H": {
+      "1": 0.2667,
+      "2": 0.0,
+      "3": 0.0
+    },
+    "warning": "Cells contain different sampled composites; deltas are descriptive, not paired causal estimates."
+  },
+  "by_policy_multiset": {
+    "CONDITION+CONDITION": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 19,
+        "rate": 0.95,
+        "wilson95": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 9,
+        "rate": 0.9,
+        "wilson95": [
+          0.5958,
+          0.9821
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 8,
+          "rate": 0.8,
+          "wilson95": [
+            0.4902,
+            0.9433
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 7,
+          "rate": 0.7,
+          "wilson95": [
+            0.3968,
+            0.8922
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 8,
+          "rate": 0.8,
+          "wilson95": [
+            0.4902,
+            0.9433
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 23,
+        "rate": 0.7667,
+        "wilson95": [
+          0.5907,
+          0.8821
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 7,
+        "rate": 0.7,
+        "wilson95": [
+          0.3968,
+          0.8922
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 8,
+        "rate": 0.8,
+        "wilson95": [
+          0.4902,
+          0.9433
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 1,
+        "rate": 0.1,
+        "wilson95": [
+          0.0179,
+          0.4042
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 9,
+        "base_with_any_failure": {
+          "n": 9,
+          "success": 3,
+          "rate": 0.3333,
+          "wilson95": [
+            0.1206,
+            0.6458
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 27,
+          "success": 20,
+          "rate": 0.7407,
+          "wilson95": [
+            0.5532,
+            0.8683
+          ]
+        },
+        "failure_error_types": {
+          "cross_unit_contamination": 2,
+          "wrong_fact_or_source": 1,
+          "wrong_temporal_state": 3,
+          "omission": 1
+        }
+      }
+    },
+    "CONDITION+CONDITION+CONDITION": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 30,
+        "success": 30,
+        "rate": 1.0,
+        "wilson95": [
+          0.8865,
+          1.0
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 10,
+        "rate": 1.0,
+        "wilson95": [
+          0.7225,
+          1.0
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 6,
+          "rate": 0.6,
+          "wilson95": [
+            0.3127,
+            0.8318
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 7,
+          "rate": 0.7,
+          "wilson95": [
+            0.3968,
+            0.8922
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 5,
+          "rate": 0.5,
+          "wilson95": [
+            0.2366,
+            0.7634
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 18,
+        "rate": 0.6,
+        "wilson95": [
+          0.4232,
+          0.7541
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 5,
+        "rate": 0.5,
+        "wilson95": [
+          0.2366,
+          0.7634
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 7,
+        "rate": 0.7,
+        "wilson95": [
+          0.3968,
+          0.8922
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 10,
+        "base_with_any_failure": {
+          "n": 10,
+          "success": 5,
+          "rate": 0.5,
+          "wilson95": [
+            0.2366,
+            0.7634
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 30,
+          "success": 18,
+          "rate": 0.6,
+          "wilson95": [
+            0.4232,
+            0.7541
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 2,
+          "wrong_temporal_state": 11
+        }
+      }
+    },
+    "CONDITION+CONDITION+SUPERSEDE": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 14,
+        "rate": 0.9333,
+        "wilson95": [
+          0.7018,
+          0.9881
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 4,
+        "rate": 0.8,
+        "wilson95": [
+          0.3755,
+          0.9638
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2039
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 4,
+        "base_with_any_failure": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0,
+          "wilson95": [
+            0.5101,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 12,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2425
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 9,
+          "wrong_fact_or_source": 3,
+          "omission": 1
+        }
+      }
+    },
+    "CONDITION+CONDITION+VERIFY_PREFER": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 9,
+        "rate": 0.6,
+        "wilson95": [
+          0.3575,
+          0.8018
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2039
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 0,
+        "base_with_any_failure": {
+          "n": 0,
+          "success": 0,
+          "rate": null,
+          "wilson95": [
+            null,
+            null
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 0,
+          "success": 0,
+          "rate": null,
+          "wilson95": [
+            null,
+            null
+          ]
+        },
+        "failure_error_types": {}
+      }
+    },
+    "CONDITION+SUPERSEDE": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 19,
+        "rate": 0.95,
+        "wilson95": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 9,
+        "rate": 0.9,
+        "wilson95": [
+          0.5958,
+          0.9821
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 1,
+          "rate": 0.1,
+          "wilson95": [
+            0.0179,
+            0.4042
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 2,
+          "rate": 0.2,
+          "wilson95": [
+            0.0567,
+            0.5098
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 1,
+          "rate": 0.1,
+          "wilson95": [
+            0.0179,
+            0.4042
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 4,
+        "rate": 0.1333,
+        "wilson95": [
+          0.0531,
+          0.2968
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 1,
+        "rate": 0.1,
+        "wilson95": [
+          0.0179,
+          0.4042
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 1,
+        "rate": 0.1,
+        "wilson95": [
+          0.0179,
+          0.4042
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 9,
+        "base_with_any_failure": {
+          "n": 9,
+          "success": 8,
+          "rate": 0.8889,
+          "wilson95": [
+            0.565,
+            0.9801
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 27,
+          "success": 4,
+          "rate": 0.1481,
+          "wilson95": [
+            0.0592,
+            0.3248
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 20,
+          "wrong_fact_or_source": 3
+        }
+      }
+    },
+    "CONDITION+SUPERSEDE+SUPERSEDE": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 15,
+        "rate": 1.0,
+        "wilson95": [
+          0.7961,
+          1.0
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 5,
+        "rate": 1.0,
+        "wilson95": [
+          0.5655,
+          1.0
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2039
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 5,
+        "base_with_any_failure": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 15,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2039
+          ]
+        },
+        "failure_error_types": {
+          "unsupported_extra": 1,
+          "wrong_fact_or_source": 4,
+          "wrong_temporal_state": 16
+        }
+      }
+    },
+    "CONDITION+SUPERSEDE+VERIFY_PREFER": {
+      "independent_base_instances": 30,
+      "atomic_unit_accuracy": {
+        "n": 90,
+        "success": 69,
+        "rate": 0.7667,
+        "wilson95": [
+          0.6695,
+          0.842
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 30,
+        "success": 10,
+        "rate": 0.3333,
+        "wilson95": [
+          0.1923,
+          0.5122
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "reverse": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "interleaved": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 90,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.0409
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 10,
+        "base_with_any_failure": {
+          "n": 10,
+          "success": 10,
+          "rate": 1.0,
+          "wilson95": [
+            0.7225,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 30,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.1135
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 30,
+          "wrong_fact_or_source": 19
+        }
+      }
+    },
+    "CONDITION+VERIFY_PREFER": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 16,
+        "rate": 0.8,
+        "wilson95": [
+          0.584,
+          0.9193
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 6,
+        "rate": 0.6,
+        "wilson95": [
+          0.3127,
+          0.8318
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 4,
+          "rate": 0.4,
+          "wilson95": [
+            0.1682,
+            0.6873
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 3,
+          "rate": 0.3,
+          "wilson95": [
+            0.1078,
+            0.6032
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 5,
+          "rate": 0.5,
+          "wilson95": [
+            0.2366,
+            0.7634
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 12,
+        "rate": 0.4,
+        "wilson95": [
+          0.2459,
+          0.5768
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 3,
+        "rate": 0.3,
+        "wilson95": [
+          0.1078,
+          0.6032
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 5,
+        "rate": 0.5,
+        "wilson95": [
+          0.2366,
+          0.7634
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 6,
+        "base_with_any_failure": {
+          "n": 6,
+          "success": 3,
+          "rate": 0.5,
+          "wilson95": [
+            0.1876,
+            0.8124
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 18,
+          "success": 12,
+          "rate": 0.6667,
+          "wilson95": [
+            0.4375,
+            0.8372
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 6,
+          "unsupported_extra": 1
+        }
+      }
+    },
+    "CONDITION+VERIFY_PREFER+VERIFY_PREFER": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 10,
+        "rate": 0.6667,
+        "wilson95": [
+          0.4171,
+          0.8482
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 1,
+        "rate": 0.2,
+        "wilson95": [
+          0.0362,
+          0.6245
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 2,
+          "rate": 0.4,
+          "wilson95": [
+            0.1176,
+            0.7693
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 2,
+        "rate": 0.1333,
+        "wilson95": [
+          0.0374,
+          0.3788
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 2,
+        "rate": 0.4,
+        "wilson95": [
+          0.1176,
+          0.7693
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 2,
+        "rate": 0.4,
+        "wilson95": [
+          0.1176,
+          0.7693
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 1,
+        "base_with_any_failure": {
+          "n": 1,
+          "success": 1,
+          "rate": 1.0,
+          "wilson95": [
+            0.2065,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 3,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.5615
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 5
+        }
+      }
+    },
+    "SUPERSEDE+SUPERSEDE": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 20,
+        "rate": 1.0,
+        "wilson95": [
+          0.8389,
+          1.0
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 10,
+        "rate": 1.0,
+        "wilson95": [
+          0.7225,
+          1.0
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 4,
+          "rate": 0.4,
+          "wilson95": [
+            0.1682,
+            0.6873
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 2,
+          "rate": 0.2,
+          "wilson95": [
+            0.0567,
+            0.5098
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 4,
+          "rate": 0.4,
+          "wilson95": [
+            0.1682,
+            0.6873
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 10,
+        "rate": 0.3333,
+        "wilson95": [
+          0.1923,
+          0.5122
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 4,
+        "rate": 0.4,
+        "wilson95": [
+          0.1682,
+          0.6873
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 10,
+        "base_with_any_failure": {
+          "n": 10,
+          "success": 8,
+          "rate": 0.8,
+          "wilson95": [
+            0.4902,
+            0.9433
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 30,
+          "success": 10,
+          "rate": 0.3333,
+          "wilson95": [
+            0.1923,
+            0.5122
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 11,
+          "wrong_temporal_state": 9,
+          "omission": 1,
+          "unsupported_extra": 1
+        }
+      }
+    },
+    "SUPERSEDE+SUPERSEDE+SUPERSEDE": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 30,
+        "success": 29,
+        "rate": 0.9667,
+        "wilson95": [
+          0.8333,
+          0.9941
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 9,
+        "rate": 0.9,
+        "wilson95": [
+          0.5958,
+          0.9821
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 3,
+          "rate": 0.3,
+          "wilson95": [
+            0.1078,
+            0.6032
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 3,
+          "rate": 0.3,
+          "wilson95": [
+            0.1078,
+            0.6032
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 4,
+          "rate": 0.4,
+          "wilson95": [
+            0.1682,
+            0.6873
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 10,
+        "rate": 0.3333,
+        "wilson95": [
+          0.1923,
+          0.5122
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 3,
+        "rate": 0.3,
+        "wilson95": [
+          0.1078,
+          0.6032
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 4,
+        "rate": 0.4,
+        "wilson95": [
+          0.1682,
+          0.6873
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 1,
+        "rate": 0.1,
+        "wilson95": [
+          0.0179,
+          0.4042
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 9,
+        "base_with_any_failure": {
+          "n": 9,
+          "success": 6,
+          "rate": 0.6667,
+          "wilson95": [
+            0.3542,
+            0.8794
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 27,
+          "success": 10,
+          "rate": 0.3704,
+          "wilson95": [
+            0.2153,
+            0.5577
+          ]
+        },
+        "failure_error_types": {
+          "omission": 4,
+          "unsupported_extra": 2,
+          "wrong_fact_or_source": 9,
+          "wrong_temporal_state": 8
+        }
+      }
+    },
+    "SUPERSEDE+SUPERSEDE+VERIFY_PREFER": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 12,
+        "rate": 0.8,
+        "wilson95": [
+          0.5481,
+          0.9295
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 2,
+        "rate": 0.4,
+        "wilson95": [
+          0.1176,
+          0.7693
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2039
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 2,
+        "base_with_any_failure": {
+          "n": 2,
+          "success": 2,
+          "rate": 1.0,
+          "wilson95": [
+            0.3424,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 6,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.3903
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 5,
+          "wrong_fact_or_source": 7
+        }
+      }
+    },
+    "SUPERSEDE+VERIFY_PREFER": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 13,
+        "rate": 0.65,
+        "wilson95": [
+          0.4329,
+          0.8188
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 3,
+        "rate": 0.3,
+        "wilson95": [
+          0.1078,
+          0.6032
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.1135
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2775
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2775
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2775
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 3,
+        "base_with_any_failure": {
+          "n": 3,
+          "success": 3,
+          "rate": 1.0,
+          "wilson95": [
+            0.4385,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 9,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2991
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 4,
+          "wrong_temporal_state": 8
+        }
+      }
+    },
+    "SUPERSEDE+VERIFY_PREFER+VERIFY_PREFER": {
+      "independent_base_instances": 5,
+      "atomic_unit_accuracy": {
+        "n": 15,
+        "success": 11,
+        "rate": 0.7333,
+        "wilson95": [
+          0.4805,
+          0.891
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 5,
+        "success": 2,
+        "rate": 0.4,
+        "wilson95": [
+          0.1176,
+          0.7693
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "reverse": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        },
+        "interleaved": {
+          "n": 5,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.4345
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 15,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2039
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 5,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.4345
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 2,
+        "base_with_any_failure": {
+          "n": 2,
+          "success": 2,
+          "rate": 1.0,
+          "wilson95": [
+            0.3424,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 6,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.3903
+          ]
+        },
+        "failure_error_types": {
+          "wrong_temporal_state": 6,
+          "wrong_fact_or_source": 4
+        }
+      }
+    },
+    "VERIFY_PREFER+VERIFY_PREFER": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 20,
+        "success": 10,
+        "rate": 0.5,
+        "wilson95": [
+          0.2993,
+          0.7007
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 3,
+        "rate": 0.3,
+        "wilson95": [
+          0.1078,
+          0.6032
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 2,
+          "rate": 0.2,
+          "wilson95": [
+            0.0567,
+            0.5098
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 3,
+          "rate": 0.3,
+          "wilson95": [
+            0.1078,
+            0.6032
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 5,
+        "rate": 0.1667,
+        "wilson95": [
+          0.0734,
+          0.3356
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2775
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 4,
+        "rate": 0.4,
+        "wilson95": [
+          0.1682,
+          0.6873
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 4,
+        "rate": 0.4,
+        "wilson95": [
+          0.1682,
+          0.6873
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 3,
+        "base_with_any_failure": {
+          "n": 3,
+          "success": 3,
+          "rate": 1.0,
+          "wilson95": [
+            0.4385,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 9,
+          "success": 2,
+          "rate": 0.2222,
+          "wilson95": [
+            0.0632,
+            0.5474
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 5,
+          "omission": 2
+        }
+      }
+    },
+    "VERIFY_PREFER+VERIFY_PREFER+VERIFY_PREFER": {
+      "independent_base_instances": 10,
+      "atomic_unit_accuracy": {
+        "n": 30,
+        "success": 21,
+        "rate": 0.7,
+        "wilson95": [
+          0.5212,
+          0.8334
+        ]
+      },
+      "atomic_all_units_per_base": {
+        "n": 10,
+        "success": 3,
+        "rate": 0.3,
+        "wilson95": [
+          0.1078,
+          0.6032
+        ]
+      },
+      "composite_by_order": {
+        "original": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        },
+        "reverse": {
+          "n": 10,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2775
+          ]
+        },
+        "interleaved": {
+          "n": 10,
+          "success": 2,
+          "rate": 0.2,
+          "wilson95": [
+            0.0567,
+            0.5098
+          ]
+        }
+      },
+      "pooled_order_trials_not_independent": {
+        "n": 30,
+        "success": 2,
+        "rate": 0.0667,
+        "wilson95": [
+          0.0185,
+          0.2132
+        ]
+      },
+      "worst_order_base_accuracy": {
+        "n": 10,
+        "success": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0.0,
+          0.2775
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 10,
+        "success": 2,
+        "rate": 0.2,
+        "wilson95": [
+          0.0567,
+          0.5098
+        ]
+      },
+      "composition_specific_failure": {
+        "eligible_bases_atomic_all_correct": 3,
+        "base_with_any_failure": {
+          "n": 3,
+          "success": 3,
+          "rate": 1.0,
+          "wilson95": [
+            0.4385,
+            1.0
+          ]
+        },
+        "successful_composite_order_trials_given_atomic_all": {
+          "n": 9,
+          "success": 1,
+          "rate": 0.1111,
+          "wilson95": [
+            0.0199,
+            0.435
+          ]
+        },
+        "failure_error_types": {
+          "wrong_fact_or_source": 12
+        }
+      }
+    }
+  },
+  "caveats": [
+    "This is a controlled cross-session composition diagnostic, not a natural-prevalence estimate.",
+    "The semantic judge is an LLM; publication claims require blind human validation on a stratified sample.",
+    "H spans the three MemConflict validity operations only: temporal, factual/source, and contextual."
+  ]
+}

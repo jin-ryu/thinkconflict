@@ -1,0 +1,89 @@
+{
+  "models": [
+    {
+      "model": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+      "atomic": {
+        "n": 48,
+        "success": 48,
+        "rate": 1.0
+      },
+      "direct_original": {
+        "n": 24,
+        "success": 19,
+        "rate": 0.7917
+      },
+      "direct_reverse": {
+        "n": 24,
+        "success": 22,
+        "rate": 0.9167
+      },
+      "composition_specific_failures": 7,
+      "composition_specific_failure_rate": 0.1458,
+      "order_flip_observed": true
+    },
+    {
+      "model": "Qwen/Qwen3-8B",
+      "atomic": {
+        "n": 48,
+        "success": 47,
+        "rate": 0.9792
+      },
+      "direct_original": {
+        "n": 24,
+        "success": 19,
+        "rate": 0.7917
+      },
+      "direct_reverse": {
+        "n": 24,
+        "success": 16,
+        "rate": 0.6667
+      },
+      "composition_specific_failures": 13,
+      "composition_specific_failure_rate": 0.2708,
+      "order_flip_observed": true,
+      "error_types": {
+        "condition_over_preservation": 4,
+        "state_omission": 1,
+        "wrong_preference_selection": 6,
+        "wrong_condition_application": 1,
+        "unsupported_inference": 1
+      }
+    },
+    {
+      "model": "openai/gpt-oss-20b",
+      "atomic": {
+        "n": 48,
+        "success": 48,
+        "rate": 1.0
+      },
+      "direct_original": {
+        "n": 24,
+        "success": 23,
+        "rate": 0.9583
+      },
+      "direct_reverse": {
+        "n": 24,
+        "success": 19,
+        "rate": 0.7917
+      },
+      "composition_specific_failures": 6,
+      "composition_specific_failure_rate": 0.125,
+      "order_flip_observed": true,
+      "error_types": {
+        "unsupported_inference": 2,
+        "wrong_preference_selection": 4
+      }
+    }
+  ],
+  "gate": {
+    "at_least_two_models_show_composition_failure": true,
+    "minimum_three_or_ten_percent_per_model": true,
+    "common_error_type_across_added_families": [
+      "unsupported_inference",
+      "wrong_preference_selection"
+    ],
+    "order_flip_not_unique_to_one_model": true,
+    "stage_f_pass": true
+  },
+  "interpretation": "Stage F tests cross-model existence and diagnostic plausibility, not a causal H effect. Proceeding to a larger K×H design is justified only as the next validation stage."
+}

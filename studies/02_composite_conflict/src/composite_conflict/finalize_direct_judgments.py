@@ -140,10 +140,10 @@ def _markdown(rows: list[dict]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--pilot-root", type=Path, default=Path("data/pilot1"))
-    parser.add_argument("--out", type=Path, default=Path("data/pilot1/final_llm_judgments.jsonl"))
+    parser.add_argument("--pilot-root", type=Path, default=Path("data/pilot1_search"))
+    parser.add_argument("--out", type=Path, default=Path("data/pilot1_search/final_llm_judgments.jsonl"))
     parser.add_argument(
-        "--report", type=Path, default=Path("results/pilot1/final_llm_judgment_table.md")
+        "--report", type=Path, default=Path("results/pilot1_search/final_llm_judgment_table.md")
     )
     args = parser.parse_args()
 

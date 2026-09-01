@@ -56,8 +56,8 @@ def render_case(view: dict, draft: dict, preview_chars: int = 1200) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--view", default="data/pilot1/calibration_view.jsonl")
-    parser.add_argument("--drafts", default="data/pilot1/llm_drafts_calibration.jsonl")
+    parser.add_argument("--view", default="data/pilot1_search/calibration_view.jsonl")
+    parser.add_argument("--drafts", default="data/pilot1_search/llm_drafts_calibration.jsonl")
     parser.add_argument("--instance-id")
     parser.add_argument("--list", action="store_true", dest="list_instances")
     parser.add_argument("--preview-chars", type=int, default=1200)

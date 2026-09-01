@@ -1,0 +1,38 @@
+{
+  "H1::direct": {
+    "n": 24,
+    "success": 24,
+    "rate": 1.0
+  },
+  "H1::generic_cot": {
+    "n": 24,
+    "success": 22,
+    "rate": 0.9167
+  },
+  "H1::oracle_unit_policies": {
+    "n": 24,
+    "success": 23,
+    "rate": 0.9583
+  },
+  "H2::direct": {
+    "n": 24,
+    "success": 19,
+    "rate": 0.7917
+  },
+  "H2::generic_cot": {
+    "n": 24,
+    "success": 21,
+    "rate": 0.875
+  },
+  "H2::oracle_unit_policies": {
+    "n": 24,
+    "success": 24,
+    "rate": 1.0
+  },
+  "descriptive_deltas_h2_minus_h1": {
+    "direct": -0.2083,
+    "generic_cot": -0.0417,
+    "oracle_unit_policies": 0.0417
+  },
+  "caveat": "Descriptive feasibility-set statistics; not a matched causal estimate. High-confidence lexical passes outside Direct were not all independently re-read by Codex."
+}

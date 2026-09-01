@@ -1,0 +1,54 @@
+protocol: stage-j-interference-v1
+started_at: 2026-08-28
+completed_at: 2026-08-28 03:12 (generation + v4 judging for 4 models; analyses in stage_j_* folders; summary stage_j_summary.md)
+human_validation_sample: results/pilot2_memory/stage_j_human/ (168 trials, 56 strata, blind file for annotators)
+serving:
+  engine: vllm
+  version: 0.17.1
+  endpoint: http://127.0.0.1:8004/v1
+  gpu: NVIDIA H100 80GB, single
+  concurrency: 16 workers; RequestThrottle disabled for local runs (2026-08-28 patch)
+inputs:
+  stage_i_controls: data/pilot2_memory/stage_i_controls/   # K2_C0 30, K3_C0 30, 3 orders, 150 atomic; seed 20260828
+  stage_i_anchor: data/pilot2_memory/stage_i_anchor/       # 60 anchors x {same,diff}, 3 orders, 131 atomic; seed 20260828
+  stage_g: data/pilot2_memory/stage_g_factorial/            # reused for v4 re-judging
+generation:
+  condition: direct
+  temperature: 0
+  seed: 20260827
+  max_tokens: 900
+  models:
+    - id: Qwen/Qwen3-8B
+      revision: b968826d9c46dd6066d109eabc6255188de91218
+      dtype: bfloat16
+      thinking: off
+    - id: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+      serving: tokenizer_mode=mistral, config_format=mistral, load_format=mistral
+    - id: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+      revision: 2123003760781134cfc31124aa6560a45b491fdf
+      quantization: awq_marlin
+    - id: Qwen/Qwen3-32B
+      revision: 9216db5781bf (local snapshot)
+      dtype: bfloat16
+      role: same-family scale-up of Qwen3-8B; thinking off for Stage G + Stage I, thinking on (max_tokens 4000) for Stage G only
+      judge: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4 v4
+      thinking_on_note: 12/840 trials exhausted the 4000-token budget inside <think> and produced no JSON; kept in the denominator as omissions (same convention as Stage G). Median completion tokens 836.
+judging:
+  protocol: v4_unit_isolated   # unit-isolated verdicts + extracted_answer; v3_evidence kept for comparison
+  controls_protocol: v4_lookup_lenient   # 2026-08-28: LOOKUP rule relaxed after blind LLM annotation showed v4 over-strict on multi-field lookups; controls re-judged (1,320 calls), conflict cells unchanged
+  temperature: 0
+  seed: 20260827
+  max_tokens: 700
+  cross_judge:
+    qwen3_8b_outputs: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+    mistral_small_3_2_24b_outputs: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+    llama3_1_70b_awq_int4_outputs: Qwen/Qwen3-8B (thinking off)  # UNRELIABLE: marks correct atomic lookups wrong; superseded by Qwen/Qwen3-32B v4 re-judging (pipeline 2)
+analyses:
+  j1_independence: src/composite_conflict/analyze_pilot2_stage_j_independence.py
+  j3_anchor: src/composite_conflict/analyze_pilot2_stage_j_anchor.py
+  j4_leakage: src/composite_conflict/analyze_pilot2_stage_j_leakage.py
+notes:
+  - Statistical unit is the base instance (or anchor pair); order variants are repeated measures.
+  - J-0 frontier gate not yet run: no API key available in this environment.
+  - Stage G v3 judgments were used for the first J-1 pass; v4 re-judging supersedes them once complete.
+  - 2026-08-28 controls gold revision: gold_atomic_answer restricted to the fields the question asks (GOLD_FIELDS in prepare_pilot2_stage_i_controls.py). Queries, records and orders are byte-identical to the first build, so generation outputs were reused; only judgments were re-run. First-build judgments kept as *_goldv1.jsonl.

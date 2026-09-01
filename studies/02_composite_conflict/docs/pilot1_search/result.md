@@ -2,8 +2,8 @@
 
 > 실행일: 2026-08-26
 > 상태: 완료 — exploratory go/no-go pilot
-> 상세 판정표: [final_llm_judgment_table.md](../../results/pilot1/final_llm_judgment_table.md)
-> 구조화 결과: [final_llm_judgments.jsonl](../../data/pilot1/final_llm_judgments.jsonl)
+> 상세 판정표: [final_llm_judgment_table.md](../../results/pilot1_search/final_llm_judgment_table.md)
+> 구조화 결과: [final_llm_judgments.jsonl](../../data/pilot1_search/final_llm_judgments.jsonl)
 
 ## 0. 결론
 

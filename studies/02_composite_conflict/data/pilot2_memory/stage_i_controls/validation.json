@@ -1,0 +1,52 @@
+{
+  "valid": true,
+  "errors": [],
+  "bases": 60,
+  "composite_order_variants": 180,
+  "atomic_probes": 150,
+  "record_count_distribution": {
+    "K2_C0:5": 30,
+    "K3_C0:8": 30
+  },
+  "pool_sizes": {
+    "14e41890": 6,
+    "2e62aacf": 6,
+    "3c2e5fe5": 5,
+    "40a79d0c": 6,
+    "40f2307d": 6,
+    "4cbe1c3d": 6,
+    "4f76dbf9": 6,
+    "575f4af8": 6,
+    "5a40c38b": 5,
+    "5c2a85a4": 6,
+    "737e8d59": 5,
+    "75345e85": 6,
+    "75b15745": 6,
+    "8518c87c": 6,
+    "8cb3c9c6": 6,
+    "90e98aa7": 6,
+    "9841f645": 5,
+    "9dffc5de": 6,
+    "a7850e51": 5,
+    "bb30a4e6": 6,
+    "c2efaebe": 5,
+    "cafa273c": 6,
+    "d337564c": 5,
+    "d65aae82": 6,
+    "e02dd733": 5,
+    "e57c356a": 6,
+    "f398d596": 6,
+    "f47bb65a": 6,
+    "f5f6c655": 6,
+    "fc1726f1": 6
+  },
+  "attribute_usage": {
+    "Career_Status": 33,
+    "Children_Status": 25,
+    "Residence": 23,
+    "Health_Status": 20,
+    "Marital_Status": 20,
+    "Work_Status": 29
+  },
+  "seed": 20260828
+}

@@ -15,8 +15,8 @@
 
 ## 산출물
 
-- [202건 전체 판정표](../../results/pilot1/final_llm_judgment_table.md)
-- [최종 구조화 판정](../../data/pilot1/final_llm_judgments.jsonl)
-- [표본 manifest](../../data/pilot1/sample_manifest.json)
+- [202건 전체 판정표](../../results/pilot1_search/final_llm_judgment_table.md)
+- [최종 구조화 판정](../../data/pilot1_search/final_llm_judgments.jsonl)
+- [표본 manifest](../../data/pilot1_search/sample_manifest.json)
 
 사전 계획과 실제 실행은 다르다. 시간 제약으로 독립 인간 주석 대신 Codex direct 판정을 사용했으며, 정확한 변경과 한계는 `result.md`에 기록했다.

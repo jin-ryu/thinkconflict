@@ -1,0 +1,335 @@
+{
+  "ALL|anchor_diff": {
+    "wrong_unit_trials": 86,
+    "labels": {
+      "unattributed": {
+        "n": 28,
+        "share": 0.326
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.302
+      },
+      "gold_present_but_wrong": {
+        "n": 22,
+        "share": 0.256
+      },
+      "gold_and_alt": {
+        "n": 7,
+        "share": 0.081
+      },
+      "wrong_condition": {
+        "n": 2,
+        "share": 0.023
+      },
+      "not_addressed": {
+        "n": 1,
+        "share": 0.012
+      }
+    }
+  },
+  "ALL|anchor_same": {
+    "wrong_unit_trials": 99,
+    "labels": {
+      "unattributed": {
+        "n": 40,
+        "share": 0.404
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.263
+      },
+      "gold_present_but_wrong": {
+        "n": 19,
+        "share": 0.192
+      },
+      "gold_and_alt": {
+        "n": 7,
+        "share": 0.071
+      },
+      "wrong_condition": {
+        "n": 5,
+        "share": 0.051
+      },
+      "not_addressed": {
+        "n": 2,
+        "share": 0.02
+      }
+    }
+  },
+  "CONDITION|ALL": {
+    "wrong_unit_trials": 13,
+    "labels": {
+      "wrong_condition": {
+        "n": 7,
+        "share": 0.538
+      },
+      "gold_present_but_wrong": {
+        "n": 4,
+        "share": 0.308
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.077
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.077
+      }
+    }
+  },
+  "CONDITION|A_DIFF": {
+    "wrong_unit_trials": 7,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 4,
+        "share": 0.571
+      },
+      "wrong_condition": {
+        "n": 2,
+        "share": 0.286
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.143
+      }
+    }
+  },
+  "CONDITION|A_SAME": {
+    "wrong_unit_trials": 6,
+    "labels": {
+      "wrong_condition": {
+        "n": 5,
+        "share": 0.833
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.167
+      }
+    }
+  },
+  "CONDITION|anchor_diff": {
+    "wrong_unit_trials": 7,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 4,
+        "share": 0.571
+      },
+      "wrong_condition": {
+        "n": 2,
+        "share": 0.286
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.143
+      }
+    }
+  },
+  "CONDITION|anchor_same": {
+    "wrong_unit_trials": 6,
+    "labels": {
+      "wrong_condition": {
+        "n": 5,
+        "share": 0.833
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.167
+      }
+    }
+  },
+  "SUPERSEDE|ALL": {
+    "wrong_unit_trials": 42,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 29,
+        "share": 0.69
+      },
+      "gold_and_alt": {
+        "n": 12,
+        "share": 0.286
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.024
+      }
+    }
+  },
+  "SUPERSEDE|A_DIFF": {
+    "wrong_unit_trials": 19,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 13,
+        "share": 0.684
+      },
+      "gold_and_alt": {
+        "n": 6,
+        "share": 0.316
+      }
+    }
+  },
+  "SUPERSEDE|A_SAME": {
+    "wrong_unit_trials": 23,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 16,
+        "share": 0.696
+      },
+      "gold_and_alt": {
+        "n": 6,
+        "share": 0.261
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.043
+      }
+    }
+  },
+  "SUPERSEDE|anchor_diff": {
+    "wrong_unit_trials": 19,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 13,
+        "share": 0.684
+      },
+      "gold_and_alt": {
+        "n": 6,
+        "share": 0.316
+      }
+    }
+  },
+  "SUPERSEDE|anchor_same": {
+    "wrong_unit_trials": 23,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 16,
+        "share": 0.696
+      },
+      "gold_and_alt": {
+        "n": 6,
+        "share": 0.261
+      },
+      "unattributed": {
+        "n": 1,
+        "share": 0.043
+      }
+    }
+  },
+  "VERIFY_PREFER|ALL": {
+    "wrong_unit_trials": 130,
+    "labels": {
+      "unattributed": {
+        "n": 66,
+        "share": 0.508
+      },
+      "latest_applied": {
+        "n": 52,
+        "share": 0.4
+      },
+      "gold_present_but_wrong": {
+        "n": 8,
+        "share": 0.062
+      },
+      "not_addressed": {
+        "n": 3,
+        "share": 0.023
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.008
+      }
+    }
+  },
+  "VERIFY_PREFER|A_DIFF": {
+    "wrong_unit_trials": 60,
+    "labels": {
+      "unattributed": {
+        "n": 27,
+        "share": 0.45
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.433
+      },
+      "gold_present_but_wrong": {
+        "n": 5,
+        "share": 0.083
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.017
+      },
+      "not_addressed": {
+        "n": 1,
+        "share": 0.017
+      }
+    }
+  },
+  "VERIFY_PREFER|A_SAME": {
+    "wrong_unit_trials": 70,
+    "labels": {
+      "unattributed": {
+        "n": 39,
+        "share": 0.557
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.371
+      },
+      "gold_present_but_wrong": {
+        "n": 3,
+        "share": 0.043
+      },
+      "not_addressed": {
+        "n": 2,
+        "share": 0.029
+      }
+    }
+  },
+  "VERIFY_PREFER|anchor_diff": {
+    "wrong_unit_trials": 60,
+    "labels": {
+      "unattributed": {
+        "n": 27,
+        "share": 0.45
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.433
+      },
+      "gold_present_but_wrong": {
+        "n": 5,
+        "share": 0.083
+      },
+      "gold_and_alt": {
+        "n": 1,
+        "share": 0.017
+      },
+      "not_addressed": {
+        "n": 1,
+        "share": 0.017
+      }
+    }
+  },
+  "VERIFY_PREFER|anchor_same": {
+    "wrong_unit_trials": 70,
+    "labels": {
+      "unattributed": {
+        "n": 39,
+        "share": 0.557
+      },
+      "latest_applied": {
+        "n": 26,
+        "share": 0.371
+      },
+      "gold_present_but_wrong": {
+        "n": 3,
+        "share": 0.043
+      },
+      "not_addressed": {
+        "n": 2,
+        "share": 0.029
+      }
+    }
+  }
+}

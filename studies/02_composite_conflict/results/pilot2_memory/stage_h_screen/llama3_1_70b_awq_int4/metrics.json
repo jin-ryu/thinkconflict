@@ -1,0 +1,380 @@
+{
+  "protocol": "stage-h-outcome-blind-screen-v1",
+  "design": {
+    "base_instances": 50,
+    "order_trials": 150,
+    "statistical_unit": "base_instance; order variants are repeated measures"
+  },
+  "generation_model": "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+  "judge_model": "Qwen/Qwen3-8B",
+  "conditions": {
+    "direct": {
+      "all_unit_success_order_trials_not_independent": {
+        "n": 150,
+        "success": 68,
+        "rate": 0.4533,
+        "wilson95": [
+          0.3758,
+          0.5332
+        ]
+      },
+      "by_order": {
+        "original": {
+          "n": 50,
+          "success": 23,
+          "rate": 0.46,
+          "wilson95": [
+            0.3297,
+            0.596
+          ]
+        },
+        "reverse": {
+          "n": 50,
+          "success": 19,
+          "rate": 0.38,
+          "wilson95": [
+            0.2586,
+            0.5185
+          ]
+        },
+        "interleaved": {
+          "n": 50,
+          "success": 26,
+          "rate": 0.52,
+          "wilson95": [
+            0.3851,
+            0.652
+          ]
+        }
+      },
+      "worst_order_base_accuracy": {
+        "n": 50,
+        "success": 15,
+        "rate": 0.3,
+        "wilson95": [
+          0.191,
+          0.4375
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 50,
+        "success": 30,
+        "rate": 0.6,
+        "wilson95": [
+          0.4618,
+          0.7239
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 50,
+        "success": 15,
+        "rate": 0.3,
+        "wilson95": [
+          0.191,
+          0.4375
+        ]
+      },
+      "paired_vs_direct": {
+        "recovered_order_trials": 0,
+        "regressed_order_trials": 0,
+        "net_success_change": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "by_cell": {
+        "K2_H1": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 22,
+            "rate": 0.7333,
+            "wilson95": [
+              0.5555,
+              0.8582
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 6,
+            "rate": 0.6,
+            "wilson95": [
+              0.3127,
+              0.8318
+            ]
+          }
+        },
+        "K2_H2": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 14,
+            "rate": 0.4667,
+            "wilson95": [
+              0.3023,
+              0.6386
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 3,
+            "rate": 0.3,
+            "wilson95": [
+              0.1078,
+              0.6032
+            ]
+          }
+        },
+        "K3_H1": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 17,
+            "rate": 0.5667,
+            "wilson95": [
+              0.392,
+              0.7262
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 4,
+            "rate": 0.4,
+            "wilson95": [
+              0.1682,
+              0.6873
+            ]
+          }
+        },
+        "K3_H2": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 8,
+            "rate": 0.2667,
+            "wilson95": [
+              0.1418,
+              0.4445
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 1,
+            "rate": 0.1,
+            "wilson95": [
+              0.0179,
+              0.4042
+            ]
+          }
+        },
+        "K3_H3": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 7,
+            "rate": 0.2333,
+            "wilson95": [
+              0.1179,
+              0.4093
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 1,
+            "rate": 0.1,
+            "wilson95": [
+              0.0179,
+              0.4042
+            ]
+          }
+        }
+      },
+      "cost": {
+        "model_calls_per_trial": 1,
+        "mean_total_tokens_per_trial": 1229.2,
+        "total_model_calls": 150,
+        "total_tokens": 184375
+      }
+    },
+    "full_local": {
+      "all_unit_success_order_trials_not_independent": {
+        "n": 150,
+        "success": 70,
+        "rate": 0.4667,
+        "wilson95": [
+          0.3887,
+          0.5463
+        ]
+      },
+      "by_order": {
+        "original": {
+          "n": 50,
+          "success": 23,
+          "rate": 0.46,
+          "wilson95": [
+            0.3297,
+            0.596
+          ]
+        },
+        "reverse": {
+          "n": 50,
+          "success": 23,
+          "rate": 0.46,
+          "wilson95": [
+            0.3297,
+            0.596
+          ]
+        },
+        "interleaved": {
+          "n": 50,
+          "success": 24,
+          "rate": 0.48,
+          "wilson95": [
+            0.348,
+            0.6149
+          ]
+        }
+      },
+      "worst_order_base_accuracy": {
+        "n": 50,
+        "success": 20,
+        "rate": 0.4,
+        "wilson95": [
+          0.2761,
+          0.5382
+        ]
+      },
+      "best_order_base_accuracy": {
+        "n": 50,
+        "success": 27,
+        "rate": 0.54,
+        "wilson95": [
+          0.404,
+          0.6703
+        ]
+      },
+      "order_flip_by_base": {
+        "n": 50,
+        "success": 7,
+        "rate": 0.14,
+        "wilson95": [
+          0.0695,
+          0.2619
+        ]
+      },
+      "paired_vs_direct": {
+        "recovered_order_trials": 15,
+        "regressed_order_trials": 13,
+        "net_success_change": 2,
+        "mcnemar_exact_p": 0.850554
+      },
+      "by_cell": {
+        "K2_H1": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 23,
+            "rate": 0.7667,
+            "wilson95": [
+              0.5907,
+              0.8821
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 7,
+            "rate": 0.7,
+            "wilson95": [
+              0.3968,
+              0.8922
+            ]
+          }
+        },
+        "K2_H2": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 12,
+            "rate": 0.4,
+            "wilson95": [
+              0.2459,
+              0.5768
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 4,
+            "rate": 0.4,
+            "wilson95": [
+              0.1682,
+              0.6873
+            ]
+          }
+        },
+        "K3_H1": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 17,
+            "rate": 0.5667,
+            "wilson95": [
+              0.392,
+              0.7262
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 4,
+            "rate": 0.4,
+            "wilson95": [
+              0.1682,
+              0.6873
+            ]
+          }
+        },
+        "K3_H2": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 9,
+            "rate": 0.3,
+            "wilson95": [
+              0.1666,
+              0.4788
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 3,
+            "rate": 0.3,
+            "wilson95": [
+              0.1078,
+              0.6032
+            ]
+          }
+        },
+        "K3_H3": {
+          "order_trials_not_independent": {
+            "n": 30,
+            "success": 9,
+            "rate": 0.3,
+            "wilson95": [
+              0.1666,
+              0.4788
+            ]
+          },
+          "worst_order_base": {
+            "n": 10,
+            "success": 2,
+            "rate": 0.2,
+            "wilson95": [
+              0.0567,
+              0.5098
+            ]
+          }
+        }
+      },
+      "cost": {
+        "model_calls_per_trial": 1,
+        "mean_total_tokens_per_trial": 1167.2,
+        "total_model_calls": 150,
+        "total_tokens": 175082
+      }
+    }
+  },
+  "verifier_increment_over_full_local": null,
+  "caveats": [
+    "Grouping, target filtering, and policy labels are oracle diagnostics, not an end-to-end method.",
+    "Target filtering uses the gold atomic answer only to identify removable non-target preferences; the gold answer is never exposed to the generation model.",
+    "The 50 bases were selected without model outcomes, but this is a screen rather than a publication-scale human-validated evaluation."
+  ]
+}

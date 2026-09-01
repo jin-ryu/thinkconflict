@@ -1,0 +1,123 @@
+{
+  "ALL|no_conflict": {
+    "wrong_unit_trials": 122,
+    "labels": {
+      "wrong_owner": {
+        "n": 65,
+        "share": 0.533
+      },
+      "gold_present_but_wrong": {
+        "n": 19,
+        "share": 0.156
+      },
+      "gold_and_alt": {
+        "n": 19,
+        "share": 0.156
+      },
+      "unattributed": {
+        "n": 15,
+        "share": 0.123
+      },
+      "not_addressed": {
+        "n": 4,
+        "share": 0.033
+      }
+    }
+  },
+  "LOOKUP|ALL": {
+    "wrong_unit_trials": 122,
+    "labels": {
+      "wrong_owner": {
+        "n": 65,
+        "share": 0.533
+      },
+      "gold_present_but_wrong": {
+        "n": 19,
+        "share": 0.156
+      },
+      "gold_and_alt": {
+        "n": 19,
+        "share": 0.156
+      },
+      "unattributed": {
+        "n": 15,
+        "share": 0.123
+      },
+      "not_addressed": {
+        "n": 4,
+        "share": 0.033
+      }
+    }
+  },
+  "LOOKUP|K2_C0": {
+    "wrong_unit_trials": 48,
+    "labels": {
+      "wrong_owner": {
+        "n": 23,
+        "share": 0.479
+      },
+      "gold_present_but_wrong": {
+        "n": 11,
+        "share": 0.229
+      },
+      "unattributed": {
+        "n": 8,
+        "share": 0.167
+      },
+      "gold_and_alt": {
+        "n": 6,
+        "share": 0.125
+      }
+    }
+  },
+  "LOOKUP|K3_C0": {
+    "wrong_unit_trials": 74,
+    "labels": {
+      "wrong_owner": {
+        "n": 42,
+        "share": 0.568
+      },
+      "gold_and_alt": {
+        "n": 13,
+        "share": 0.176
+      },
+      "gold_present_but_wrong": {
+        "n": 8,
+        "share": 0.108
+      },
+      "unattributed": {
+        "n": 7,
+        "share": 0.095
+      },
+      "not_addressed": {
+        "n": 4,
+        "share": 0.054
+      }
+    }
+  },
+  "LOOKUP|no_conflict": {
+    "wrong_unit_trials": 122,
+    "labels": {
+      "wrong_owner": {
+        "n": 65,
+        "share": 0.533
+      },
+      "gold_present_but_wrong": {
+        "n": 19,
+        "share": 0.156
+      },
+      "gold_and_alt": {
+        "n": 19,
+        "share": 0.156
+      },
+      "unattributed": {
+        "n": 15,
+        "share": 0.123
+      },
+      "not_addressed": {
+        "n": 4,
+        "share": 0.033
+      }
+    }
+  }
+}

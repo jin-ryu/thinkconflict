@@ -295,14 +295,14 @@ NatConfQA에서는 unit graph 통계와 `K` 일치도를, QACC에서는 strict `
 
 ## 7.1 산출물
 
-- `data/pilot1/sample_manifest.json`
-- `data/pilot1/llm_drafts.jsonl`
-- `data/pilot1/human_A_verified.jsonl`
-- `data/pilot1/human_B_random_audit.jsonl`
-- `data/pilot1/human_B_h_gt1_audit.jsonl`
-- `data/pilot1/adjudicated.jsonl`
+- `data/pilot1_search/sample_manifest.json`
+- `data/pilot1_search/llm_drafts.jsonl`
+- `data/pilot1_search/human_A_verified.jsonl`
+- `data/pilot1_search/human_B_random_audit.jsonl`
+- `data/pilot1_search/human_B_h_gt1_audit.jsonl`
+- `data/pilot1_search/adjudicated.jsonl`
 - `docs/pilot1_search/annotation_guideline.md`
-- `results/pilot1/prevalence_summary.json`
+- `results/pilot1_search/prevalence_summary.json`
 - `docs/pilot1_search/result.md`
 
 ## 7.2 예상 작업량

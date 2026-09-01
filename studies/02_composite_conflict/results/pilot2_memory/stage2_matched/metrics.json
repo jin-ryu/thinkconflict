@@ -1,0 +1,154 @@
+{
+  "by_evidence_order": {
+    "original::H1::direct": {
+      "n": 24,
+      "success": 24,
+      "rate": 1.0
+    },
+    "original::H1::oracle_unit_policies": {
+      "n": 24,
+      "success": 23,
+      "rate": 0.9583
+    },
+    "original::H2::direct": {
+      "n": 24,
+      "success": 19,
+      "rate": 0.7917
+    },
+    "original::H2::oracle_unit_policies": {
+      "n": 24,
+      "success": 24,
+      "rate": 1.0
+    },
+    "reverse::H1::direct": {
+      "n": 24,
+      "success": 21,
+      "rate": 0.875
+    },
+    "reverse::H1::oracle_unit_policies": {
+      "n": 24,
+      "success": 22,
+      "rate": 0.9167
+    },
+    "reverse::H2::direct": {
+      "n": 24,
+      "success": 22,
+      "rate": 0.9167
+    },
+    "reverse::H2::oracle_unit_policies": {
+      "n": 24,
+      "success": 21,
+      "rate": 0.875
+    }
+  },
+  "pooled_order_trials_not_independent": {
+    "H1::direct": {
+      "n": 48,
+      "success": 45,
+      "rate": 0.9375
+    },
+    "H1::oracle_unit_policies": {
+      "n": 48,
+      "success": 45,
+      "rate": 0.9375
+    },
+    "H2::direct": {
+      "n": 48,
+      "success": 41,
+      "rate": 0.8542
+    },
+    "H2::oracle_unit_policies": {
+      "n": 48,
+      "success": 45,
+      "rate": 0.9375
+    }
+  },
+  "h2_within_instance_composition": {
+    "single_units": {
+      "n": 48,
+      "success": 48,
+      "rate": 1.0
+    },
+    "original_composite": {
+      "n": 24,
+      "success": 19,
+      "rate": 0.7917
+    },
+    "reverse_composite": {
+      "n": 24,
+      "success": 22,
+      "rate": 0.9167
+    },
+    "failed_original_despite_both_single_success": 5,
+    "failed_both_orders_despite_both_single_success": 1
+  },
+  "natural_matched_primary": {
+    "pairs": 9,
+    "orders": {
+      "original": {
+        "H1": {
+          "n": 9,
+          "success": 9,
+          "rate": 1.0
+        },
+        "H2": {
+          "n": 9,
+          "success": 6,
+          "rate": 0.6667
+        },
+        "delta_h2_minus_h1": -0.3333
+      },
+      "reverse": {
+        "H1": {
+          "n": 9,
+          "success": 9,
+          "rate": 1.0
+        },
+        "H2": {
+          "n": 9,
+          "success": 7,
+          "rate": 0.7778
+        },
+        "delta_h2_minus_h1": -0.2222
+      }
+    }
+  },
+  "natural_matched_strong_only": {
+    "pairs": 4,
+    "orders": {
+      "original": {
+        "H1": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0
+        },
+        "H2": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0
+        },
+        "delta_h2_minus_h1": 0.0
+      },
+      "reverse": {
+        "H1": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0
+        },
+        "H2": {
+          "n": 4,
+          "success": 4,
+          "rate": 1.0
+        },
+        "delta_h2_minus_h1": 0.0
+      }
+    }
+  },
+  "matching_quality": {
+    "total": 24,
+    "strong": 4,
+    "moderate": 5,
+    "weak_excluded": 15
+  },
+  "interpretation_caveat": "Natural matching retains residual task differences. Original and reverse trials reuse the same instances and are not independent. Codex judgments are exploratory and not a substitute for blind human validation."
+}

@@ -1,0 +1,1798 @@
+{
+  "ALL": {
+    "pairs": 60,
+    "worst_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 60,
+        "success": 32,
+        "rate": 0.5333,
+        "wilson95": [
+          0.4089,
+          0.6537
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 60,
+        "success": 34,
+        "rate": 0.5667,
+        "wilson95": [
+          0.441,
+          0.6843
+        ]
+      },
+      "same_ok_diff_fail": 1,
+      "diff_ok_same_fail": 3,
+      "mcnemar_exact_p": 0.625
+    },
+    "best_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 60,
+        "success": 48,
+        "rate": 0.8,
+        "wilson95": [
+          0.6822,
+          0.8817
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 60,
+        "success": 49,
+        "rate": 0.8167,
+        "wilson95": [
+          0.7008,
+          0.8944
+        ]
+      },
+      "same_ok_diff_fail": 4,
+      "diff_ok_same_fail": 5,
+      "mcnemar_exact_p": 1.0
+    },
+    "per_order": {
+      "original": {
+        "same": {
+          "n": 60,
+          "success": 37,
+          "rate": 0.6167,
+          "wilson95": [
+            0.4902,
+            0.7291
+          ]
+        },
+        "diff": {
+          "n": 60,
+          "success": 42,
+          "rate": 0.7,
+          "wilson95": [
+            0.5749,
+            0.801
+          ]
+        },
+        "p": 0.266846
+      },
+      "reverse": {
+        "same": {
+          "n": 60,
+          "success": 38,
+          "rate": 0.6333,
+          "wilson95": [
+            0.5068,
+            0.7438
+          ]
+        },
+        "diff": {
+          "n": 60,
+          "success": 41,
+          "rate": 0.6833,
+          "wilson95": [
+            0.5577,
+            0.7869
+          ]
+        },
+        "p": 0.548828
+      },
+      "interleaved": {
+        "same": {
+          "n": 60,
+          "success": 43,
+          "rate": 0.7167,
+          "wilson95": [
+            0.5923,
+            0.8149
+          ]
+        },
+        "diff": {
+          "n": 60,
+          "success": 44,
+          "rate": 0.7333,
+          "wilson95": [
+            0.6099,
+            0.8287
+          ]
+        },
+        "p": 1.0
+      }
+    },
+    "anchor_atomic_accuracy": {
+      "n": 60,
+      "success": 57,
+      "rate": 0.95,
+      "wilson95": [
+        0.863,
+        0.9829
+      ]
+    },
+    "partner_worst_order": {
+      "same": {
+        "n": 60,
+        "success": 30,
+        "rate": 0.5,
+        "wilson95": [
+          0.3773,
+          0.6227
+        ]
+      },
+      "diff": {
+        "n": 60,
+        "success": 30,
+        "rate": 0.5,
+        "wilson95": [
+          0.3773,
+          0.6227
+        ]
+      }
+    },
+    "partner_atomic_accuracy": {
+      "same": {
+        "n": 60,
+        "success": 53,
+        "rate": 0.8833,
+        "wilson95": [
+          0.7782,
+          0.9423
+        ]
+      },
+      "diff": {
+        "n": 60,
+        "success": 49,
+        "rate": 0.8167,
+        "wilson95": [
+          0.7008,
+          0.8944
+        ]
+      }
+    }
+  },
+  "CONDITION": {
+    "pairs": 20,
+    "worst_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 16,
+        "rate": 0.8,
+        "wilson95": [
+          0.584,
+          0.9193
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 18,
+        "rate": 0.9,
+        "wilson95": [
+          0.699,
+          0.9721
+        ]
+      },
+      "same_ok_diff_fail": 0,
+      "diff_ok_same_fail": 2,
+      "mcnemar_exact_p": 0.5
+    },
+    "best_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 19,
+        "rate": 0.95,
+        "wilson95": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 19,
+        "rate": 0.95,
+        "wilson95": [
+          0.7639,
+          0.9911
+        ]
+      },
+      "same_ok_diff_fail": 0,
+      "diff_ok_same_fail": 0,
+      "mcnemar_exact_p": 1.0
+    },
+    "per_order": {
+      "original": {
+        "same": {
+          "n": 20,
+          "success": 16,
+          "rate": 0.8,
+          "wilson95": [
+            0.584,
+            0.9193
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 19,
+          "rate": 0.95,
+          "wilson95": [
+            0.7639,
+            0.9911
+          ]
+        },
+        "p": 0.25
+      },
+      "reverse": {
+        "same": {
+          "n": 20,
+          "success": 19,
+          "rate": 0.95,
+          "wilson95": [
+            0.7639,
+            0.9911
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 19,
+          "rate": 0.95,
+          "wilson95": [
+            0.7639,
+            0.9911
+          ]
+        },
+        "p": 1.0
+      },
+      "interleaved": {
+        "same": {
+          "n": 20,
+          "success": 18,
+          "rate": 0.9,
+          "wilson95": [
+            0.699,
+            0.9721
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 18,
+          "rate": 0.9,
+          "wilson95": [
+            0.699,
+            0.9721
+          ]
+        },
+        "p": 1.0
+      }
+    },
+    "anchor_atomic_accuracy": {
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "wilson95": [
+        0.8389,
+        1.0
+      ]
+    },
+    "partner_worst_order": {
+      "same": {
+        "n": 20,
+        "success": 15,
+        "rate": 0.75,
+        "wilson95": [
+          0.5313,
+          0.8881
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 10,
+        "rate": 0.5,
+        "wilson95": [
+          0.2993,
+          0.7007
+        ]
+      }
+    },
+    "partner_atomic_accuracy": {
+      "same": {
+        "n": 20,
+        "success": 20,
+        "rate": 1.0,
+        "wilson95": [
+          0.8389,
+          1.0
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 11,
+        "rate": 0.55,
+        "wilson95": [
+          0.3421,
+          0.7418
+        ]
+      }
+    }
+  },
+  "SUPERSEDE": {
+    "pairs": 20,
+    "worst_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 15,
+        "rate": 0.75,
+        "wilson95": [
+          0.5313,
+          0.8881
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 14,
+        "rate": 0.7,
+        "wilson95": [
+          0.481,
+          0.8545
+        ]
+      },
+      "same_ok_diff_fail": 1,
+      "diff_ok_same_fail": 0,
+      "mcnemar_exact_p": 1.0
+    },
+    "best_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 20,
+        "rate": 1.0,
+        "wilson95": [
+          0.8389,
+          1.0
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 17,
+        "rate": 0.85,
+        "wilson95": [
+          0.6396,
+          0.9476
+        ]
+      },
+      "same_ok_diff_fail": 3,
+      "diff_ok_same_fail": 0,
+      "mcnemar_exact_p": 0.25
+    },
+    "per_order": {
+      "original": {
+        "same": {
+          "n": 20,
+          "success": 17,
+          "rate": 0.85,
+          "wilson95": [
+            0.6396,
+            0.9476
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 16,
+          "rate": 0.8,
+          "wilson95": [
+            0.584,
+            0.9193
+          ]
+        },
+        "p": 1.0
+      },
+      "reverse": {
+        "same": {
+          "n": 20,
+          "success": 17,
+          "rate": 0.85,
+          "wilson95": [
+            0.6396,
+            0.9476
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 15,
+          "rate": 0.75,
+          "wilson95": [
+            0.5313,
+            0.8881
+          ]
+        },
+        "p": 0.625
+      },
+      "interleaved": {
+        "same": {
+          "n": 20,
+          "success": 18,
+          "rate": 0.9,
+          "wilson95": [
+            0.699,
+            0.9721
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 16,
+          "rate": 0.8,
+          "wilson95": [
+            0.584,
+            0.9193
+          ]
+        },
+        "p": 0.5
+      }
+    },
+    "anchor_atomic_accuracy": {
+      "n": 20,
+      "success": 20,
+      "rate": 1.0,
+      "wilson95": [
+        0.8389,
+        1.0
+      ]
+    },
+    "partner_worst_order": {
+      "same": {
+        "n": 20,
+        "success": 13,
+        "rate": 0.65,
+        "wilson95": [
+          0.4329,
+          0.8188
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 5,
+        "rate": 0.25,
+        "wilson95": [
+          0.1119,
+          0.4687
+        ]
+      }
+    },
+    "partner_atomic_accuracy": {
+      "same": {
+        "n": 20,
+        "success": 18,
+        "rate": 0.9,
+        "wilson95": [
+          0.699,
+          0.9721
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 18,
+        "rate": 0.9,
+        "wilson95": [
+          0.699,
+          0.9721
+        ]
+      }
+    }
+  },
+  "VERIFY_PREFER": {
+    "pairs": 20,
+    "worst_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 1,
+        "rate": 0.05,
+        "wilson95": [
+          0.0089,
+          0.2361
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 2,
+        "rate": 0.1,
+        "wilson95": [
+          0.0279,
+          0.301
+        ]
+      },
+      "same_ok_diff_fail": 0,
+      "diff_ok_same_fail": 1,
+      "mcnemar_exact_p": 1.0
+    },
+    "best_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 20,
+        "success": 9,
+        "rate": 0.45,
+        "wilson95": [
+          0.2582,
+          0.6579
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 20,
+        "success": 13,
+        "rate": 0.65,
+        "wilson95": [
+          0.4329,
+          0.8188
+        ]
+      },
+      "same_ok_diff_fail": 1,
+      "diff_ok_same_fail": 5,
+      "mcnemar_exact_p": 0.21875
+    },
+    "per_order": {
+      "original": {
+        "same": {
+          "n": 20,
+          "success": 4,
+          "rate": 0.2,
+          "wilson95": [
+            0.0807,
+            0.416
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 7,
+          "rate": 0.35,
+          "wilson95": [
+            0.1812,
+            0.5671
+          ]
+        },
+        "p": 0.453125
+      },
+      "reverse": {
+        "same": {
+          "n": 20,
+          "success": 2,
+          "rate": 0.1,
+          "wilson95": [
+            0.0279,
+            0.301
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 7,
+          "rate": 0.35,
+          "wilson95": [
+            0.1812,
+            0.5671
+          ]
+        },
+        "p": 0.125
+      },
+      "interleaved": {
+        "same": {
+          "n": 20,
+          "success": 7,
+          "rate": 0.35,
+          "wilson95": [
+            0.1812,
+            0.5671
+          ]
+        },
+        "diff": {
+          "n": 20,
+          "success": 10,
+          "rate": 0.5,
+          "wilson95": [
+            0.2993,
+            0.7007
+          ]
+        },
+        "p": 0.507812
+      }
+    },
+    "anchor_atomic_accuracy": {
+      "n": 20,
+      "success": 17,
+      "rate": 0.85,
+      "wilson95": [
+        0.6396,
+        0.9476
+      ]
+    },
+    "partner_worst_order": {
+      "same": {
+        "n": 20,
+        "success": 2,
+        "rate": 0.1,
+        "wilson95": [
+          0.0279,
+          0.301
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 15,
+        "rate": 0.75,
+        "wilson95": [
+          0.5313,
+          0.8881
+        ]
+      }
+    },
+    "partner_atomic_accuracy": {
+      "same": {
+        "n": 20,
+        "success": 15,
+        "rate": 0.75,
+        "wilson95": [
+          0.5313,
+          0.8881
+        ]
+      },
+      "diff": {
+        "n": 20,
+        "success": 20,
+        "rate": 1.0,
+        "wilson95": [
+          0.8389,
+          1.0
+        ]
+      }
+    }
+  },
+  "anchor_atomic_correct_only": {
+    "pairs": 57,
+    "worst_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 57,
+        "success": 32,
+        "rate": 0.5614,
+        "wilson95": [
+          0.4328,
+          0.6823
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 57,
+        "success": 34,
+        "rate": 0.5965,
+        "wilson95": [
+          0.467,
+          0.7138
+        ]
+      },
+      "same_ok_diff_fail": 1,
+      "diff_ok_same_fail": 3,
+      "mcnemar_exact_p": 0.625
+    },
+    "best_order": {
+      "anchor_in_same_policy_composite": {
+        "n": 57,
+        "success": 46,
+        "rate": 0.807,
+        "wilson95": [
+          0.6866,
+          0.8887
+        ]
+      },
+      "anchor_in_diff_policy_composite": {
+        "n": 57,
+        "success": 48,
+        "rate": 0.8421,
+        "wilson95": [
+          0.7264,
+          0.9146
+        ]
+      },
+      "same_ok_diff_fail": 3,
+      "diff_ok_same_fail": 5,
+      "mcnemar_exact_p": 0.726562
+    },
+    "per_order": {
+      "original": {
+        "same": {
+          "n": 57,
+          "success": 37,
+          "rate": 0.6491,
+          "wilson95": [
+            0.5194,
+            0.76
+          ]
+        },
+        "diff": {
+          "n": 57,
+          "success": 41,
+          "rate": 0.7193,
+          "wilson95": [
+            0.5917,
+            0.8192
+          ]
+        },
+        "p": 0.387695
+      },
+      "reverse": {
+        "same": {
+          "n": 57,
+          "success": 38,
+          "rate": 0.6667,
+          "wilson95": [
+            0.5372,
+            0.7751
+          ]
+        },
+        "diff": {
+          "n": 57,
+          "success": 41,
+          "rate": 0.7193,
+          "wilson95": [
+            0.5917,
+            0.8192
+          ]
+        },
+        "p": 0.548828
+      },
+      "interleaved": {
+        "same": {
+          "n": 57,
+          "success": 41,
+          "rate": 0.7193,
+          "wilson95": [
+            0.5917,
+            0.8192
+          ]
+        },
+        "diff": {
+          "n": 57,
+          "success": 43,
+          "rate": 0.7544,
+          "wilson95": [
+            0.629,
+            0.8477
+          ]
+        },
+        "p": 0.774414
+      }
+    },
+    "anchor_atomic_accuracy": {
+      "n": 57,
+      "success": 57,
+      "rate": 1.0,
+      "wilson95": [
+        0.9369,
+        1.0
+      ]
+    },
+    "partner_worst_order": {
+      "same": {
+        "n": 57,
+        "success": 29,
+        "rate": 0.5088,
+        "wilson95": [
+          0.3826,
+          0.6338
+        ]
+      },
+      "diff": {
+        "n": 57,
+        "success": 28,
+        "rate": 0.4912,
+        "wilson95": [
+          0.3662,
+          0.6174
+        ]
+      }
+    },
+    "partner_atomic_accuracy": {
+      "same": {
+        "n": 57,
+        "success": 50,
+        "rate": 0.8772,
+        "wilson95": [
+          0.7675,
+          0.9392
+        ]
+      },
+      "diff": {
+        "n": 57,
+        "success": 46,
+        "rate": 0.807,
+        "wilson95": [
+          0.6866,
+          0.8887
+        ]
+      }
+    }
+  },
+  "by_anchor_and_diff_partner": {
+    "CONDITION->SUPERSEDE": {
+      "pairs": 8,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 8,
+          "success": 5,
+          "rate": 0.625,
+          "wilson95": [
+            0.3057,
+            0.8632
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 8,
+          "success": 6,
+          "rate": 0.75,
+          "wilson95": [
+            0.4093,
+            0.9285
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 1,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 8,
+          "success": 7,
+          "rate": 0.875,
+          "wilson95": [
+            0.5291,
+            0.9776
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 8,
+          "success": 7,
+          "rate": 0.875,
+          "wilson95": [
+            0.5291,
+            0.9776
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 8,
+            "success": 5,
+            "rate": 0.625,
+            "wilson95": [
+              0.3057,
+              0.8632
+            ]
+          },
+          "diff": {
+            "n": 8,
+            "success": 7,
+            "rate": 0.875,
+            "wilson95": [
+              0.5291,
+              0.9776
+            ]
+          },
+          "p": 0.5
+        },
+        "reverse": {
+          "same": {
+            "n": 8,
+            "success": 7,
+            "rate": 0.875,
+            "wilson95": [
+              0.5291,
+              0.9776
+            ]
+          },
+          "diff": {
+            "n": 8,
+            "success": 7,
+            "rate": 0.875,
+            "wilson95": [
+              0.5291,
+              0.9776
+            ]
+          },
+          "p": 1.0
+        },
+        "interleaved": {
+          "same": {
+            "n": 8,
+            "success": 6,
+            "rate": 0.75,
+            "wilson95": [
+              0.4093,
+              0.9285
+            ]
+          },
+          "diff": {
+            "n": 8,
+            "success": 6,
+            "rate": 0.75,
+            "wilson95": [
+              0.4093,
+              0.9285
+            ]
+          },
+          "p": 1.0
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 8,
+        "success": 8,
+        "rate": 1.0,
+        "wilson95": [
+          0.6756,
+          1.0
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 8,
+          "success": 7,
+          "rate": 0.875,
+          "wilson95": [
+            0.5291,
+            0.9776
+          ]
+        },
+        "diff": {
+          "n": 8,
+          "success": 7,
+          "rate": 0.875,
+          "wilson95": [
+            0.5291,
+            0.9776
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 8,
+          "success": 8,
+          "rate": 1.0,
+          "wilson95": [
+            0.6756,
+            1.0
+          ]
+        },
+        "diff": {
+          "n": 8,
+          "success": 7,
+          "rate": 0.875,
+          "wilson95": [
+            0.5291,
+            0.9776
+          ]
+        }
+      }
+    },
+    "CONDITION->VERIFY_PREFER": {
+      "pairs": 12,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 12,
+          "success": 11,
+          "rate": 0.9167,
+          "wilson95": [
+            0.6461,
+            0.9851
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 12,
+          "success": 12,
+          "rate": 1.0,
+          "wilson95": [
+            0.7575,
+            1.0
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 1,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 12,
+          "success": 12,
+          "rate": 1.0,
+          "wilson95": [
+            0.7575,
+            1.0
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 12,
+          "success": 12,
+          "rate": 1.0,
+          "wilson95": [
+            0.7575,
+            1.0
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 12,
+            "success": 11,
+            "rate": 0.9167,
+            "wilson95": [
+              0.6461,
+              0.9851
+            ]
+          },
+          "diff": {
+            "n": 12,
+            "success": 12,
+            "rate": 1.0,
+            "wilson95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "p": 1.0
+        },
+        "reverse": {
+          "same": {
+            "n": 12,
+            "success": 12,
+            "rate": 1.0,
+            "wilson95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "diff": {
+            "n": 12,
+            "success": 12,
+            "rate": 1.0,
+            "wilson95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "p": 1.0
+        },
+        "interleaved": {
+          "same": {
+            "n": 12,
+            "success": 12,
+            "rate": 1.0,
+            "wilson95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "diff": {
+            "n": 12,
+            "success": 12,
+            "rate": 1.0,
+            "wilson95": [
+              0.7575,
+              1.0
+            ]
+          },
+          "p": 1.0
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 12,
+        "success": 12,
+        "rate": 1.0,
+        "wilson95": [
+          0.7575,
+          1.0
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 12,
+          "success": 8,
+          "rate": 0.6667,
+          "wilson95": [
+            0.3906,
+            0.8619
+          ]
+        },
+        "diff": {
+          "n": 12,
+          "success": 3,
+          "rate": 0.25,
+          "wilson95": [
+            0.0889,
+            0.5323
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 12,
+          "success": 12,
+          "rate": 1.0,
+          "wilson95": [
+            0.7575,
+            1.0
+          ]
+        },
+        "diff": {
+          "n": 12,
+          "success": 4,
+          "rate": 0.3333,
+          "wilson95": [
+            0.1381,
+            0.6094
+          ]
+        }
+      }
+    },
+    "SUPERSEDE->CONDITION": {
+      "pairs": 5,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "diff": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "p": 1.0
+        },
+        "reverse": {
+          "same": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "diff": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "p": 1.0
+        },
+        "interleaved": {
+          "same": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "diff": {
+            "n": 5,
+            "success": 5,
+            "rate": 1.0,
+            "wilson95": [
+              0.5655,
+              1.0
+            ]
+          },
+          "p": 1.0
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 5,
+        "success": 5,
+        "rate": 1.0,
+        "wilson95": [
+          0.5655,
+          1.0
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 5,
+          "success": 2,
+          "rate": 0.4,
+          "wilson95": [
+            0.1176,
+            0.7693
+          ]
+        },
+        "diff": {
+          "n": 5,
+          "success": 4,
+          "rate": 0.8,
+          "wilson95": [
+            0.3755,
+            0.9638
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 5,
+          "success": 4,
+          "rate": 0.8,
+          "wilson95": [
+            0.3755,
+            0.9638
+          ]
+        },
+        "diff": {
+          "n": 5,
+          "success": 5,
+          "rate": 1.0,
+          "wilson95": [
+            0.5655,
+            1.0
+          ]
+        }
+      }
+    },
+    "SUPERSEDE->VERIFY_PREFER": {
+      "pairs": 15,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 15,
+          "success": 10,
+          "rate": 0.6667,
+          "wilson95": [
+            0.4171,
+            0.8482
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 15,
+          "success": 9,
+          "rate": 0.6,
+          "wilson95": [
+            0.3575,
+            0.8018
+          ]
+        },
+        "same_ok_diff_fail": 1,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 15,
+          "success": 15,
+          "rate": 1.0,
+          "wilson95": [
+            0.7961,
+            1.0
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 15,
+          "success": 12,
+          "rate": 0.8,
+          "wilson95": [
+            0.5481,
+            0.9295
+          ]
+        },
+        "same_ok_diff_fail": 3,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 0.25
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 15,
+            "success": 12,
+            "rate": 0.8,
+            "wilson95": [
+              0.5481,
+              0.9295
+            ]
+          },
+          "diff": {
+            "n": 15,
+            "success": 11,
+            "rate": 0.7333,
+            "wilson95": [
+              0.4805,
+              0.891
+            ]
+          },
+          "p": 1.0
+        },
+        "reverse": {
+          "same": {
+            "n": 15,
+            "success": 12,
+            "rate": 0.8,
+            "wilson95": [
+              0.5481,
+              0.9295
+            ]
+          },
+          "diff": {
+            "n": 15,
+            "success": 10,
+            "rate": 0.6667,
+            "wilson95": [
+              0.4171,
+              0.8482
+            ]
+          },
+          "p": 0.625
+        },
+        "interleaved": {
+          "same": {
+            "n": 15,
+            "success": 13,
+            "rate": 0.8667,
+            "wilson95": [
+              0.6212,
+              0.9626
+            ]
+          },
+          "diff": {
+            "n": 15,
+            "success": 11,
+            "rate": 0.7333,
+            "wilson95": [
+              0.4805,
+              0.891
+            ]
+          },
+          "p": 0.5
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 15,
+        "success": 15,
+        "rate": 1.0,
+        "wilson95": [
+          0.7961,
+          1.0
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 15,
+          "success": 11,
+          "rate": 0.7333,
+          "wilson95": [
+            0.4805,
+            0.891
+          ]
+        },
+        "diff": {
+          "n": 15,
+          "success": 1,
+          "rate": 0.0667,
+          "wilson95": [
+            0.0119,
+            0.2982
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 15,
+          "success": 14,
+          "rate": 0.9333,
+          "wilson95": [
+            0.7018,
+            0.9881
+          ]
+        },
+        "diff": {
+          "n": 15,
+          "success": 13,
+          "rate": 0.8667,
+          "wilson95": [
+            0.6212,
+            0.9626
+          ]
+        }
+      }
+    },
+    "VERIFY_PREFER->CONDITION": {
+      "pairs": 9,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 9,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2992
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 9,
+          "success": 1,
+          "rate": 0.1111,
+          "wilson95": [
+            0.0199,
+            0.435
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 1,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 9,
+          "success": 5,
+          "rate": 0.5556,
+          "wilson95": [
+            0.2666,
+            0.8112
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 9,
+          "success": 5,
+          "rate": 0.5556,
+          "wilson95": [
+            0.2666,
+            0.8112
+          ]
+        },
+        "same_ok_diff_fail": 1,
+        "diff_ok_same_fail": 1,
+        "mcnemar_exact_p": 1.0
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 9,
+            "success": 2,
+            "rate": 0.2222,
+            "wilson95": [
+              0.0632,
+              0.5474
+            ]
+          },
+          "diff": {
+            "n": 9,
+            "success": 2,
+            "rate": 0.2222,
+            "wilson95": [
+              0.0632,
+              0.5474
+            ]
+          },
+          "p": 1.0
+        },
+        "reverse": {
+          "same": {
+            "n": 9,
+            "success": 0,
+            "rate": 0.0,
+            "wilson95": [
+              0.0,
+              0.2992
+            ]
+          },
+          "diff": {
+            "n": 9,
+            "success": 4,
+            "rate": 0.4444,
+            "wilson95": [
+              0.1888,
+              0.7334
+            ]
+          },
+          "p": 0.125
+        },
+        "interleaved": {
+          "same": {
+            "n": 9,
+            "success": 4,
+            "rate": 0.4444,
+            "wilson95": [
+              0.1888,
+              0.7334
+            ]
+          },
+          "diff": {
+            "n": 9,
+            "success": 4,
+            "rate": 0.4444,
+            "wilson95": [
+              0.1888,
+              0.7334
+            ]
+          },
+          "p": 1.0
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 9,
+        "success": 8,
+        "rate": 0.8889,
+        "wilson95": [
+          0.565,
+          0.9801
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 9,
+          "success": 0,
+          "rate": 0.0,
+          "wilson95": [
+            0.0,
+            0.2992
+          ]
+        },
+        "diff": {
+          "n": 9,
+          "success": 8,
+          "rate": 0.8889,
+          "wilson95": [
+            0.565,
+            0.9801
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 9,
+          "success": 5,
+          "rate": 0.5556,
+          "wilson95": [
+            0.2666,
+            0.8112
+          ]
+        },
+        "diff": {
+          "n": 9,
+          "success": 9,
+          "rate": 1.0,
+          "wilson95": [
+            0.7008,
+            1.0
+          ]
+        }
+      }
+    },
+    "VERIFY_PREFER->SUPERSEDE": {
+      "pairs": 11,
+      "worst_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 11,
+          "success": 1,
+          "rate": 0.0909,
+          "wilson95": [
+            0.0162,
+            0.3774
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 11,
+          "success": 1,
+          "rate": 0.0909,
+          "wilson95": [
+            0.0162,
+            0.3774
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 0,
+        "mcnemar_exact_p": 1.0
+      },
+      "best_order": {
+        "anchor_in_same_policy_composite": {
+          "n": 11,
+          "success": 4,
+          "rate": 0.3636,
+          "wilson95": [
+            0.1517,
+            0.6462
+          ]
+        },
+        "anchor_in_diff_policy_composite": {
+          "n": 11,
+          "success": 8,
+          "rate": 0.7273,
+          "wilson95": [
+            0.4343,
+            0.9025
+          ]
+        },
+        "same_ok_diff_fail": 0,
+        "diff_ok_same_fail": 4,
+        "mcnemar_exact_p": 0.125
+      },
+      "per_order": {
+        "original": {
+          "same": {
+            "n": 11,
+            "success": 2,
+            "rate": 0.1818,
+            "wilson95": [
+              0.0514,
+              0.477
+            ]
+          },
+          "diff": {
+            "n": 11,
+            "success": 5,
+            "rate": 0.4545,
+            "wilson95": [
+              0.2127,
+              0.7199
+            ]
+          },
+          "p": 0.375
+        },
+        "reverse": {
+          "same": {
+            "n": 11,
+            "success": 2,
+            "rate": 0.1818,
+            "wilson95": [
+              0.0514,
+              0.477
+            ]
+          },
+          "diff": {
+            "n": 11,
+            "success": 3,
+            "rate": 0.2727,
+            "wilson95": [
+              0.0975,
+              0.5657
+            ]
+          },
+          "p": 1.0
+        },
+        "interleaved": {
+          "same": {
+            "n": 11,
+            "success": 3,
+            "rate": 0.2727,
+            "wilson95": [
+              0.0975,
+              0.5657
+            ]
+          },
+          "diff": {
+            "n": 11,
+            "success": 6,
+            "rate": 0.5455,
+            "wilson95": [
+              0.2801,
+              0.7873
+            ]
+          },
+          "p": 0.375
+        }
+      },
+      "anchor_atomic_accuracy": {
+        "n": 11,
+        "success": 9,
+        "rate": 0.8182,
+        "wilson95": [
+          0.523,
+          0.9486
+        ]
+      },
+      "partner_worst_order": {
+        "same": {
+          "n": 11,
+          "success": 2,
+          "rate": 0.1818,
+          "wilson95": [
+            0.0514,
+            0.477
+          ]
+        },
+        "diff": {
+          "n": 11,
+          "success": 7,
+          "rate": 0.6364,
+          "wilson95": [
+            0.3538,
+            0.8483
+          ]
+        }
+      },
+      "partner_atomic_accuracy": {
+        "same": {
+          "n": 11,
+          "success": 10,
+          "rate": 0.9091,
+          "wilson95": [
+            0.6226,
+            0.9838
+          ]
+        },
+        "diff": {
+          "n": 11,
+          "success": 11,
+          "rate": 1.0,
+          "wilson95": [
+            0.7412,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "label": "qwen3_8b_gen__llama3_1_70b_judge__v4_unit_isolated"
+}

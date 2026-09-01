@@ -6,8 +6,8 @@
 
 - protocol: `strict-kh-direct-v1`
 - 최종 결과: [`result.md`](result.md)
-- 최종 JSONL: [`../../data/pilot1/final_llm_judgments.jsonl`](../../data/pilot1/final_llm_judgments.jsonl)
-- 전체 판정표: [`../../results/pilot1/final_llm_judgment_table.md`](../../results/pilot1/final_llm_judgment_table.md)
+- 최종 JSONL: [`../../data/pilot1_search/final_llm_judgments.jsonl`](../../data/pilot1_search/final_llm_judgments.jsonl)
+- 전체 판정표: [`../../results/pilot1_search/final_llm_judgment_table.md`](../../results/pilot1_search/final_llm_judgment_table.md)
 
 인간 검토와 human-human IAA는 수행하지 않았다. 아래 명령은 사용한 표본과 최종 산출물의 구조를 재현·검증하기 위한 것이다.
 
@@ -25,10 +25,10 @@ PYTHONPATH=src ../../.venv/bin/python -m composite_conflict.prepare_pilot1
 
 생성되는 원문 포함 view도 Git에서 제외한다.
 
-- `data/pilot1/calibration_view.jsonl`
-- `data/pilot1/confrag_prevalence_view.jsonl`
-- `data/pilot1/natconfqa_strict_wh_mix_view.jsonl`
-- `data/pilot1/qacc_control_view.jsonl`
+- `data/pilot1_search/calibration_view.jsonl`
+- `data/pilot1_search/confrag_prevalence_view.jsonl`
+- `data/pilot1_search/natconfqa_strict_wh_mix_view.jsonl`
+- `data/pilot1_search/qacc_control_view.jsonl`
 
 ## 2. 최종 판정 재집계
 

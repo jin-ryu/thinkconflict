@@ -1,0 +1,72 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "inference_control": {
+    "temperature": 0,
+    "seed": 20260826,
+    "disable_thinking": false,
+    "reasoning_effort": "low"
+  },
+  "atomic": {
+    "n": 48,
+    "success": 48,
+    "rate": 1.0
+  },
+  "direct": {
+    "original": {
+      "n": 24,
+      "success": 23,
+      "rate": 0.9583
+    },
+    "reverse": {
+      "n": 24,
+      "success": 19,
+      "rate": 0.7917
+    }
+  },
+  "direct_pooled_order_trials_not_independent": {
+    "n": 48,
+    "success": 42,
+    "rate": 0.875
+  },
+  "composition_specific_failures": {
+    "count": 6,
+    "rate_over_order_trials": 0.125,
+    "error_types": {
+      "unsupported_inference": 2,
+      "wrong_preference_selection": 4
+    }
+  },
+  "order_sensitivity": {
+    "parents_with_flip": 4,
+    "rate": 0.1667,
+    "parent_ids": [
+      "2e62aacf-70e2-3d5a-b6bd-6f9ad776893d:S8:Q_002+Q_003",
+      "9841f645-49ad-3de3-9010-cef938781102:S38:Q_002+Q_003",
+      "d65aae82-db00-00c3-3714-6eb500f83f5b:S49:Q_002+Q_003",
+      "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003"
+    ]
+  },
+  "oracle_unit_policies": {
+    "original": {
+      "n": 24,
+      "success": 22,
+      "rate": 0.9167
+    },
+    "reverse": {
+      "n": 24,
+      "success": 21,
+      "rate": 0.875
+    }
+  },
+  "oracle_pooled_order_trials_not_independent": {
+    "n": 48,
+    "success": 43,
+    "rate": 0.8958
+  },
+  "oracle_effect_on_direct": {
+    "rescued_direct_failures": 3,
+    "direct_failures": 6,
+    "regressed_direct_successes": 2
+  },
+  "caveat": "Original and reverse trials reuse the same 24 parents and are not independent. Codex judgments are exploratory; publication claims require blind human validation."
+}

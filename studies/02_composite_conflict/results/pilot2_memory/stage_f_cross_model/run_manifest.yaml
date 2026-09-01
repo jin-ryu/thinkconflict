@@ -1,0 +1,43 @@
+experiment: pilot2_stage_f_cross_model
+date: 2026-08-27
+hardware:
+  gpu: NVIDIA H100 80GB HBM3
+  count: 1
+serving:
+  framework: vLLM
+  version: 0.27.1
+  mode: sequential_single_model
+inputs:
+  h2_parents: 24
+  h2_atomic_probes: 48
+  original_composites: 24
+  reverse_composites: 24
+common_generation:
+  temperature: 0
+  seed: 20260826
+  max_tokens: 900
+models:
+  - id: Qwen/Qwen3-8B
+    revision: b968826d9c46dd6066d109eabc6255188de91218
+    dtype: bfloat16
+    thinking: disabled
+    f1_direct_calls: 96
+    f2_oracle_unit_policy_calls: 48
+    errors: 0
+  - id: openai/gpt-oss-20b
+    revision: 6cee5e81ee83917806bbde320786a8fb61efebee
+    checkpoint_quantization: native_mxfp4
+    reasoning_effort: low
+    f1_direct_calls: 96
+    f2_oracle_unit_policy_calls: 48
+    errors: 0
+excluded_attempt:
+  model: Qwen/Qwen3.6-27B
+  reason: incomplete_local_snapshot_and_disk_quota_during_missing_shard_reconstruction
+  included_in_metrics: false
+evaluation:
+  lexical_screen: lexical-screen-v1
+  semantic_protocol: pilot2-stage-f-semantic-v1
+  judge: OpenAI Codex interactive agent
+  deployment_checkpoint: not exposed by the interface
+  publication_requirement: blind human validation and IAA

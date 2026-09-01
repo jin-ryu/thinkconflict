@@ -3,8 +3,11 @@
 > 작성일: 2026-08-26
 > 범위: 기존 보유 데이터의 실제 재집계가 아니라, 다중 충돌 관련 데이터셋 논문이 문제를 어떻게 정의하고 필요성을 입증하는지 분석한다.
 > 목적: 활용할 데이터셋을 먼저 선정하고, 이후 prevalence audit과 방법 실험으로 검증할 연구 주장을 확정한다.
+> 문서 구성: **Part I은 검색 문서 conflict**, **Part II는 장기 메모리 conflict**를 다룬다. 두 환경의 데이터와 근거를 서로 바꾸어 해석하지 않는다.
 
 ---
+
+# Part I. 검색 문서 conflict
 
 ## 1. 결론부터
 
@@ -512,3 +515,282 @@ RAMDocs에서 강한 baseline과 MADAM-RAG 모두 낮은 EM을 보이고, ConfRA
 6. 자동 relation detector 오류를 제외한 oracle-action 조건에서도 composition failure가 존재하는가?
 
 이 질문에 답한 뒤에만 prevalence와 order-sensitive resolution을 논문의 강한 empirical claim으로 사용한다.
+
+---
+
+# Part II. 장기 메모리 conflict
+
+> 이 Part는 파일럿 2인 **Compositional Memory Conflict**에 사용할 데이터셋을 조사한 결과다.
+> 검색 문서 conflict와 memory conflict는 근거·시간·사용자 상태의 의미가 다르므로 데이터, taxonomy, 실험 주장을 분리한다.
+
+## 8. 결론부터
+
+파일럿 2에 바로 쓸 수 있는 완성형 `K>1,H>1` memory-conflict 데이터셋은 아직 확인되지 않았다. 기존 데이터는 대체로 하나의 query가 하나의 attribute 또는 하나의 conflict policy만 평가한다. 따라서 우리 데이터 기여는 단순한 새 대화 생성이 아니라, **공개된 동일-persona history에서 여러 query-relevant conflict unit을 찾아 하나의 자연스러운 multi-goal query로 조합하고 unit별 policy gold를 추가하는 것**이다.
+
+현 시점의 권장 구성은 다음과 같다.
+
+1. **주 구성 source — MemConflict:** 같은 persona의 장기 history, dynamic/static/conditional metadata와 정답 memory가 공개되어 가장 직접적이다.
+2. **자연성·외부 검증 — Memora 또는 HaluMem-Medium:** 같은-user 장기 history와 update를 제공하지만 복합 policy gold는 새로 주석해야 한다.
+3. **암시적·의존적 갱신 stress test — STALE:** 명시적 부정 없이 이전 memory가 무효화되거나 관련 상태로 전파되는 경우를 제공한다.
+4. **동질 다중 충돌 통제군 — MemoryAgentBench/FactConsolidation:** 여러 later-wins fact pair가 있어 `K`는 늘고 policy는 `SUPERSEDE` 하나인 조건을 만들기 좋다.
+5. **조건부 외부 검증 — TANGLE:** action 공간은 가장 풍부하지만 2026-08-26 현재 공식 공개 artifact 링크를 확인하지 못해 필수 경로에서는 제외한다.
+
+LongMemEval은 update 문항과 자연스러운 질문 형식 참고에 유용하지만, 서로 다른 persona의 문항을 합쳐서는 안 된다. Mem2ActBench는 구축 과정에서 conflict를 해소하므로 conflict source가 아니라 후속 task-oriented transfer 평가용이다.
+
+### 8.1 메모리 환경의 `K/H/D`
+
+- **Memory conflict cardinality `K`:** 현재 query의 서로 다른 answer/action slot과 관련된 독립 conflict unit 수
+- **Memory conflict heterogeneity `H`:** gold response에 필요한 서로 다른 core resolution policy 수
+- **Dependency `D`:** 한 상태 변화가 다른 memory의 유효성을 바꾸거나, 한 unit의 해결이 다른 unit의 판단에 영향을 주는 정도
+
+History 전체에 conflict pair가 여러 개 있어도 현재 질문이 한 사실만 묻는다면 query-level `K=1`이다. 데이터셋의 전체 conflict 수와 query-relevant `K`를 혼동하지 않는다.
+
+---
+
+## 9. 논문별 데이터셋 분석
+
+## 9.1 MemConflict
+
+- **논문:** [MemConflict: Evaluating Long-Term Memory Systems Under Memory Conflicts](https://arxiv.org/abs/2605.20926)
+- **등재 상태:** arXiv preprint, 2026-05-20 공개
+- **공식 데이터·코드:** [TaoZhen1110/MemConflict](https://github.com/TaoZhen1110/MemConflict), 최종 공개 파일 `Data/Step4_4.jsonl`
+
+### 논문이 정의한 문제
+
+장기 memory의 유효성을 query-conditioned fitness-for-use로 보고 세 종류를 구분한다.
+
+| 원 유형 | 유효성 차원 | 본 연구 policy 대응 |
+|---|---|---|
+| Dynamic conflict | 실제 상태가 시간에 따라 갱신됨 | `SUPERSEDE` |
+| Static conflict | 안정된 사실 뒤에 거짓 모순이 등장함 | `VERIFY_PREFER` |
+| Conditional conflict | 조건에 따라 선호·값의 적용 범위가 달라짐 | `CONDITION` |
+
+각 instance에는 multi-session history, conflict metadata, query, gold label과 supporting-memory 평가용 필드가 있다. 논문은 긴 history, distractor, implicit query와 먼 conflict distance가 성능을 낮춘다고 보고한다.
+
+### 왜 주 source인가
+
+- 세 policy가 이미 같은 schema와 생성 pipeline 안에 있다.
+- persona와 timeline이 유지되므로 서로 다른 사람의 문항을 억지로 붙이지 않고 같은-persona 조합 가능성을 audit할 수 있다.
+- answer뿐 아니라 supporting memory gold가 있어 retrieval failure와 resolution failure를 나눌 수 있다.
+- 원 benchmark는 대체로 한 query가 한 target attribute와 한 conflict type을 평가하므로 multi-slot action composition이 직접적인 확장점이다.
+
+### 한계와 우리 활용
+
+논문은 controlled simulation, 제한된 유형, nested/overlapping conflict와 더 넓은 query space의 부재를 한계로 둔다. 이는 우리 문제의 직접적인 근거지만 자연 발생 prevalence를 증명하지는 않는다.
+
+먼저 persona별로 다음을 audit한다.
+
+1. 동일 history에 서로 다른 type의 conflict-bearing attribute가 몇 개 있는가?
+2. 하나의 생활 과제에서 함께 물을 수 있는 attribute pair가 있는가?
+3. 원 claim, timestamp, provenance를 유지한 채 연결 문장과 query만 최소 수정할 수 있는가?
+
+1차 조합은 원 gold에 충실한 `SUPERSEDE + CONDITION`, `SUPERSEDE + VERIFY_PREFER`, `CONDITION + VERIFY_PREFER`로 제한한다. MemConflict만으로 `KEEP_BOTH`와 고위험 `ABSTAIN_QUALIFY`까지 충분히 만든다고 전제하지 않는다.
+
+## 9.2 TANGLE
+
+- **논문:** [When Personal Memory Has No Single Answer: Evaluating LLM Agents under Irreducible Conflict](https://arxiv.org/abs/2608.13921)
+- **등재 상태:** arXiv preprint, 2026-08-14 공개
+- **규모:** 541 instances, 40 personas
+- **공식 데이터·코드:** 2026-08-26 현재 논문에서 공개 artifact 링크를 확인하지 못함. 실행 직전에 재확인 필요
+
+### 논문이 정의한 문제
+
+TANGLE은 더 최신 값을 고르면 끝나는 reducible conflict가 아니라, query에 조건·시점·source authority가 부족해 하나의 정답으로 환원할 수 없는 conflict를 다룬다.
+
+| 원 유형 | 핵심 | 가능한 행동 |
+|---|---|---|
+| Context-Partitioned Conflict (CPC) | 조건별 선호가 다르지만 query가 조건을 충분히 주지 않음 | conditionalize, clarify |
+| Behavior-Oscillation Conflict (BOC) | 행동이 오가며 안정된 최신값을 확정할 수 없음 | verify, defer, reversible trial |
+| Source-Contradiction Conflict (SCC) | 서로 다른 source가 양립 불가능한 정보를 줌 | preserve uncertainty, clarify/verify |
+
+CAAP는 `{commit, conditionalize, clarify, verify, defer, reversible_trial}` 중 conflict에 맞는 action을 선택한다. 따라서 “유형을 탐지해 적절한 action으로 routing한다”만으로는 TANGLE과 차별화되지 않는다.
+
+### 우리와의 관계와 한계
+
+각 instance는 한 persona-aspect의 하나의 unresolved slot과 하나의 중심 conflict type을 평가한다. 우리의 차별점은 action 하나의 선택이 아니라, **한 query의 여러 slot에 서로 다른 action을 선택해 서로 모순 없는 한 응답으로 합성하는 것**이다.
+
+같은 persona에 여러 aspect/type이 있어 조합 source로 유망하지만, artifact 확보 전에는 실제 pair 가능성과 license를 확인할 수 없다. 공개되면 irreducible-conflict 외부 검증셋으로 쓰고, 공개되지 않으면 taxonomy와 rubric 참고에만 사용한다.
+
+## 9.3 STALE
+
+- **논문:** [STALE: Can LLM Agents Know When Their Memories Are No Longer Valid?](https://arxiv.org/abs/2605.06527)
+- **등재 상태:** arXiv preprint, 2026-05-07 공개
+- **공식 데이터·코드:** [icedreamc/STALE](https://github.com/icedreamc/STALE), [Hugging Face dataset](https://huggingface.co/datasets/STALEproj/STALE)
+- **규모:** 400 expert-validated scenarios, 1,200 queries, 100개 이상 일상 주제, 최대 150K-token context
+
+### 논문이 정의한 문제
+
+나중 observation이 앞선 memory를 명시적으로 부정하지 않지만 문맥·상식상 무효화하는 **implicit conflict**를 다룬다.
+
+- **Type I, co-referential:** 같은 속성의 뒤 observation이 이전 상태를 암시적으로 갱신한다.
+- **Type II, propagated:** 관련 속성의 변화가 기존 belief나 downstream policy를 무효화한다.
+- **평가:** State Resolution, Premise Resistance, Implicit Policy Adaptation
+
+논문은 최신 evidence를 retrieval하는 것과 실제 응답·행동을 새 상태에 맞추는 것 사이의 간극을 보이며, 평가된 최고 모델도 전체 55.2%였다.
+
+### 우리 활용과 한계
+
+STALE의 강점은 `D>0`을 직접 stress-test할 수 있다는 점이다. 그러나 각 scenario는 하나의 conflict pair 중심이고 삽입된 LongMemEval distractor는 동일 persona의 별도 conflict unit이 아니다. 따라서 자연스러운 복합 충돌 prevalence 근거로 쓰지 않고 다음 역할로 제한한다.
+
+1. implicit `SUPERSEDE`와 propagation-aware unit의 원자적 source
+2. MemConflict 조합에 Type II dependency를 더한 별도 `D>0` stress set
+3. retrieval 성공 후 action adaptation이 실패하는지 보는 외부 평가
+
+STALE의 CUPMem이 write-time consolidation과 invalidation을 이미 제안하므로, 우리의 방법 기여는 단일 stale state 갱신이 아니라 query-level multi-policy composition이어야 한다.
+
+## 9.4 Memora
+
+- **논문:** [From Recall to Forgetting: Benchmarking Long-Term Memory for Personalized Agents](https://arxiv.org/abs/2604.20006)
+- **등재:** ACL 2026
+- **공식 데이터·코드:** [geniesinc/Memora](https://github.com/geniesinc/Memora)
+
+### 논문이 정의한 문제
+
+수주에서 수개월의 사용자 대화에서 remembering, reasoning, recommending을 평가한다. FAMA(Forgetting-Aware Memory Accuracy)는 맞는 정보를 기억하는 것뿐 아니라 삭제되거나 갱신되어 obsolete가 된 memory를 다시 사용하지 않는지도 벌점화한다. 논문은 memory agent들이 invalid memory를 반복 사용하고 evolving memory를 충분히 reconcile하지 못함을 보인다.
+
+### 우리 활용과 한계
+
+실제 장기 사용에 가까운 update·deletion과 downstream recommendation을 볼 수 있어 자연성 검증과 `SUPERSEDE/forget` 외부 전이에 유용하다. 다만 unit별 heterogeneous policy와 action dependency gold를 주지는 않는다.
+
+원 history 안에서 아래를 audit한 뒤 보조 source로 쓴다.
+
+- 하나의 query가 두 개 이상의 updated/deleted memory를 실제로 필요로 하는가?
+- update와 stable/conditional preference가 같은 사용자 목표에 연결되는가?
+- FAMA의 obsolete-memory annotation을 unit-level forbidden evidence로 변환할 수 있는가?
+
+Memora 자체로 `H>1` prevalence를 주장하지 않고, 자연스러운 장기 update와 행동 형식을 검증하는 역할로 둔다.
+
+## 9.5 HaluMem
+
+- **논문:** [HaluMem: Evaluating Hallucinations in Memory Systems of Agents](https://arxiv.org/abs/2511.03506)
+- **등재 상태:** 2025 arXiv/OpenReview manuscript; 확정 학회는 실행 전 재확인
+- **공식 데이터·코드:** [MemTensor/HaluMem](https://github.com/MemTensor/HaluMem), [Hugging Face dataset](https://huggingface.co/datasets/IAAR-Shanghai/HaluMem)
+- **규모:** Medium/Long 각 20 users, 약 14,948 memory points와 3,467 QA pairs. Medium은 사용자당 약 160K tokens, Long은 약 1M tokens
+
+### 논문이 정의한 문제
+
+Memory-system hallucination을 end-to-end 점수 하나가 아니라 memory extraction, memory updating, memory QA 단계로 나눈다. user-centric 장기 session, persona·event·relationship memory point와 QA의 direct evidence link를 제공한다.
+
+### 우리 활용과 한계
+
+동일 user 안에 많은 session과 update가 있어 같은-persona 복합 query를 찾는 raw source로 유망하다. 그러나 각 update에 `SUPERSEDE`, `CONDITION`, `VERIFY_PREFER` 같은 policy gold가 있는 것은 아니다.
+
+비용이 낮은 **HaluMem-Medium만 먼저 schema audit**한다.
+
+1. update record에서 old/new memory edge와 timestamp를 복원할 수 있는가?
+2. 한 user 안에 서로 다른 relation의 query-relevant pair가 있는가?
+3. direct evidence link를 유지한 multi-slot query를 만들 수 있는가?
+4. consistency filtering이 conflict를 이미 제거하지 않았는가?
+
+조건이 만족되지 않으면 생성 source에서 제외하고 long-context robustness 평가에만 사용한다.
+
+## 9.6 LongMemEval
+
+- **논문:** [LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory](https://arxiv.org/abs/2410.10813)
+- **등재:** ICLR 2025
+- **공식 데이터·코드:** [xiaowu0162/LongMemEval](https://github.com/xiaowu0162/LongMemEval)
+- **규모:** 500개 manually curated questions
+
+### 활용과 한계
+
+Information extraction, multi-session reasoning, temporal reasoning, knowledge update, abstention을 포함해 질문 형식과 장기 retrieval baseline에 유용하다. 그러나 multi-session reasoning은 multi-conflict가 아니며 knowledge-update도 보통 하나의 현재 상태를 묻는다. 서로 다른 item은 사용자 배경이 다를 수 있으므로 결합하지 않는다.
+
+- MemConflict multi-goal query가 실제 assistant 질문과 비슷한지 비교한다.
+- 원 knowledge-update 문항은 `K=1,H=1` 외부 baseline으로만 쓴다.
+
+## 9.7 MemoryAgentBench / FactConsolidation
+
+- **논문:** [Evaluating Memory in LLM Agents via Incremental Multi-Turn Interactions](https://arxiv.org/abs/2507.05257)
+- **등재:** ICLR 2026
+- **공식 데이터·코드:** [HUST-AI-HYZ/MemoryAgentBench](https://github.com/HUST-AI-HYZ/MemoryAgentBench)
+
+### 데이터 구성
+
+FactConsolidation은 MQUAKE의 counterfactual edit pair를 사용한다. 각 pair는 원래 사실과 나중에 등장한 모순된 수정 사실이며, 여러 pair를 이어 6K, 32K, 64K, 262K context를 만든다. Single-Hop과 Multi-Hop 질문 모두 나중 정보를 우선하도록 명시한다.
+
+### 우리 활용과 한계
+
+모든 conflict가 같은 `SUPERSEDE` policy라 `H>1` source로는 부적합하다. 대신 길이와 query-relevant conflict 수를 늘리면서 policy는 하나로 고정하는 **`K>1,H=1` 통제군**에 적합하다.
+
+긴 context에 pair가 여러 개 있다는 이유만으로 query-level `K>1`이라 하지 않는다. 질문이 실제로 둘 이상의 edit pair를 함께 요구할 때만 `K`로 센다.
+
+## 9.8 Mem2ActBench
+
+- **논문:** [Mem2ActBench: A Benchmark for Evaluating Long-Term Memory Utilization in Task-Oriented Autonomous Agents](https://aclanthology.org/2026.acl-long.370/)
+- **등재:** ACL 2026 Long Paper
+- **공식 데이터·코드:** [Cantaloupe-M/Mem2ActBench](https://github.com/Cantaloupe-M/Mem2ActBench)
+- **규모:** 2,029 sessions, 400 tool-use tasks
+
+### 활용과 제외 이유
+
+개인 선호와 task state를 tool action에 적용하는 평가라 최종 downstream 목표와 맞는다. 그러나 구축 과정에서 conflict를 해소해 globally consistent evolution chain을 만들기 때문에 원본은 memory-conflict source가 아니다. 파일럿 2에서는 제외하고, 추후 controlled conflict 주입 후 action parameter별 policy compliance를 평가하는 transfer set으로만 고려한다.
+
+---
+
+## 10. 데이터셋 비교와 우선순위
+
+| 데이터셋 | 공개 상태 | 동일 persona 장기 history | 원 conflict/action gold | 원 query `H>1` | 파일럿 2 역할 | 우선순위 |
+|---|---|---:|---:|---:|---|---:|
+| MemConflict | 공개 | 예 | 세 유형, supporting memory | 아니오 | 주 구성 source | 1 |
+| Memora | 공개 | 예 | update/deletion, obsolete-memory 평가 | 아니오 | 자연성·외부 검증 | 2 |
+| HaluMem-Medium | 공개 | 예 | update/evidence, policy gold 불명확 | 아니오 | schema audit 후 보조 source | 3 |
+| STALE | 공개 | scenario 단위 | implicit type과 세 probe | 아니오 | `D>0` stress test | 4 |
+| FactConsolidation | 공개 | 개인 memory 아님 | later-wins edit pair | 아니오 | `K>1,H=1` 통제 | 5 |
+| TANGLE | 공개 artifact 미확인 | 논문상 예 | type과 action rubric | 아니오 | 확보 시 외부 검증 | 조건부 |
+| LongMemEval | 공개 | item 단위 history | update/temporal QA | 아니오 | 질문 형식·single-unit transfer | 보조 |
+| Mem2ActBench | 공개 | 예 | conflict는 구축 중 해소 | 아니오 | 후속 action transfer | 제외 |
+
+### 10.1 빠른 파일럿의 현실적 최소 구성
+
+1. **MemConflict audit:** persona별 type/attribute 분포와 자연스러운 pair 후보를 계산한다.
+2. **MemConflict matched set:** `K=2,H=1` 24개와 `K=2,H=2` 24개를 같은 persona·길이·slot 수로 맞춘다.
+3. **STALE stress set:** Type II를 포함한 `D=0/D>0` 각 10~20개로 dependency 효과만 별도 확인한다.
+4. **Memora/HaluMem-Medium 중 하나만 외부 검증:** schema audit 결과 자연 pair가 더 많은 쪽을 선택한다.
+5. **FactConsolidation 통제:** later-wins policy만 반복될 때 `K` 증가와 `H` 증가 효과를 분리한다.
+
+TANGLE은 artifact가 확보되면 우선적인 irreducible-conflict 외부 검증으로 승격하지만 일정의 필수 경로에는 두지 않는다.
+
+---
+
+## 11. 직접 지지되는 주장과 아직 검증할 주장
+
+### 11.1 지금 직접 주장할 수 있는 것
+
+- MemConflict는 temporal, factual, contextual validity가 서로 다른 memory conflict임을 보이고 시스템 강점이 유형별로 불균일함을 보고한다.
+- TANGLE은 모든 personal-memory conflict가 단일 정답으로 환원되지 않으며 fixed rule보다 conflict-conditioned action이 필요함을 보인다.
+- STALE은 updated evidence retrieval과 downstream behavior 수정이 별개이고 implicit propagation이 어렵다는 것을 보인다.
+- Memora는 obsolete memory 재사용과 evolving-memory reconciliation 실패가 장기 평가에서 문제임을 보인다.
+- 대표 공개 benchmark의 query는 주로 하나의 target attribute/aspect 또는 하나의 중심 policy를 평가한다.
+
+### 11.2 파일럿 전에는 주장하면 안 되는 것
+
+- 실제 사용자의 한 요청에서 `K>1,H>1` memory conflict가 흔하다.
+- MemConflict의 같은 persona 안에 자연스럽게 결합할 서로 다른 유형이 충분히 많다.
+- HaluMem update record만으로 unit별 policy gold를 안정적으로 복원할 수 있다.
+- `H` 증가가 길이·slot 수를 통제한 뒤에도 성능 저하의 원인이다.
+- graph 또는 plan-search가 CoT보다 항상 낫다.
+
+파일럿이 입증할 최소 주장은 **공개 memory history에서 자연스러운 heterogeneous composition을 구성할 수 있고, 동일 `K`에서 heterogeneous policy가 homogeneous policy와 다른 오류를 만든다**는 것이다.
+
+---
+
+## 12. 파일럿 2 데이터 결정 규칙
+
+### 12.1 Go 조건
+
+1. MemConflict 동일-persona history에서 최소 40개의 자연스러운 `K=2,H=2` 후보를 만들 수 있다.
+2. 연구자 검토 후 최소 24개 matched pair가 자연성·gold 보존 기준을 통과한다.
+3. 최소 세 policy 조합 중 둘 이상에서 사례를 확보한다.
+4. `K=2,H=2`가 `K=2,H=1`보다 all-unit success 또는 policy-collapse rate에서 일관된 악화를 보인다.
+5. oracle unit/policy를 주면 성능이 회복되어 실패가 단순 정보 부족만은 아님을 보인다.
+
+### 12.2 축소·전환 조건
+
+- 서로 다른 type은 많지만 한 goal로 묶기 부자연스러우면 **multi-query memory batch resolution**로 축소한다.
+- `H>1` 효과가 없고 `D>0`에서만 실패하면 **dependency-aware stale-memory resolution**로 좁힌다.
+- controlled 조합만 가능하면 “현실에서 흔하다”는 주장을 버리고 **compositional stress benchmark**로 명시한다.
+- HaluMem·Memora에서도 mixed-policy pair가 거의 없으면 prevalence가 아니라 benchmark blind spot과 worst-case reliability를 기여로 삼되 주장 강도를 낮춘다.
+
+### 12.3 최종 권고
+
+파일럿 2는 **MemConflict로 controlled matched set을 만들고, Memora/HaluMem 중 하나로 자연성을 보강하며, STALE과 FactConsolidation으로 `D`와 `K` 통제축을 분리**하는 구성이 가장 방어 가능하다. 각 데이터셋이 잘 주석한 현상만 가져와 가설별 역할을 분리해야 한다.

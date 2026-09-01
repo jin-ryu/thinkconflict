@@ -1,0 +1,62 @@
+study: pilot2b_matched_validation
+date: 2026-08-26
+status: exploratory_complete
+
+source:
+  dataset: MemConflict
+  revision: ec51d5d36e87f7665d1337f3a88cbde95fc2a964
+  frozen_h1_instances: 24
+  frozen_h2_instances: 24
+  retrieval_setting: oracle relevant evidence with same-conflict distractors retained
+
+single_unit_probe:
+  instances: 96
+  conditions: [direct]
+  calls: 96
+  result: 96/96 semantic success
+  purpose: distinguish atomic resolution difficulty from composition failure
+
+natural_matching:
+  protocol: pilot2b-natural-covariate-v1
+  total_pairs: 24
+  strong_pairs: 4
+  moderate_pairs: 5
+  weak_excluded_pairs: 15
+  primary_pairs: 9
+  caveat: natural matching retains residual task and goal differences
+
+evidence_order_validation:
+  variants: [original, reverse]
+  reverse_instances: 48
+  reverse_conditions:
+    - direct
+    - generic_cot
+    - taxonomy_cot
+    - oracle_units
+    - oracle_unit_policies
+  reverse_calls: 240
+  reverse_errors: 0
+
+generation:
+  model: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+  serving: local vLLM OpenAI-compatible endpoint
+  temperature: 0
+  seed: 20260826
+  max_tokens:
+    single_unit: 600
+    composite: 900
+
+semantic_judge:
+  name: OpenAI Codex interactive agent
+  model_family: GPT-5-based Codex
+  exact_checkpoint: not exposed by interface
+  protocol:
+    single_unit: pilot2b-single-unit-v1
+    reverse_composite: pilot2b-reverse-semantic-v1
+  intended_use: exploratory controlled validation
+  independent_human_validation: false
+
+primary_interpretation:
+  supported: atomic units can succeed while their composition fails and varies with evidence order
+  not_supported: a causal general claim that H=2 is harder than H=1
+  next_method_target: unit-local evidence selection plus policy application and composition verification

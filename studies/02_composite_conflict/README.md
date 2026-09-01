@@ -8,26 +8,35 @@
 - **복합 충돌**: 서로 다른 core resolution policy가 함께 필요한 경우(`H>1`)
 - 파일럿 1에서 자연 검색 문서 202건을 판정했으나 strict `K>1,H>1`은 0건이었다.
 - 검색 문서의 자연 prevalence를 주요 동기로 삼는 방향은 중단한다.
-- 파일럿 2는 long-term personalized memory에서 query-level `K/H` composition이 자연스럽고 독립적으로 어려운지 검증한다.
-- 파일럿을 통과한 뒤에만 memory-unit decomposition → policy assignment → response-plan composition의 training-free pipeline을 개발한다.
+- 파일럿 2 Stage G에서 150개 controlled `K×H` composite와 세 모델 검증을 완료했다.
+- 현재는 H의 보편적 인과 주장보다 atomic-to-composite interference와 evidence-order robustness를 핵심 발견으로 둔다.
+- Stage H에서 Qwen의 oracle accuracy recovery와 Llama의 order-robustness 개선을 확인했지만 교차모델 accuracy recovery는 미충족이다.
+- Stage I–J([결과](docs/pilot2_memory/stage_j_result.md))에서 no-conflict 통제군과 anchor-unit 짝 설계로 검증한 결과, 4 모델 모두 conflict 고유 간섭과 policy 이질성 효과가 없었다. `H` 축과 CMCR-Linear는 보류하고, evidence order 취약성·동질성 간섭·evidence binding 실패를 중심으로 방향을 재설정한다.
+- 2026-08 기준 관련 연구 조사는 [related_work_memory_2026.md](docs/background/related_work_memory_2026.md)에 있다. read-time per-unit heterogeneous policy composition은 아직 공백이지만 CAR(2606.01435), CAAP(2608.13921), IBA-Bench(2608.02171)가 인접한다.
 
 generic memory conflict 또는 conflict-type routing만으로는 MemConflict·TANGLE과 차별화되지 않는다. 연구 후보의 핵심은 여러 memory slot에 서로 다른 action을 적용할 때 생기는 **global-policy collapse와 cross-unit contamination**이다.
 
 ## 읽는 순서
 
 1. [현재 결론과 안내](START_HERE.md)
-2. [파일럿 1 결과](docs/pilot1_search/result.md)
-3. [파일럿 1 전체 판정표](results/pilot1/final_llm_judgment_table.md)
-4. [파일럿 2: Compositional Memory Conflict](docs/pilot2_memory/plan.md)
+2. [Stage J 결과](docs/pilot2_memory/stage_j_result.md)
+3. [파일럿 2 Stage I–J 계획](docs/pilot2_memory/stage_ij_plan.md)
+4. [2026 memory conflict 연구 조사](docs/background/related_work_memory_2026.md)
+5. [Stage H 최신 결과](docs/pilot2_memory/stage_h_result.md)
+6. [Stage G factorial 결과](docs/pilot2_memory/stage_g_result.md)
+7. [파일럿 2 전체 계획과 다음 단계](docs/pilot2_memory/plan.md)
+8. [새 memory 연구 문제 정의와 CMCR](docs/background/memory_problem_and_method.md)
+9. [파일럿 1 결과](docs/pilot1_search/result.md)
 
 배경 문서는 다음과 같다.
 
-5. [기존 문제 정의와 제안 방법](docs/background/problem_and_method.md)
-6. [관련 논문: 문제·방법·한계](docs/background/related_work.md)
-7. [검색 다중·복합 충돌 데이터 근거](docs/background/dataset_evidence.md)
-8. [파일럿 1 사전 계획](docs/pilot1_search/plan.md)
-9. [주석 지침](docs/pilot1_search/annotation_guideline.md)
-10. [파일럿 1 실행 안내](docs/pilot1_search/runbook.md)
+10. [파일럿 1 전체 판정표](results/pilot1_search/final_llm_judgment_table.md)
+11. [기존 검색 문제 정의와 PCCR](docs/background/problem_and_method.md)
+12. [관련 논문: 문제·방법·한계](docs/background/related_work.md)
+13. [검색·memory 다중·복합 충돌 데이터 근거](docs/background/dataset_evidence.md)
+14. [파일럿 1 사전 계획](docs/pilot1_search/plan.md)
+15. [주석 지침](docs/pilot1_search/annotation_guideline.md)
+16. [파일럿 1 실행 안내](docs/pilot1_search/runbook.md)
 
 ## 작업 구조
 

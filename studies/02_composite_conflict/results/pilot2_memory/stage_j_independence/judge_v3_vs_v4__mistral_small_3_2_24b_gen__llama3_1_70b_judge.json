@@ -1,0 +1,39 @@
+{
+  "label": "mistral_small_3_2_24b_gen__llama3_1_70b_judge",
+  "atomic": {
+    "n": 390,
+    "agreement": 0.9436,
+    "kappa": 0.8255,
+    "a_true_b_false": 7,
+    "a_false_b_true": 15,
+    "accuracy_a": 0.7872,
+    "accuracy_b": 0.8077
+  },
+  "composite": {
+    "n": 1170,
+    "agreement": 0.7983,
+    "kappa": 0.5646,
+    "a_true_b_false": 35,
+    "a_false_b_true": 201,
+    "accuracy_a": 0.5821,
+    "accuracy_b": 0.7239
+  },
+  "gap_worst_order": {
+    "a": 0.3667,
+    "b": 0.2
+  },
+  "gap_per_order": {
+    "original": {
+      "a": 0.1821,
+      "b": 0.0821
+    },
+    "reverse": {
+      "a": 0.2051,
+      "b": 0.0692
+    },
+    "interleaved": {
+      "a": 0.2282,
+      "b": 0.1
+    }
+  }
+}

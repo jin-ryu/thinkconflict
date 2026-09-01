@@ -1,0 +1,25 @@
+{
+  "judge": {
+    "name": "OpenAI Codex interactive agent",
+    "model_family": "GPT-5-based Codex",
+    "deployment_checkpoint": "not exposed by the interface",
+    "protocol": "pilot2-stage-f-semantic-v1",
+    "intended_use": "exploratory cross-model validation"
+  },
+  "atomic_failures": {},
+  "direct_failures": {
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008": {"error_type": "unsupported_inference", "rationale": "Invented a 7 p.m. bedtime supervision window that is absent from the records."},
+    "9841f645-49ad-3de3-9010-cef938781102:S38:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected action or superhero films instead of the query-matched feel-good comedy."},
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008::order_reverse": {"error_type": "unsupported_inference", "rationale": "Invented an 8–10 a.m. supervision window that is absent from the records."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected a casual walk with cargo pants instead of a workout with a breathable gym tank."},
+    "d65aae82-db00-00c3-3714-6eb500f83f5b:S49:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected gory horror instead of the weekend Hollywood-blockbuster preference."},
+    "2e62aacf-70e2-3d5a-b6bd-6f9ad776893d:S8:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Recommended a City Building game as the primary break instead of Candy Crush."}
+  },
+  "oracle_failures": {
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008": {"error_type": "unsupported_inference", "rationale": "Invented a 6–8 p.m. supervision window even with the unit behavior supplied."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003": {"error_type": "wrong_preference_selection", "rationale": "Selected cycling with cargo pants despite the supplied unit behavior."},
+    "75b15745-6d32-726b-be79-d765808bbfe7:S34:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected a solo Dark and Gritty Crime movie despite the supplied unit behavior."},
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008::order_reverse": {"error_type": "unsupported_inference", "rationale": "Invented a 2–4 p.m. supervision window even with the unit behavior supplied."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected a casual walk with cargo pants despite the supplied unit behavior."}
+  }
+}

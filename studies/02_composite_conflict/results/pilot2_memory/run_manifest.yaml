@@ -1,0 +1,57 @@
+pilot: compositional_memory_conflict_pilot2
+frozen_version: v3_post_compatibility_audit
+run_date: 2026-08-26
+
+source:
+  dataset: MemConflict
+  repository: https://github.com/TaoZhen1110/MemConflict
+  revision: ec51d5d36e87f7665d1337f3a88cbde95fc2a964
+  file: Data/Step4_4.jsonl
+
+instances:
+  h1: 24
+  h1_supercede_supercede: 12
+  h1_condition_condition: 12
+  h2: 24
+  h2_supercede_condition: 24
+  retrieval: oracle_relevant_evidence_with_same_conflict_distractors
+  query_audits:
+    - no_gold_state_leakage
+    - independent_unit_check
+    - unit_deletion_test
+    - simultaneous_gold_compatibility
+
+generation:
+  model: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+  endpoint: local_vllm_openai_compatible
+  temperature: 0
+  seed: 20260826
+  max_tokens: 900
+  workers: 8
+  calls: 288
+  errors: 0
+  baseline_conditions:
+    - direct
+    - generic_cot
+    - taxonomy_cot
+    - single_global_policy
+    - oracle_units
+    - oracle_unit_policies
+
+evaluation:
+  lexical_screen: lexical-screen-v1
+  semantic_core: pilot2-semantic-core-v1
+  semantic_judge: OpenAI Codex interactive agent
+  semantic_model_family: GPT-5-based Codex
+  semantic_deployment_checkpoint: not_exposed_by_interface
+  semantic_scope:
+    direct: all_runs_reviewed
+    generic_cot: lexical_failures_reviewed_plus_high_confidence_lexical_passes
+    oracle_unit_policies: lexical_failures_reviewed_plus_high_confidence_lexical_passes
+  limitation: exploratory_pilot_without_independent_human_validation
+
+version_history:
+  v0_pre_query_audit: multiple preference conditions could be activated by six queries
+  v1_pre_necessity_audit: some queries leaked dynamic state or did not require both units
+  v2_pre_compatibility_audit: one query had no simultaneously satisfiable pair of gold decisions
+  v3_post_compatibility_audit: frozen version used for reported metrics

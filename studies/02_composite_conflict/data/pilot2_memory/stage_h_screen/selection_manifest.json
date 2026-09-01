@@ -1,0 +1,83 @@
+{
+  "protocol": "stage-h-outcome-blind-screen-v1",
+  "source": "data/pilot2_memory/stage_g_factorial/composite_order_variants.jsonl",
+  "seed": 20260828,
+  "selection_key": "sha256(seed:base_instance_id); no model outcome used",
+  "per_cell": 10,
+  "base_instances": 50,
+  "order_trials": 150,
+  "selected_by_cell": {
+    "K2_H1": [
+      "stageg:k2_h1:015:8cb3c9c6",
+      "stageg:k2_h1:016:90e98aa7",
+      "stageg:k2_h1:030:fc1726f1",
+      "stageg:k2_h1:027:f398d596",
+      "stageg:k2_h1:008:575f4af8",
+      "stageg:k2_h1:002:2e62aacf",
+      "stageg:k2_h1:022:cafa273c",
+      "stageg:k2_h1:011:737e8d59",
+      "stageg:k2_h1:013:75b15745",
+      "stageg:k2_h1:024:d65aae82"
+    ],
+    "K2_H2": [
+      "stageg:k2_h2:007:4f76dbf9",
+      "stageg:k2_h2:001:14e41890",
+      "stageg:k2_h2:030:fc1726f1",
+      "stageg:k2_h2:008:575f4af8",
+      "stageg:k2_h2:018:9dffc5de",
+      "stageg:k2_h2:005:40f2307d",
+      "stageg:k2_h2:022:cafa273c",
+      "stageg:k2_h2:027:f398d596",
+      "stageg:k2_h2:021:c2efaebe",
+      "stageg:k2_h2:006:4cbe1c3d"
+    ],
+    "K3_H1": [
+      "stageg:k3_h1:021:c2efaebe",
+      "stageg:k3_h1:014:8518c87c",
+      "stageg:k3_h1:023:d337564c",
+      "stageg:k3_h1:004:40a79d0c",
+      "stageg:k3_h1:006:4cbe1c3d",
+      "stageg:k3_h1:025:e02dd733",
+      "stageg:k3_h1:019:a7850e51",
+      "stageg:k3_h1:017:9841f645",
+      "stageg:k3_h1:010:5c2a85a4",
+      "stageg:k3_h1:028:f47bb65a"
+    ],
+    "K3_H2": [
+      "stageg:k3_h2:007:4f76dbf9",
+      "stageg:k3_h2:003:3c2e5fe5",
+      "stageg:k3_h2:013:75b15745",
+      "stageg:k3_h2:019:a7850e51",
+      "stageg:k3_h2:026:e57c356a",
+      "stageg:k3_h2:028:f47bb65a",
+      "stageg:k3_h2:017:9841f645",
+      "stageg:k3_h2:018:9dffc5de",
+      "stageg:k3_h2:030:fc1726f1",
+      "stageg:k3_h2:024:d65aae82"
+    ],
+    "K3_H3": [
+      "stageg:k3_h3:003:3c2e5fe5",
+      "stageg:k3_h3:001:14e41890",
+      "stageg:k3_h3:022:cafa273c",
+      "stageg:k3_h3:008:575f4af8",
+      "stageg:k3_h3:020:bb30a4e6",
+      "stageg:k3_h3:010:5c2a85a4",
+      "stageg:k3_h3:030:fc1726f1",
+      "stageg:k3_h3:013:75b15745",
+      "stageg:k3_h3:027:f398d596",
+      "stageg:k3_h3:009:5a40c38b"
+    ]
+  },
+  "cell_order_counts": {
+    "K2_H1": 30,
+    "K2_H2": 30,
+    "K3_H1": 30,
+    "K3_H2": 30,
+    "K3_H3": 30
+  },
+  "order_counts": {
+    "interleaved": 50,
+    "original": 50,
+    "reverse": 50
+  }
+}

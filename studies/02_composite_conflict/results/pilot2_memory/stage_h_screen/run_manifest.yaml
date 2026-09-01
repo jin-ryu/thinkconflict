@@ -1,0 +1,58 @@
+protocol: stage-h-outcome-blind-screen-v1
+executed_at: 2026-08-27
+seed: 20260828
+serving:
+  engine: vllm
+  version: 0.27.1
+  endpoint: http://127.0.0.1:8004/v1
+selection:
+  source: data/pilot2_memory/stage_g_factorial/composite_order_variants.jsonl
+  manifest: data/pilot2_memory/stage_h_screen/selection_manifest.json
+  instances: data/pilot2_memory/stage_h_screen/instances.jsonl
+  selection_key: 'sha256(seed:base_instance_id); no model outcome used'
+  cells: [K2_H1, K2_H2, K3_H1, K3_H2, K3_H3]
+  bases_per_cell: 10
+  base_instances: 50
+  order_trials: 150
+qwen_screen:
+  generation_model:
+    id: Qwen/Qwen3-8B
+    local_revision: b968826d9c46dd6066d109eabc6255188de91218
+    temperature: 0
+    max_tokens: 900
+    disable_thinking: true
+  judge_model:
+    id: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+    local_revision: 2123003760781134cfc31124aa6560a45b491fdf
+    protocol: evidence-aware-v3
+    temperature: 0
+    max_tokens: 700
+  conditions: [grouped_only, owner_filter, target_filter, grouped_policy, full_local, full_local_verifier]
+  new_generation_calls: 900
+  new_judgment_calls: 900
+  errors: 0
+  baseline: Stage G direct outputs and v3 evidence-aware judgments, selected by instance_id
+llama_replication:
+  generation_model:
+    id: hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
+    local_revision: 2123003760781134cfc31124aa6560a45b491fdf
+    temperature: 0
+    max_tokens: 900
+    disable_thinking: false
+  judge_model:
+    id: Qwen/Qwen3-8B
+    local_revision: b968826d9c46dd6066d109eabc6255188de91218
+    protocol: evidence-aware-v3
+    temperature: 0
+    max_tokens: 700
+    disable_thinking: true
+  conditions: [full_local]
+  new_generation_calls: 150
+  new_judgment_calls: 150
+  errors: 0
+  baseline: Stage G direct outputs and v3 evidence-aware judgments, selected by instance_id
+notes:
+  - Grouping, target filtering, and policy labels are oracle diagnostics.
+  - Gold atomic answers are used only internally by target_filter and are not exposed to generators.
+  - Order variants are repeated measures; the statistical unit is the base instance.
+  - The screen is not a publication-scale human-validated evaluation.

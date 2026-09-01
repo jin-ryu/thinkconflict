@@ -1,0 +1,35 @@
+{
+  "valid": true,
+  "errors": [],
+  "pairs": 60,
+  "bases": 120,
+  "composite_order_variants": 360,
+  "atomic_probes": 131,
+  "anchors_by_policy": {
+    "SUPERSEDE": 20,
+    "VERIFY_PREFER": 20,
+    "CONDITION": 20
+  },
+  "diff_partner_policy": {
+    "SUPERSEDE->VERIFY_PREFER": 15,
+    "SUPERSEDE->CONDITION": 5,
+    "VERIFY_PREFER->SUPERSEDE": 11,
+    "VERIFY_PREFER->CONDITION": 9,
+    "CONDITION->SUPERSEDE": 8,
+    "CONDITION->VERIFY_PREFER": 12
+  },
+  "anchor_stage_g_ok_models": {
+    "9": 4,
+    "3": 29,
+    "6": 12,
+    "12": 1,
+    "2": 12,
+    "4": 2
+  },
+  "personas": 26,
+  "skipped": {
+    "persona_cap": 7,
+    "no_matched_partner": 2
+  },
+  "seed": 20260828
+}

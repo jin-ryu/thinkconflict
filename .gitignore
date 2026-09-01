@@ -10,6 +10,12 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+
+# Local API credentials
+.env
+.env.*
+!.env.example
+
 .pytest_cache/
 
 # 원본 데이터는 git에 넣지 않는다 — download.sh로 재현 (계획서 §2)

@@ -1,0 +1,39 @@
+{
+  "label": "qwen3_8b_gen__llama3_1_70b_judge",
+  "atomic": {
+    "n": 390,
+    "agreement": 0.9026,
+    "kappa": 0.6258,
+    "a_true_b_false": 18,
+    "a_false_b_true": 20,
+    "accuracy_a": 0.8436,
+    "accuracy_b": 0.8487
+  },
+  "composite": {
+    "n": 1170,
+    "agreement": 0.8274,
+    "kappa": 0.6517,
+    "a_true_b_false": 34,
+    "a_false_b_true": 168,
+    "accuracy_a": 0.5162,
+    "accuracy_b": 0.6308
+  },
+  "gap_worst_order": {
+    "a": 0.5179,
+    "b": 0.3615
+  },
+  "gap_per_order": {
+    "original": {
+      "a": 0.3564,
+      "b": 0.2436
+    },
+    "reverse": {
+      "a": 0.2795,
+      "b": 0.1974
+    },
+    "interleaved": {
+      "a": 0.3462,
+      "b": 0.2128
+    }
+  }
+}

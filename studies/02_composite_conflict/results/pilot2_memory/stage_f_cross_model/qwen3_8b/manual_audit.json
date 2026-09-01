@@ -1,0 +1,43 @@
+{
+  "judge": {
+    "name": "OpenAI Codex interactive agent",
+    "model_family": "GPT-5-based Codex",
+    "deployment_checkpoint": "not exposed by the interface",
+    "protocol": "pilot2-stage-f-semantic-v1",
+    "intended_use": "exploratory cross-model validation"
+  },
+  "atomic_failures": {
+    "f47bb65a-6e84-11f7-37f7-1f02b89d3ddf:S23:Q_002+Q_003::single::Q_003": {
+      "error_type": "wrong_preference_selection",
+      "rationale": "Selected the summer-break outing condition instead of historical sites for classical-theatre and local-heritage research."
+    }
+  },
+  "direct_failures": {
+    "75b15745-6d32-726b-be79-d765808bbfe7:S34:Q_002+Q_003": {"error_type": "condition_over_preservation", "rationale": "Did not commit to the friends-setting Hollywood blockbuster and retained incompatible alternatives."},
+    "2e62aacf-70e2-3d5a-b6bd-6f9ad776893d:S8:Q_002+Q_003": {"error_type": "state_omission", "rationale": "Omitted the current Busy state and added a City Building alternative from another condition."},
+    "c2efaebe-0dd4-c0dc-23a5-7d713b14c99f:S51:Q_002+Q_007": {"error_type": "wrong_preference_selection", "rationale": "Selected Chrysanthemum Tea instead of Herbal Tea for the virtual book-club condition."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003": {"error_type": "wrong_preference_selection", "rationale": "Selected an outdoor activity with cargo pants instead of a workout with a breathable gym tank."},
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S25:Q_004+Q_006": {"error_type": "wrong_preference_selection", "rationale": "Selected acoustic folk music instead of ambient or meditative music for the baby-nap setting."},
+    "5c2a85a4-05a5-5a54-5f50-8029bff79f8f:S44:Q_003+Q_007::order_reverse": {"error_type": "condition_over_preservation", "rationale": "Retained the sabbatical tropical-getaway option instead of selecting only the conference budget-hostel condition."},
+    "75b15745-6d32-726b-be79-d765808bbfe7:S34:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected Dark and Gritty Crime instead of a Hollywood blockbuster with friends."},
+    "d65aae82-db00-00c3-3714-6eb500f83f5b:S49:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected gory horror and unrelated reading instead of the weekend Hollywood-blockbuster preference."},
+    "c2efaebe-0dd4-c0dc-23a5-7d713b14c99f:S51:Q_002+Q_007::order_reverse": {"error_type": "condition_over_preservation", "rationale": "Returned both Chrysanthemum and Herbal Tea instead of selecting Herbal Tea for the query condition."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected a casual activity with cargo pants instead of a workout with a breathable gym tank."},
+    "9841f645-49ad-3de3-9010-cef938781102:S38:Q_002+Q_003::order_reverse": {"error_type": "condition_over_preservation", "rationale": "Promoted the high-energy action option while only retaining the query-matched feel-good comedy as an alternative."},
+    "4cbe1c3d-78c2-df45-ba61-72ebc35b4d40:S50:Q_002+Q_004::order_reverse": {"error_type": "wrong_condition_application", "rationale": "Rejected badminton despite the explicit stress-relief preference and substituted unrelated activities."},
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008::order_reverse": {"error_type": "unsupported_inference", "rationale": "Invented a nap or bedtime supervision window and treated it as equivalent to the quiet-play condition."}
+  },
+  "oracle_failures": {
+    "4cbe1c3d-78c2-df45-ba61-72ebc35b4d40:S50:Q_002+Q_004": {"error_type": "wrong_condition_application", "rationale": "Rejected badminton even with the unit-level CONDITION behavior supplied."},
+    "75345e85-6427-eb51-0834-32d7463852e9:S15:Q_002+Q_005": {"error_type": "wrong_condition_application", "rationale": "Rejected the query-matched Civilization activity despite the supplied unit behavior."},
+    "c2efaebe-0dd4-c0dc-23a5-7d713b14c99f:S51:Q_002+Q_007": {"error_type": "wrong_preference_selection", "rationale": "Selected Chrysanthemum Tea despite the supplied unit behavior."},
+    "f398d596-a91e-2afd-605f-be545475deca:S48:Q_002+Q_003": {"error_type": "wrong_preference_selection", "rationale": "Selected formal or casual clothing instead of the workout and gym-tank preference."},
+    "e02dd733-a7b5-a87b-522d-5119f87c158d:S43:Q_001+Q_006": {"error_type": "wrong_preference_selection", "rationale": "Selected comics for the commute instead of biographies or memoirs about performers."},
+    "75b15745-6d32-726b-be79-d765808bbfe7:S34:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected Dark and Gritty Crime despite the supplied unit behavior."},
+    "d65aae82-db00-00c3-3714-6eb500f83f5b:S49:Q_002+Q_003::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected gory horror despite the supplied unit behavior."},
+    "c2efaebe-0dd4-c0dc-23a5-7d713b14c99f:S51:Q_002+Q_007::order_reverse": {"error_type": "wrong_preference_selection", "rationale": "Selected Chrysanthemum Tea despite the supplied unit behavior."},
+    "9841f645-49ad-3de3-9010-cef938781102:S38:Q_002+Q_003::order_reverse": {"error_type": "condition_over_preservation", "rationale": "Promoted action and feel-good movies together instead of selecting the query-matched feel-good comedy."},
+    "4cbe1c3d-78c2-df45-ba61-72ebc35b4d40:S50:Q_002+Q_004::order_reverse": {"error_type": "wrong_condition_application", "rationale": "Rejected badminton even with the unit-level CONDITION behavior supplied."},
+    "90e98aa7-1d5d-0a8f-55d8-0b0886897dd3:S46:Q_002+Q_008::order_reverse": {"error_type": "unsupported_inference", "rationale": "Invented a nap or bedtime window instead of grounding the decision in quiet play."}
+  }
+}

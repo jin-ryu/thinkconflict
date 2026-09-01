@@ -1,0 +1,107 @@
+{
+  "ALL|no_conflict": {
+    "wrong_unit_trials": 83,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 32,
+        "share": 0.386
+      },
+      "wrong_owner": {
+        "n": 29,
+        "share": 0.349
+      },
+      "gold_and_alt": {
+        "n": 14,
+        "share": 0.169
+      },
+      "unattributed": {
+        "n": 8,
+        "share": 0.096
+      }
+    }
+  },
+  "LOOKUP|ALL": {
+    "wrong_unit_trials": 83,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 32,
+        "share": 0.386
+      },
+      "wrong_owner": {
+        "n": 29,
+        "share": 0.349
+      },
+      "gold_and_alt": {
+        "n": 14,
+        "share": 0.169
+      },
+      "unattributed": {
+        "n": 8,
+        "share": 0.096
+      }
+    }
+  },
+  "LOOKUP|K2_C0": {
+    "wrong_unit_trials": 30,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 12,
+        "share": 0.4
+      },
+      "wrong_owner": {
+        "n": 9,
+        "share": 0.3
+      },
+      "gold_and_alt": {
+        "n": 7,
+        "share": 0.233
+      },
+      "unattributed": {
+        "n": 2,
+        "share": 0.067
+      }
+    }
+  },
+  "LOOKUP|K3_C0": {
+    "wrong_unit_trials": 53,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 20,
+        "share": 0.377
+      },
+      "wrong_owner": {
+        "n": 20,
+        "share": 0.377
+      },
+      "gold_and_alt": {
+        "n": 7,
+        "share": 0.132
+      },
+      "unattributed": {
+        "n": 6,
+        "share": 0.113
+      }
+    }
+  },
+  "LOOKUP|no_conflict": {
+    "wrong_unit_trials": 83,
+    "labels": {
+      "gold_present_but_wrong": {
+        "n": 32,
+        "share": 0.386
+      },
+      "wrong_owner": {
+        "n": 29,
+        "share": 0.349
+      },
+      "gold_and_alt": {
+        "n": 14,
+        "share": 0.169
+      },
+      "unattributed": {
+        "n": 8,
+        "share": 0.096
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "all": {
+    "n": 840,
+    "agreement": 0.8,
+    "kappa": 0.5902,
+    "qwen_positive": 0.5762,
+    "llama_positive": 0.5786
+  },
+  "atomic": {
+    "n": 390,
+    "agreement": 0.8897,
+    "kappa": 0.7081,
+    "qwen_positive": 0.7128,
+    "llama_positive": 0.7872
+  },
+  "composite": {
+    "n": 450,
+    "agreement": 0.7222,
+    "kappa": 0.4347,
+    "qwen_positive": 0.4578,
+    "llama_positive": 0.3978
+  }
+}
