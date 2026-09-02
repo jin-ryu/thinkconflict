@@ -1,0 +1,21 @@
+{
+  "validation_version": "proofwriter-natlang-symbolic-v1",
+  "checked_at": "2026-09-01",
+  "status": "PASS",
+  "error_count": 0,
+  "errors": [],
+  "instance_count": 20,
+  "counts": {
+    "conflict": 15,
+    "no_conflict": 5
+  },
+  "paired_source_identical_count": 5,
+  "checks": [
+    "target independently derived by forward chaining",
+    "source theory consistent before terminal",
+    "conflict label equals post-terminal logical consistency",
+    "D1 and D2 each mix facts and rules",
+    "target not derivable from D1 or D2 alone",
+    "paired conflict/control share identical D1 and D2"
+  ]
+}

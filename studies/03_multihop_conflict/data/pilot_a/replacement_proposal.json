@@ -1,0 +1,20 @@
+{
+  "proposal_version": "coverage-replacement-v1",
+  "status": "not_applied_pending_g2_g4_review",
+  "gold": false,
+  "rule": "Within each source file, use the earliest reserve rank that passes source-fact coverage.",
+  "replacements": [
+    {"exclude": "magic-mh-c3-id0068", "replacement": "magic-mh-c3-id0041", "reserve_rank": 1},
+    {"exclude": "magic-mh-c3-id0026", "replacement": "magic-mh-c3-id0033", "reserve_rank": 5},
+    {"exclude": "magic-mh-c4-id0038", "replacement": "magic-mh-c4-id0003", "reserve_rank": 3},
+    {"exclude": "magic-mh-c4-id0012", "replacement": "magic-mh-c4-id0041", "reserve_rank": 9},
+    {"exclude": "magic-mh-c4-id0037", "replacement": "magic-mh-c4-id0004", "reserve_rank": 10},
+    {"exclude": "magic-mh-c4-id0008", "replacement": "magic-mh-c4-id0042", "reserve_rank": 12}
+  ],
+  "remaining_gates": [
+    "g2_graph_to_text_fidelity",
+    "g3_proof_step_soundness",
+    "g4_terminal_incompatibility",
+    "independent_annotator_agreement"
+  ]
+}

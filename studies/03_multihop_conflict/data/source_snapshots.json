@@ -1,0 +1,54 @@
+{
+  "snapshot_version": "pilot-a-sources-v2",
+  "checked_at": "2026-09-01",
+  "sources": {
+    "magic": {
+      "url": "https://huggingface.co/datasets/HYU-NLP/MAGIC",
+      "revision": "b96dbb2c7960ed14adc98b2feb4e693f9554df12",
+      "records": 1080,
+      "license": "No explicit license file or dataset-card license field found; verify before redistribution.",
+      "files": {
+        "multi-hop/1-multi-hop_conflict.json": {
+          "records": 300,
+          "sha256": "a2fc5262bec48948f047cbda40daa04cbf6775a2d6355877b3b111d6743197b8"
+        },
+        "multi-hop/2-multi-hop_conflict.json": {
+          "records": 158,
+          "sha256": "528efc13979bc30eec59b6af77ea2a15ed5c9f47252c4ed12c15f39a516a1fc3"
+        },
+        "multi-hop/3-multi-hop_conflict.json": {
+          "records": 80,
+          "sha256": "b7586d4e60517325c49663fd50ba67a87a5834319614b412925f380babb6d2b3"
+        },
+        "multi-hop/4-multi-hop_conflict.json": {
+          "records": 50,
+          "sha256": "29d04344ffbc52741e92e14a80237bca61c0d7d69253c5d3be406ab95700831a"
+        },
+        "single-hop/1-single-hop_conflict.json": {
+          "records": 208,
+          "sha256": "13f2e33af30d0142b2b07129aac9622bcbddcc83a0e3018fb694510fa5abba91"
+        },
+        "single-hop/2-single-hop_conflict.json": {
+          "records": 154,
+          "sha256": "065616dbd4ff7614289782142543273e4ffd3f6b6983c323dbafe7e982e5dd80"
+        },
+        "single-hop/3-single-hop_conflict.json": {
+          "records": 80,
+          "sha256": "f9356c5b2b6c61a8c3a43df04a0ee1b2a7f88964faac445c88f05f214653dd19"
+        },
+        "single-hop/4-single-hop_conflict.json": {
+          "records": 50,
+          "sha256": "70bfa344c5e0d6a4a3a7c4aacb531dbcb2fdd066bd0cf969f4a05da6db48a1e6"
+        }
+      }
+    },
+    "proofwriter": {
+      "url": "https://aristo-data-public.s3.amazonaws.com/proofwriter/proofwriter-dataset-V2020.12.3.zip",
+      "release": "V2020.12.3",
+      "archive_bytes": 214185889,
+      "archive_sha256": "bbc5694901e8306d0bd659aa1ad53ccfd02c201864f4b320ffa3777827d1fc26",
+      "audited_subset": "OWA/NatLang dev+test; OWA/depth-5 dev+test",
+      "license": "UNVERIFIED: official archive contains no license file and README states no license; do not redistribute original rows pending confirmation."
+    }
+  }
+}

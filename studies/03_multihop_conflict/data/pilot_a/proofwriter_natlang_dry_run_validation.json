@@ -1,0 +1,34 @@
+{
+  "validation_version": "proofwriter-natlang-dry-run-v1",
+  "checked_at": "2026-09-01",
+  "status": "PASS",
+  "error_count": 0,
+  "errors": [],
+  "instance_count": 20,
+  "counts": {
+    "conflict": {
+      "2": 5,
+      "3": 5,
+      "4": 5
+    },
+    "no_conflict": {
+      "2": 2,
+      "3": 2,
+      "4": 1
+    }
+  },
+  "gates_passed": {
+    "official_gold_proof_present": true,
+    "terminal_polarity_valid": true,
+    "source_sentence_coverage": true,
+    "paired_control_count": true,
+    "raw_text_is_human_paraphrased_natlang": true
+  },
+  "limitations": [
+    "Facts and rules are mixed across D1/D2, but the synthetic micro-document style remains to be audited.",
+    "ProofWriter NatLang provable targets are positive, so every terminal statement is negative; conflict and controls keep this cue matched.",
+    "The NatLang source is AttNoneg unary-attribute reasoning only; binary relations require external transfer validation.",
+    "Independent forward-chaining validation is recorded in a separate validation artifact.",
+    "Human semantic-equivalence review of NatLang sentences remains pending."
+  ]
+}

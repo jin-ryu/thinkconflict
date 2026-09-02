@@ -1,0 +1,159 @@
+{
+  "manifest_version": "proofwriter-natlang-dry-run-v1",
+  "seed": 20260901,
+  "status": "dry_run_not_for_model_evaluation",
+  "source": "ProofWriter V2020.12.3 / OWA / NatLang dev+test",
+  "redistribution": "No original sentences are included; official archive license is unverified.",
+  "selection": [
+    {
+      "base_instance_id": "pw-nl-d2-01",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-195",
+      "question_id": "Q5",
+      "family": "AttNonegNatLang",
+      "qdep": 2,
+      "paired_control": true,
+      "source_record_sha256": "4c4479dc85b4de0c0bed8a1cf1b874aa641068dab54a8ec82294229e4ea39153"
+    },
+    {
+      "base_instance_id": "pw-nl-d2-02",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-214",
+      "question_id": "Q5",
+      "family": "AttNonegNatLang",
+      "qdep": 2,
+      "paired_control": true,
+      "source_record_sha256": "327d266c928da7ac9d3e789eb0c204f8cf594e065ef208ce2b2e1487acece90f"
+    },
+    {
+      "base_instance_id": "pw-nl-d2-03",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-45",
+      "question_id": "Q5",
+      "family": "AttNonegNatLang",
+      "qdep": 2,
+      "paired_control": false,
+      "source_record_sha256": "27e5434080673503cf8ae4441b38c0895b9cbdf2e16fee63636adb8bb5e442fa"
+    },
+    {
+      "base_instance_id": "pw-nl-d2-04",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-394",
+      "question_id": "Q5",
+      "family": "AttNonegNatLang",
+      "qdep": 2,
+      "paired_control": false,
+      "source_record_sha256": "d8fe54346f29111da9062159ed06d82bba5d1a03dfbe4f9053891c8f2d181dbf"
+    },
+    {
+      "base_instance_id": "pw-nl-d2-05",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-56",
+      "question_id": "Q5",
+      "family": "AttNonegNatLang",
+      "qdep": 2,
+      "paired_control": false,
+      "source_record_sha256": "21795cd5abd0b812a4a9a542f7ccccec107cb4d24837cc579effb68d5220c142"
+    },
+    {
+      "base_instance_id": "pw-nl-d3-06",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-61",
+      "question_id": "Q7",
+      "family": "AttNonegNatLang",
+      "qdep": 3,
+      "paired_control": true,
+      "source_record_sha256": "034b145226dc89bb6448e303ef844d1203522dc4fdd9aa6ac72a6b93086aa115"
+    },
+    {
+      "base_instance_id": "pw-nl-d3-07",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-464",
+      "question_id": "Q7",
+      "family": "AttNonegNatLang",
+      "qdep": 3,
+      "paired_control": true,
+      "source_record_sha256": "a9d48ac5b74ca34f2c79399ccf4e5b4a2ae2ee8672886080574ad4e10dd37635"
+    },
+    {
+      "base_instance_id": "pw-nl-d3-08",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-14",
+      "question_id": "Q7",
+      "family": "AttNonegNatLang",
+      "qdep": 3,
+      "paired_control": false,
+      "source_record_sha256": "03c8c5fc11510d9d506fade69cb9c67dc95e13daa6904fbf591e8e6e81209c8e"
+    },
+    {
+      "base_instance_id": "pw-nl-d3-09",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-372",
+      "question_id": "Q7",
+      "family": "AttNonegNatLang",
+      "qdep": 3,
+      "paired_control": false,
+      "source_record_sha256": "1470324a4ea01ee3fab108adaf25e3a6c9c9a3687ecd8cfcbb48dc73e12faa6d"
+    },
+    {
+      "base_instance_id": "pw-nl-d3-10",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-212",
+      "question_id": "Q7",
+      "family": "AttNonegNatLang",
+      "qdep": 3,
+      "paired_control": false,
+      "source_record_sha256": "80a1a136444f625130039e6c7f31b3fe460dc9c38ee18a39e9c1942fe1a09458"
+    },
+    {
+      "base_instance_id": "pw-nl-d4-11",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-88",
+      "question_id": "Q9",
+      "family": "AttNonegNatLang",
+      "qdep": 4,
+      "paired_control": true,
+      "source_record_sha256": "94364fa24fe55160638520ccd8c2df4605703eaec15aeb7c82baf4f8256f24f0"
+    },
+    {
+      "base_instance_id": "pw-nl-d4-12",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-294",
+      "question_id": "Q9",
+      "family": "AttNonegNatLang",
+      "qdep": 4,
+      "paired_control": false,
+      "source_record_sha256": "46835ecf3218b8df4074be7c68b4993ed09357903b988c65b968321847b2196d"
+    },
+    {
+      "base_instance_id": "pw-nl-d4-13",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-185",
+      "question_id": "Q9",
+      "family": "AttNonegNatLang",
+      "qdep": 4,
+      "paired_control": false,
+      "source_record_sha256": "bc6935075a2de179b42fe826654eee44015565da5f6eb9db0bab106dc5e0af6e"
+    },
+    {
+      "base_instance_id": "pw-nl-d4-14",
+      "split": "test",
+      "theory_id": "AttNonegNatLang-OWA-112",
+      "question_id": "Q9",
+      "family": "AttNonegNatLang",
+      "qdep": 4,
+      "paired_control": false,
+      "source_record_sha256": "7a16119bab42f69825a5ba05c34965a5bdd3d672942b10211de70d12d65c4a92"
+    },
+    {
+      "base_instance_id": "pw-nl-d4-15",
+      "split": "dev",
+      "theory_id": "AttNonegNatLang-OWA-126",
+      "question_id": "Q9",
+      "family": "AttNonegNatLang",
+      "qdep": 4,
+      "paired_control": false,
+      "source_record_sha256": "633c5dc2fd144e0f5cbd33e57e2bda0649040f8613b949ac1e06ba4ee86735f9"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "validator_version": "pilot-a-structure-v1",
+  "manifest_status": "provisional_pre_audit",
+  "passed": true,
+  "failures": [],
+  "counts": {
+    "primary": 76,
+    "reserve": 38,
+    "control_templates": 24,
+    "annotations": 114,
+    "review_a": 114,
+    "review_b": 114
+  },
+  "primary_length_quartiles": {
+    "1": 20,
+    "2": 22,
+    "3": 18,
+    "4": 16
+  },
+  "primary_relation_types": 36,
+  "lexical_warning_ids": [
+    "magic-mh-c3-id0056",
+    "magic-mh-c3-id0068",
+    "magic-mh-c3-id0026",
+    "magic-mh-c4-id0014",
+    "magic-mh-c4-id0030",
+    "magic-mh-c4-id0023",
+    "magic-mh-c4-id0033",
+    "magic-mh-c4-id0038",
+    "magic-mh-c4-id0012",
+    "magic-mh-c4-id0037",
+    "magic-mh-c4-id0008"
+  ],
+  "semantic_gates_not_covered": [
+    "source_fact_coverage_human_confirmation",
+    "proof_step_soundness",
+    "terminal_incompatibility",
+    "no_conflict_semantic_validation"
+  ]
+}

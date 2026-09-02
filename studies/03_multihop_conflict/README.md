@@ -3,7 +3,13 @@
 실제 RAG 문서에서 질문 관련 claim, 개체, 시간, 조건과 예외를 복원하는 **semantic compilation**의 불확실성이 고차 충돌 추론에 어떻게 전파되는지 분석하고, 여러 가능한 의미 구조를 공동 추론하는 source-grounded conflict reasoning 방법을 연구한다.
 
 작성일: 2026-08-31  
-상태: ACL main 연구 방향 재구성 / 파일럿 착수 전
+상태: ACL main 연구 방향 재구성 / ProofWriter NatLang dry run 구조 검증 PASSㆍ의미 검수 전
+
+문서가 많아졌으므로 먼저 [문서 안내](docs/README.md)를 본다. 현재 판단에 필요한 핵심은 [Pilot A 계획서](docs/pilot_a_plan.md)와 [데이터셋 선택 요약](docs/dataset_decision.md) 두 개다.
+
+Pilot A의 ProofWriter 도입 가능성은 [feasibility audit](docs/proofwriter_feasibility.md), 20개 변환 결과는 [NatLang dry-run report](data/pilot_a/proofwriter_natlang_dry_run_report.md), 재현 절차와 공개 제한은 [data README](data/README.md)에 기록한다. 기존 MAGIC 구성 결과는 감사 이력으로만 보존한다.
+
+데이터 품질 감사에서 MAGIC의 relation path와 본 연구의 엄격한 proof certificate 사이의 불일치가 발견됐다. 이에 Pilot A의 controlled diagnostic core는 ProofWriter의 검증된 multi-hop proof를 문서 간 충돌로 변환하는 방식으로 바꾸고, MAGIC은 외부 전이ㆍ선행연구 비교용으로만 사용한다. ProofWriter는 원래 충돌 데이터셋이 아니라는 점과 구체적인 변환ㆍ검증 규칙은 [Pilot A 계획서](docs/pilot_a_plan.md)를 따른다. 기존 감사의 상세 내용은 [MAGIC data quality audit findings](docs/data_quality_audit_findings.md)에 보존한다.
 
 ## 1. 최종 연구 방향
 
@@ -142,9 +148,9 @@ c4: Mina has no exemption.
 | 구성 | 목표 수량 | 목적 |
 |---|---:|---|
 | controlled source-grounded instances | 1,200 | factor별 인과적 비교 |
-| natural/curated web instances | 300 | 외적 타당성 |
+| 신규 natural multi-hop conflict | TBD | 수집·주석 타당성 확인 후 외적 타당성 평가 |
 | hard no-conflict controls | 500 | 과잉 탐지 측정 |
-| 합계 | 2,000 | ACL 본실험 |
+| 합계 | 1,700 + TBD | ACL 본실험 |
 
 최종 수량은 파일럿의 주석 합의도와 효과 크기에 따라 조정한다.
 
@@ -187,11 +193,12 @@ q3: 정책 담당자의 이름은?                  → 문서에 충돌이 있�
 
 ### 6.5 데이터 원천
 
-- MAGIC/Wikidata 관계를 사용한 통제 사례
-- Wikipedia 편집 및 contradiction 사례
-- ConfRAG형 실제 웹 다중 출처
-- 정책ㆍ서비스 약관ㆍ소프트웨어 변경 기록
-- 시간과 조건이 명시된 공공 문서
+- ProofWriter의 검증된 proof를 multi-document conflict로 변환한 통제 사례
+- 엄격한 proof audit를 통과한 MAGIC 사례는 외부 전이ㆍ선행연구 비교에만 사용
+- WikiContradict는 자연 충돌 calibration 후보일 뿐 multi-hop conflict 데이터로 세지 않음
+- ConfRAG는 자연 상충 답변 calibration 후보일 뿐 multi-hop proof를 보장하지 않음
+- 신규 자연 사례는 최소 두 문서, 2개 이상 추론 step, single-document insufficiency와 전체 source-grounded proof를 독립 주석
+- 자연 multi-hop 후보 원천은 별도 수집 타당성 파일럿에서 결정
 
 실제 웹 사례는 자동 생성 결과를 그대로 사용하지 않고 독립 주석자가 source span과 proof를 확인한다.
 
@@ -395,7 +402,7 @@ H1이 맞다면 claim/alignment gap이 search gap보다 커야 한다. 이 결�
 - 기존 Foundations MUS 기준선보다 raw-document 조건에서 명확한 개선
 - gold-claim oracle에서는 기존 MUS가 강하지만 raw-document에서 붕괴한다는 진단 결과
 - query twin에서 query-agnostic 방법의 체계적 실패
-- natural web subset에서도 controlled 결과의 방향 재현
+- 별도 구축·검증한 natural multi-hop conflict subset에서도 controlled 결과의 방향 재현
 - proof validity와 calibration 개선이 단순 추가 토큰으로 설명되지 않음
 - 최소 두 모델 계열 또는 encoder/LLM 조합에서 방법 효과 재현
 - 높은 사람 주석 합의와 source-grounded proof 공개
@@ -486,6 +493,7 @@ H1이 맞다면 claim/alignment gap이 search gap보다 커야 한다. 이 결�
 ## 19. 관련 문서
 
 - [Pilot A 사전 계획](docs/pilot_a_plan.md)
+- [기존 연구로 검증된 사실과 남은 공백](docs/prior_validated_findings.md)
 - [멀티홉 충돌 연구 지형](../../literature/analysis/09_multihop_conflict_landscape.md)
 - [문헌 분석 종합](../../literature/analysis/README.md)
 - [MAGIC 한국어 LaTeX](<../../literature/papers/MAGIC; A Multi-Hop and Graph-Based Benchmark for Inter-Context Conflicts in Retrieval-Augmented Generation/main_ko.tex>)

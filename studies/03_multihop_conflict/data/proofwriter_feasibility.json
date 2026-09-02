@@ -1,0 +1,552 @@
+{
+  "audit_version": "proofwriter-feasibility-v1",
+  "checked_at": "2026-09-01",
+  "source": {
+    "url": "https://aristo-data-public.s3.amazonaws.com/proofwriter/proofwriter-dataset-V2020.12.3.zip",
+    "release": "V2020.12.3",
+    "archive_sha256": "bbc5694901e8306d0bd659aa1ad53ccfd02c201864f4b320ffa3777827d1fc26",
+    "archive_bytes": 214185889,
+    "audited_world": "OWA",
+    "audited_dataset": "depth-5",
+    "audited_splits": [
+      "dev",
+      "test"
+    ],
+    "license_status": "UNVERIFIED: official archive has no license file and its README does not state a license; do not redistribute original rows pending confirmation.",
+    "has_license_file": false,
+    "readme_mentions_license": false
+  },
+  "schema": {
+    "records_by_split": {
+      "dev": 482,
+      "test": 948
+    },
+    "schema_error_count": 0,
+    "schema_error_examples": [],
+    "available_fields": [
+      "theory",
+      "triples",
+      "rules",
+      "questions",
+      "QDep",
+      "QLen",
+      "strategy",
+      "proofsWithIntermediates",
+      "proofDetails"
+    ]
+  },
+  "questions_by_qdep": {
+    "0": 9365,
+    "1": 6839,
+    "2": 4359,
+    "3": 3548,
+    "4": 3141,
+    "5": 2948,
+    "6": 19,
+    "7": 1
+  },
+  "true_proof_candidates": {
+    "dev": {
+      "1": {
+        "+": 466,
+        "-": 16
+      },
+      "2": {
+        "+": 475,
+        "-": 7
+      },
+      "3": {
+        "+": 476,
+        "-": 6
+      },
+      "4": {
+        "+": 476,
+        "-": 6
+      }
+    },
+    "test": {
+      "1": {
+        "+": 919,
+        "-": 29
+      },
+      "2": {
+        "+": 925,
+        "-": 23
+      },
+      "3": {
+        "+": 930,
+        "-": 18
+      },
+      "4": {
+        "+": 928,
+        "-": 20
+      }
+    }
+  },
+  "linear_depth_candidates": {
+    "dev": {
+      "1": {
+        "+": 466,
+        "-": 16
+      },
+      "2": {
+        "+": 469,
+        "-": 7
+      },
+      "3": {
+        "+": 393,
+        "-": 6
+      },
+      "4": {
+        "+": 327,
+        "-": 6
+      }
+    },
+    "test": {
+      "1": {
+        "+": 919,
+        "-": 29
+      },
+      "2": {
+        "+": 906,
+        "-": 23
+      },
+      "3": {
+        "+": 802,
+        "-": 15
+      },
+      "4": {
+        "+": 629,
+        "-": 12
+      }
+    }
+  },
+  "clean_linear_candidates": {
+    "dev": {
+      "1": {
+        "+": 466,
+        "-": 16
+      },
+      "2": {
+        "+": 469,
+        "-": 7
+      },
+      "3": {
+        "+": 393,
+        "-": 6
+      },
+      "4": {
+        "+": 327,
+        "-": 6
+      }
+    },
+    "test": {
+      "1": {
+        "+": 919,
+        "-": 29
+      },
+      "2": {
+        "+": 906,
+        "-": 23
+      },
+      "3": {
+        "+": 802,
+        "-": 15
+      },
+      "4": {
+        "+": 629,
+        "-": 12
+      }
+    }
+  },
+  "clean_candidates_by_depth_and_family": {
+    "1": {
+      "AttNeg": 373,
+      "AttNoneg": 422,
+      "RelNeg": 311,
+      "RelNoneg": 324
+    },
+    "2": {
+      "AttNeg": 367,
+      "AttNoneg": 415,
+      "RelNeg": 310,
+      "RelNoneg": 313
+    },
+    "3": {
+      "AttNeg": 307,
+      "AttNoneg": 329,
+      "RelNeg": 291,
+      "RelNoneg": 289
+    },
+    "4": {
+      "AttNeg": 230,
+      "AttNoneg": 211,
+      "RelNeg": 277,
+      "RelNoneg": 256
+    }
+  },
+  "minimum_clean_candidates_in_each_audited_split": {
+    "1": 482,
+    "2": 476,
+    "3": 399,
+    "4": 333
+  },
+  "pilot_requirement_per_depth": {
+    "1": 20,
+    "2": 20,
+    "3": 20,
+    "4": 20
+  },
+  "feasibility_pass": true,
+  "candidate_examples": {
+    "depth_1_+": [
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-331",
+        "question_id": "Q3",
+        "question": "Harry is smart.",
+        "qdep": 1,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-740",
+        "question_id": "Q3",
+        "question": "The cat is blue.",
+        "qdep": 1,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-1364",
+        "question_id": "Q3",
+        "question": "Erin is big.",
+        "qdep": 1,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-849",
+        "question_id": "Q3",
+        "question": "Anne is red.",
+        "qdep": 1,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-777",
+        "question_id": "Q3",
+        "question": "The cat needs the mouse.",
+        "qdep": 1,
+        "polarity": "+"
+      }
+    ],
+    "depth_1_-": [
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-1176",
+        "question_id": "Q3",
+        "question": "Erin is not blue.",
+        "qdep": 1,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-668",
+        "question_id": "Q3",
+        "question": "The bald eagle does not visit the lion.",
+        "qdep": 1,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-483",
+        "question_id": "Q3",
+        "question": "The lion is not nice.",
+        "qdep": 1,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-884",
+        "question_id": "Q3",
+        "question": "The rabbit does not chase the tiger.",
+        "qdep": 1,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-908",
+        "question_id": "Q3",
+        "question": "Bob is not big.",
+        "qdep": 1,
+        "polarity": "-"
+      }
+    ],
+    "depth_2_+": [
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-331",
+        "question_id": "Q5",
+        "question": "Charlie is smart.",
+        "qdep": 2,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-740",
+        "question_id": "Q5",
+        "question": "The cat chases the tiger.",
+        "qdep": 2,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-1364",
+        "question_id": "Q5",
+        "question": "Fiona is smart.",
+        "qdep": 2,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-849",
+        "question_id": "Q5",
+        "question": "Bob is nice.",
+        "qdep": 2,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-777",
+        "question_id": "Q5",
+        "question": "The cat is big.",
+        "qdep": 2,
+        "polarity": "+"
+      }
+    ],
+    "depth_2_-": [
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-278",
+        "question_id": "Q5",
+        "question": "The cow does not see the bald eagle.",
+        "qdep": 2,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-668",
+        "question_id": "Q5",
+        "question": "The rabbit does not need the cow.",
+        "qdep": 2,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-1124",
+        "question_id": "Q5",
+        "question": "Erin is not cold.",
+        "qdep": 2,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-115",
+        "question_id": "Q5",
+        "question": "The dog does not like the dog.",
+        "qdep": 2,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-40",
+        "question_id": "Q5",
+        "question": "Harry is not furry.",
+        "qdep": 2,
+        "polarity": "-"
+      }
+    ],
+    "depth_3_+": [
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-331",
+        "question_id": "Q7",
+        "question": "Charlie is blue.",
+        "qdep": 3,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-740",
+        "question_id": "Q7",
+        "question": "The tiger likes the bald eagle.",
+        "qdep": 3,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-777",
+        "question_id": "Q7",
+        "question": "The cat likes the cow.",
+        "qdep": 3,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-829",
+        "question_id": "Q7",
+        "question": "The rabbit is cold.",
+        "qdep": 3,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-270",
+        "question_id": "Q7",
+        "question": "Charlie is red.",
+        "qdep": 3,
+        "polarity": "+"
+      }
+    ],
+    "depth_3_-": [
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-694",
+        "question_id": "Q7",
+        "question": "Anne is not rough.",
+        "qdep": 3,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-717",
+        "question_id": "Q7",
+        "question": "Erin is not green.",
+        "qdep": 3,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-1229",
+        "question_id": "Q7",
+        "question": "Dave is not furry.",
+        "qdep": 3,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-327",
+        "question_id": "Q7",
+        "question": "Bob is not young.",
+        "qdep": 3,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-430",
+        "question_id": "Q7",
+        "question": "The squirrel does not like the lion.",
+        "qdep": 3,
+        "polarity": "-"
+      }
+    ],
+    "depth_4_+": [
+      {
+        "split": "dev",
+        "theory_id": "AttNoneg-OWA-D5-331",
+        "question_id": "Q9",
+        "question": "Charlie is nice.",
+        "qdep": 4,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-740",
+        "question_id": "Q9",
+        "question": "The tiger is blue.",
+        "qdep": 4,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-777",
+        "question_id": "Q9",
+        "question": "The cow sees the bear.",
+        "qdep": 4,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNoneg-OWA-D5-829",
+        "question_id": "Q9",
+        "question": "The rabbit is blue.",
+        "qdep": 4,
+        "polarity": "+"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-694",
+        "question_id": "Q9",
+        "question": "Anne is white.",
+        "qdep": 4,
+        "polarity": "+"
+      }
+    ],
+    "depth_4_-": [
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-270",
+        "question_id": "Q9",
+        "question": "Charlie is not white.",
+        "qdep": 4,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "RelNeg-OWA-D5-224",
+        "question_id": "Q9",
+        "question": "The tiger is not red.",
+        "qdep": 4,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-717",
+        "question_id": "Q9",
+        "question": "Fiona is not green.",
+        "qdep": 4,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-54",
+        "question_id": "Q9",
+        "question": "Erin is not young.",
+        "qdep": 4,
+        "polarity": "-"
+      },
+      {
+        "split": "dev",
+        "theory_id": "AttNeg-OWA-D5-843",
+        "question_id": "Q9",
+        "question": "Charlie is not furry.",
+        "qdep": 4,
+        "polarity": "-"
+      }
+    ]
+  },
+  "selection_policy": {
+    "world": "OWA only",
+    "answer": true,
+    "strategy": "proof",
+    "depths": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "linear_rule_application_filter": "At least one proof has exactly QDep explicit rule applications.",
+    "clean_inverse_filter": "The polarity-inverted target is neither an input fact nor independently provable."
+  }
+}

@@ -39,3 +39,5 @@ studies/*/results/**/generations/
 literature/papers/
 studies/02_composite_conflict/data/raw/
 studies/02_composite_conflict/data/pilot1/*_view.jsonl
+studies/03_multihop_conflict/data/raw/
+studies/03_multihop_conflict/data/pilot_a/generated/
